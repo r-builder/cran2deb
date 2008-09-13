@@ -1,0 +1,33 @@
+A dependency alias (created in populated_depend_aliases) is some name (such as
+java) and some associated run and build time dependencies, specified like this:
+
+    alias_build java openjdk-6-jdk
+    alias_build java libgcj9-dev
+    alias_run java openjdk-6-jre
+
+So when cran2deb needs to use the 'java' build dependency, it will add
+"openjdk-6-jdk, libgcj9-dev" to the Build-Depends:. alias_run deals with
+Depends: only.
+Since in Debian you cannot Build-Depend: upon build-essential, there is a
+special 'ignore' dependency alias (this can be handy for dropping unnecessary
+system requirements)
+
+    alias_build ignore build-essential
+
+populate_forcedep contains like:
+
+    force java rJava
+
+which forces the R package rJava to use the dependency alias 'java'. This is
+for cases where there is no SystemRequirement.
+
+Finally, populate_sysreq has lines like:
+
+   sysreq quantlib quantlib%
+
+This says, whenever a part of a SystemRequirement matches the SQL LIKE pattern
+'quantlib%', use the dependency alias. SystemRequirements are converted to
+lower case and messed around with; details are in R/debcontrol.R in the
+sysreqs_as_debian function. R/debcontrol.R contains pretty much all of the code
+for dependencies (the database interface code is in R/db.R).
+

@@ -1,0 +1,33 @@
+#!/usr/bin/rc
+## DOC: cran2deb copy_find path
+## DOC:     a tool for finding (heuristically) some copyright notices.
+## DOC:
+kwords='copyright|warranty|redistribution|modification|patent|trademark|licen[cs]e|permission'
+nl=`` () {printf '\n'}
+ifs=$nl {
+    files=`{find $1 ! -path '*debian*' -type f}
+    lines=()
+    for (file in $files) {
+        notices=`{grep -H '(C)' $file}
+        notices=($notices `{grep -HEi $kwords $file})
+        lines=($lines `{{for (notice in $notices) echo $notice} | sort -u})
+    }
+    # let's hope no file has a : in it
+    ifs=() { seen_files=`{{for (line in $lines) echo $line} | cut -d: -f1} }
+    missing_copyright=()
+    for (file in $files) {
+        if (echo -n $seen_files | grep -q '^'^$file^'$') {
+        } else {
+            missing_copyright=($missing_copyright $file)
+        }
+    }
+    echo 'Suspect copyright notices:'
+    for (line in $lines) echo '    '$line
+    echo 'Files without *suspect* copyright notices:'
+    for (missing in $missing_copyright) {
+        echo '    '$missing
+        echo '       type: '`{file $missing}
+        echo '      chars: '`{wc -c $missing | awk '{print $1}'}
+        echo '      lines: '`{wc -l $missing | awk '{print $1}'}
+    }
+}

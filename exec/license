@@ -1,0 +1,126 @@
+#!/usr/bin/env r
+## DOC: cran2deb license
+## DOC:     add licenses and change acceptance/rejection of licenses
+## DOC:
+
+suppressPackageStartupMessages(library(cran2deb))
+suppressPackageStartupMessages(library(digest))
+
+exec_cmd <- function(argc, argv) {
+    usage <- function()
+        message(paste('usage: accept <license>'
+                     ,'       reject <license>'
+                     ,'       hash <license> (<path>|<hash>)'
+                     ,'       pkg <license> <pkg>'
+                     ,'       view <pkg>'
+                     ,'       ls'
+                     ,'       quit'
+                     ,sep='\n'))
+
+    if (argc < 1) {
+        exit()
+    }
+    cmd = argv[1]
+
+    if (cmd == 'accept' || cmd == 'reject') {
+        if (argc != 2) {
+            usage()
+            return()
+        }
+        action = (cmd == 'accept')
+        db_add_license_override(argv[2],action)
+    } else if (cmd == 'hash') {
+        if (argc != 3) {
+            usage()
+            return()
+        }
+        license = argv[2]
+        path = argv[3]
+        if (is.null(db_license_override_name(license))) {
+            error('license',license,'is not known; add it first')
+            return()
+        }
+        if (file.exists(path)) {
+            license_sha1 = digest(readChar(path,file.info(path)$size)
+                                 ,algo='sha1', serialize=FALSE)
+        } else if (length(grep('^[0-9a-f]{40}$',path))) {
+            license_sha1 = path
+        } else {
+            error(path,'does not exist and does not look like an SHA1 hash')
+            return()
+        }
+        db_add_license_hash(license,license_sha1)
+    } else if (cmd == 'pkg') {
+        if (argc != 3) {
+            usage()
+            return()
+        }
+        license <- argv[2]
+        pkg_name <- argv[3]
+        current_action <- db_license_override_name(license)
+        if (is.null(current_action)) {
+            notice('license',license,'is not known; add it')
+            return()
+        }
+        action = 'accept'
+        if (!current_action) {
+            action = 'reject'
+        }
+        notice('in future, will',action,'the package',pkg_name,'under license',license)
+        tmp <- setup()
+        success <- try((function() {
+            pkg <- prepare_pkg(tmp,pkg_name)
+            if (!('License' %in% names(pkg$description[1,]))) {
+                error('package',pkg$name,'has no License: field in DESCRIPTION')
+                return()
+            }
+            first_license = (strsplit(chomp(pkg$description[1,'License'])
+                                     ,'[[:space:]]*\\|[[:space:]]*')[[1]])[1]
+            license_sha1 <- get_license_hash(pkg,first_license)
+            db_add_license_hash(license,license_sha1)
+        })())
+        cleanup(tmp)
+        if (inherits(success,'try-error')) {
+            return()
+        }
+    } else if (cmd == 'view') {
+        if (argc != 2) {
+            usage()
+            return()
+        }
+        pkg_name <- argv[2]
+        tmp <- setup()
+        success <- try((function() {
+            pkg <- prepare_pkg(tmp,pkg_name)
+            if (!('License' %in% names(pkg$description[1,]))) {
+                error('package',pkg$name,'has no License: field in DESCRIPTION')
+                return()
+            }
+            first_license = (strsplit(chomp(pkg$description[1,'License'])
+                                     ,'[[:space:]]*\\|[[:space:]]*')[[1]])[1]
+            first_license = get_license(pkg,first_license)
+            cat(strwrap(first_license),file='|less')
+        })())
+        cleanup(tmp)
+        if (inherits(success,'try-error')) {
+            return()
+        }
+    } else if (cmd == 'ls') {
+        for (x in db_license_overrides()) print(x)
+    } else if (cmd == 'help') {
+        usage()
+        return()
+    } else if (cmd == 'quit') {
+        exit()
+    }
+}
+
+argc <- length(argv)
+if (argc > 1) {
+    exec_cmd(argc-1,argv[c(2:argc)])
+} else {
+    while(T) {
+        argv <- strsplit(readline('license> '),'[[:space:]]+')[[1]]
+        exec_cmd(length(argv),argv)
+    }
+}

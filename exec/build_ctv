@@ -1,0 +1,14 @@
+#!/bin/sh
+## DOC: cran2deb build_ctv
+## DOC:     build all CRAN TaskViews. warning and error logs in ./ctv/
+## DOC:
+
+for ctv in $(cran2deb cran_pkgs query); do
+    echo task view $ctv...
+    if [ ! -e "ctv/$ctv" ]; then
+        cran2deb build_some "$ctv"
+        mkdir -p "ctv/$ctv"
+        mv warn fail "ctv/$ctv"
+    fi
+done
+

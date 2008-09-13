@@ -1,0 +1,33 @@
+#!/usr/bin/env Rscript
+library(cran2deb)
+library(ctv)
+
+argv <- commandArgs()
+argv <- argv[-(1:match("--args", argv))]
+
+#mirror <- 'http://cran.uk.r-project.org/'
+mirror <- 'http://cran.r-project.org/'
+
+message('updating list of available R packages...')
+available <- available.packages(contrib.url(mirror))
+
+#available <- rbind(available,available.packages(contrib.url('http://www.bioconductor.org/')))
+#dupes <- duplicated(rownames(available), fromLast=T)
+#available <- available[!dupes,]
+
+message('updating list of available R task views...')
+ctv.available <- available.views(repo=mirror)
+
+message('updating list of base R packages...')
+base_pkgs <- readLines(pipe(paste('sudo pbuilder --execute --override-config --configfile'
+                                 ,shQuote(pbuilder_config),'-- /usr/bin/R --vanilla 2>&1 >/dev/null <'
+                                 ,shQuote(file.path(root,'exec/get_base_pkgs'))
+                                 ,'| grep -v ^W:')))
+
+message('updating list of existing Debian packages...')
+debian_pkgs <- readLines(pipe('apt-cache rdepends r-base-core | sed -e "/^  r-cran/{s/^[[:space:]]*r/r/;p}" -e d | sort -u'))
+
+save(debian_pkgs, base_pkgs, available, ctv.available, file=file.path(cache_root,'cache.rda'),eval.promises=T)
+
+message('synchronising database...')
+db_update_package_versions()

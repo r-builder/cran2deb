@@ -1,0 +1,4 @@
+#!/usr/bin/env r
+for (pkg in rownames(installed.packages())) {
+	message(pkg)
+}

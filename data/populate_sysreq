@@ -1,0 +1,37 @@
+sysreq ignore gcc 
+sysreq ignore gnu make 
+sysreq ignore % if present 
+sysreq ignore none 
+sysreq libcurl curl 
+sysreq ggobi ggobi 
+sysreq libatk atk 
+sysreq libcairo cairo 
+sysreq libdieharder dieharder% 
+sysreq libfontconfig fontconfig 
+sysreq libfreetype freetype 
+sysreq libfreetype %freetype 
+sysreq libgd libgd 
+sysreq libgdal %gdal% 
+sysreq opengl opengl 
+sysreq glade %glade 
+sysreq glib glib 
+sysreq glu glu library 
+sysreq gmp gmp 
+sysreq libgraphviz graphviz 
+sysreq gsl gnu gsl% 
+sysreq gsl gnu scientific library 
+sysreq libgtk gtk% 
+sysreq libjpeg libjpeg% 
+sysreq libmagick imagemagick 
+sysreq libpango pango 
+sysreq libpng libpng 
+sysreq quantlib quantlib% 
+sysreq libxml libxml% 
+sysreq msttcorefonts msttcorefonts 
+sysreq pari-gp pari/gp 
+sysreq proj proj% 
+sysreq zlib zlib 
+sysreq java java 
+sysreq odbc %odbc% 
+sysreq ignore drivers. see readme. 
+sysreq ignore r must be compiled with --enable-r-shlib if the server is to be built 

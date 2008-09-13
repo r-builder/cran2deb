@@ -1,0 +1,95 @@
+#!/usr/bin/env r
+## DOC: cran2deb depend
+## DOC:     add dependency aliases, system requirements and forced dependencies
+## DOC:
+
+suppressPackageStartupMessages(library(cran2deb))
+suppressPackageStartupMessages(library(digest))
+
+exec_cmd <- function(argc, argv) {
+    usage <- function()
+        message(paste('usage: alias <alias> <debian_pkg>'
+                     ,'       alias_run <alias> <debian_pkg>'
+                     ,'       alias_build <alias> <debian_pkg>'
+                     ,'       sysreq <alias> <sysreq sql pattern>'
+                     ,'       force <alias> <r_pkg>'
+                     ,'       ls [aliases|force|sysreq]'
+                     ,'       quit'
+                     ,sep='\n'))
+
+    if (argc < 1) {
+        return()
+    }
+    cmd = argv[1]
+
+    if (cmd == 'alias') {
+        if (argc < 3) {
+            usage()
+            return()
+        }
+        alias = argv[2]
+        pkg = argv[3]
+        db_add_depends(alias, pkg, build=T)
+        pkg = gsub('-dev$','',pkg)
+        db_add_depends(alias, pkg, build=F)
+    } else if (cmd == 'alias_run' || cmd == 'alias_build') {
+        if (argc < 3) {
+            usage()
+            return()
+        }
+        db_add_depends(argv[2], argv[3], cmd == 'alias_build')
+    } else if (cmd == 'sysreq') {
+        if (argc < 3) {
+            usage()
+            return()
+        }
+        sysreq = paste(argv[3:argc],collapse=' ')
+        db_add_sysreq_override(sysreq,argv[2])
+    } else if (cmd == 'force') {
+        if (argc < 3) {
+            usage()
+            return()
+        }
+        db_add_forced_depends(argv[3],argv[2])
+    } else if (cmd == 'ls') {
+        if (argc < 2 || argv[2] == 'aliases') {
+            aliases <- db_depends()
+            for (i in rownames(aliases)) {
+                type = 'alias_run'
+                if (as.logical(aliases[i,'build'])) {
+                    type = 'alias_build'
+                }
+                cat(paste(type,aliases[i,'alias'],aliases[i,'debian_pkg'],'\n'))
+            }
+        } else if (argv[2] == 'sysreq') {
+            sysreqs <- db_sysreq_overrides()
+            for (i in rownames(sysreqs)) {
+                cat(paste('sysreq',sysreqs[i,'depend_alias'],sysreqs[i,'r_pattern'],'\n'))
+            }
+        } else if (argv[2] == 'force') {
+            forced <- db_forced_depends()
+            for (i in rownames(forced)) {
+                cat(paste('force',forced[i,'depend_alias'],forced[i,'r_name'],'\n'))
+            }
+        } else {
+            usage()
+            return()
+        }
+    } else if (cmd == 'quit') {
+        exit()
+    } else if (cmd == '#') {
+    } else {
+        usage()
+        return()
+    }
+}
+
+argc <- length(argv)
+if (argc > 1) {
+    exec_cmd(argc-1,argv[c(2:argc)])
+} else {
+    while(T) {
+        argv <- strsplit(readline('depend> '),'[[:space:]]+')[[1]]
+        exec_cmd(length(argv),argv)
+    }
+}

@@ -1,0 +1,6 @@
+#!/bin/bash
+# example file to be used with --hookdir
+#
+# run lintian on generated deb files
+apt-get install -y --force-yes lintian
+lintian /tmp/buildd/*.deb

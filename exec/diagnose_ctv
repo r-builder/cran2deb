@@ -1,0 +1,2 @@
+#!/bin/sh
+(for x in ctv/*; do echo;echo;echo "$x: "; cd "$x" && cran2deb diagnose && cd ../..; done) >ctv.results

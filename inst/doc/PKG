@@ -1,0 +1,23 @@
+One of the key data structures using by cran2deb is commonly called 'pkg'.
+It is constructed in R/getrpkg.R by prepare_pkg. prepare_pkg obtains
+an R package and converts the source package into something suitable for use
+with Debian.
+
+If a particular upstream version has already been used to create a Debian
+package, then the source tarball of that upstream version is expected to be
+available locally, and is used for building. In this case no conversion is
+performed, so the archive does not change. In future it may be desirable to
+obtain the source tarball from some central archive but this is not done at the
+moment.
+
+download_pkg in R/getrpkg.R obtains the tarball (archive) of the R package, either
+from the previous Debian build, or from the R archive. The field pkg$need_repack
+indicates if the obtained archive must be repacked into a form acceptable
+as a Debian source archive. This repacking, if necessary, is performed by
+repack_pkg in R/getrpkg.R
+
+
+Most of the creation of pkg is done by R/getrpkg.R. However some more build
+specific operations (such as determining the new build version pkg$debversion)
+are performed by R/debianpkg.R.
+

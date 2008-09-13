@@ -1,0 +1,28 @@
+#!/usr/bin/env r
+## DOC: cran2deb cran_pkgs
+## DOC:     print a list of 800 packages picked at random
+## DOC: cran2deb cran_pkgs query
+## DOC:     print the names of all CRAN TaskViews
+## DOC: cran2deb cran_pkgs taskview1 taskview2 ...
+## DOC:     print the names of all packages in a particular CRAN TaskView
+## DOC:
+
+library(cran2deb)
+
+if (length(argv) == 1) {
+    writeLines(sample(dimnames(available)[[1]],800))
+} else {
+    argv = argv[2:length(argv)]
+    if (argv[1] == 'query') {
+        for (ctv in ctv.available) {
+            writeLines(ctv$name)
+        }
+        q(save='no')
+    }
+    # list of task lists
+    for (ctv in ctv.available) {
+        if (ctv$name %in% argv) {
+            writeLines(ctv$packagelist$name)
+        }
+    }
+}

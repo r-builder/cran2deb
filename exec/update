@@ -1,0 +1,29 @@
+#!/usr/bin/rc
+## DOC: cran2deb update
+## DOC:     update the cran2deb cache and database
+## DOC: cran2deb update full
+## DOC:     force a full update of the cran2deb cache and database
+## DOC:
+
+umask 002
+root=$1
+shift
+mkdir -p /var/cache/cran2deb/results || exit 1
+mini-dinstall --batch -c /etc/cran2deb/mini-dinstall.conf || exit 1
+update_period=10800
+if (~ $1 full || ![ -e /var/cache/cran2deb/cache.rda ] ) {
+    delta=`{awk 'END{print '^$update_period^'+1}' </dev/null}
+    echo Forcing cache update
+} else {
+    delta=`{awk 'END{print '^`{date +%s}^-^`{stat -c '%Y' /var/cache/cran2deb/cache.rda}^'}' </dev/null}
+    echo Cache is $delta seconds out of date.
+}
+if (![ -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]) {
+    mode=create
+    if ([ -e /var/cache/pbuilder/base-cran2deb.tgz ]) {
+        mode=update
+    }
+    sudo pbuilder $mode --override-config --configfile /etc/cran2deb/pbuilderrc
+    $root/exec/update_cache $root
+}
+

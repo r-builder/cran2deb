@@ -1,0 +1,10 @@
+#!/bin/sh
+umask 002
+root=$(r -e 'suppressMessages(library(cran2deb));cat(system.file(package="cran2deb"),file=stdout())')
+cmd=$1
+shift
+if [ ! -x "$root/exec/$cmd" ]; then
+    echo unknown command $cmd
+    exit 1
+fi
+"$root/exec/$cmd" "$root" $*

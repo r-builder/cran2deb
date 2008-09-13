@@ -1,0 +1,81 @@
+this file documents some of R/db.R -- the DB interface code.
+
+
+table: sysreq_override
+fields: depend_alias TEXT, r_pattern TEXT
+
+SystemRequirements LIKE r_pattern are mapped onto the dependency alias
+depend_alias (this is a foreign key in debian_dependency).
+
+table: debian_dependency
+fields: id INTEGER PRIMARY KEY AUTOINCREMENT,
+        alias TEXT,
+        build INTEGER NOT NULL,
+        debian_pkg TEXT NOT NULL,
+        UNIQUE (alias,build,debian_pkg)
+
+sets up a dependency alias. each row is a Debian dependency entry, debian_pkg, which
+may be added to Depends: (and Build-Depends: if build = 1).
+
+table: forced_depends
+fields: r_name TEXT.
+        depend_alias TEXT,
+        PRIMARY KEY (r_name,depend_alias)'
+
+forces the R package r_name to have the dependencies implied by depend_alias (a foriegn
+key in debian_dependency).
+
+table: license_override
+fields: name TEXT PRIMARY KEY,
+        accept INT NOT NULL
+
+specifies whether the license, name, is accepted or rejected.
+
+table: license_hashes
+fields: name TEXT
+        sha1 TEXT PRIMARY KEY
+
+matches an SHA1 hash of the LICEN[CS]E file or part of the License: field to
+a particular license name (a foreign key in license_override).
+
+table: database_versions
+fields: version INTEGER PRIMARY KEY AUTOINCREMENT,
+        version_date INTEGER,
+        base_epoch INTEGER
+
+a version of the database. each time one of the above tables (but not the below
+tables) is updated, a new record is added to this table, indicating significant
+changes to the database. version_date indicates when this change occurred
+(seconds since UNIX epoch) and base_epoch is the Debian version epoch.
+
+in future, all of the above fields should be versioned and somehow linked to
+the packages that used them, so we only rebuild what is necessary.
+
+table: packages
+fields: package TEXT PRIMARY KEY,
+        latest_r_version TEXT
+
+a package, and its latest R version. this is a copy of the 'available'
+structure in the cran2deb R cache, and it is here as it allows queries on the
+'builds' table to be much simpler (and perhaps faster).
+
+table: builds
+fields: id INTEGER PRIMARY KEY AUTOINCREMENT,
+        package TEXT,
+        r_version TEXT,
+        deb_epoch INTEGER,
+        deb_revision INTEGER,
+        db_version INTEGER,
+        date_stamp TEXT,
+        git_revision TEXT,
+        success INTEGER,
+        log TEXT,
+        UNIQUE(package,r_version,deb_epoch,deb_revision,db_version)
+
+Each time a 'package' is built, its 'success' is logged, along with the
+particular database, cran2deb, R and Debian version information (db_version,
+git_revision, r_version, deb_epoch, deb_revision) and the current date
+(date_stamp). 'log' contains the output of the build process.
+
+A new 'deb_revision' is assigned to each successful build.
+

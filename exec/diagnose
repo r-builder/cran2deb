@@ -1,0 +1,72 @@
+#!/usr/bin/rc
+
+success=`{ls /var/cache/cran2deb/results/*.deb | wc -l}
+echo $success successful packages
+total=$success
+
+fn count_dup { sort | uniq -c | sort -n}# | awk '$1 > 1{print}' }
+fn collapse { a=`{echo $^* | sed -e 's/ | /|/g'}; echo $^a }
+echo 'warnings:'
+{for (x in (warn/* /dev/null)) cut -d: -f3- <$x | sort -u} | awk '{print $1}' | count_dup
+echo
+
+faildep=('^Error: package ''.*'' could not be loaded'
+     '|' '^ERROR: lazy loading failed for package ''.*'''
+     '|' '^[[:space:]]*package .* is not available'
+     '|' 'there is no package called ''.*''')
+faildeb='do not know what to do with SystemRequirement:'
+faillic=('No acceptable license: ')
+failspc=': No space left on device'
+failhdr='error: .*\.hp?p?: No such file or directory'
+faildep=`{collapse $faildep}
+faildep=$^faildep
+faillic=`{collapse $faillic}
+faillic=$^faillic
+other=''
+
+nfaildep=`{grep -El $faildep fail/* /dev/null | wc -l}
+echo $nfaildep failed R dependencies.
+grep -Eh $faildep fail/* | count_dup
+other=$faildep
+#total=$total+$nfaildep
+echo
+
+nfaillic=`{grep -El $faillic `{grep -EL $other fail/*} /dev/null | wc -l}
+echo $nfaillic failed licenses.
+grep -Eh $faillic `{grep -EL $other fail/*} | count_dup
+other=$other^'|'^$faillic
+total=$total+$nfaillic
+echo
+
+nfailspc=`{grep -El $failspc `{grep -EL $other fail/*} /dev/null | wc -l}
+echo $nfailspc out of space
+other=$other^'|'^$failspc
+total=$total+$nfailspc
+echo
+
+nfailhdr=`{grep -El $failhdr `{grep -EL $other fail/*} /dev/null | wc -l}
+echo $nfailhdr missing C header
+grep -Eh $failhdr `{grep -EL $other fail/* /dev/null} | count_dup
+other=$other^'|'^$failhdr
+total=$total+$nfailhdr
+echo
+
+nfaildeb=`{grep -El $faildeb `{grep -EL $other fail/*} /dev/null | wc -l}
+echo $nfaildeb system requirement failures.
+grep -Eh $faildeb `{grep -EL $other fail/* /dev/null} | count_dup
+other=$other^'|'^$faildeb
+total=$total+$nfaildeb
+echo
+
+nfailother=`{hoc -e `{grep -EL $other fail/* /dev/null | wc -l}^-1}
+echo $nfailother other failures.
+
+total=`{hoc -e $total}
+succrate=`{hoc -e $success/'('$total')*100'}
+echo $succrate% success rate '('$total' total)'
+#total=`{hoc -e $total-$nfaillic-$nfailspc-$nfailhdr}
+total=`{hoc -e $total-$nfaillic-$nfailspc}
+succrate=`{hoc -e $success/'('$total')*100'}
+echo $succrate% success rate with exclusions '('$total' total)'
+grep -EL $other fail/* /dev/null | xargs tail -n 20
+

@@ -1,0 +1,8 @@
+[local]
+method = local
+incoming = /etc/cran2deb/archive/mini-dinstall/incoming
+allow_non-us_software = 1
+run_dinstall = 0
+run_lintian = 1
+post_upload_command = /usr/bin/mini-dinstall --batch -c /etc/cran2deb/mini-dinstall.conf
+allow_unsigned_uploads = 1
