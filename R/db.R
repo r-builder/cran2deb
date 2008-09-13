@@ -59,7 +59,7 @@ db_start <- function() {
                   ,',deb_revision INTEGER NOT NULL'
                   ,',db_version INTEGER NOT NULL'
                   ,',date_stamp TEXT NOT NULL'
-                  ,',git_revision TEXT NOT NULL'
+                  ,',git_revision TEXT NOT NULL'  # legacy: really scm_revision
                   ,',success INTEGER NOT NULL'
                   ,',log TEXT'
                   ,',UNIQUE(package,r_version,deb_epoch,deb_revision,db_version)'
@@ -295,7 +295,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
                         ,',',db_cur_version(con)
                         ,',',as.integer(success)
                         ,',',db_quote(format(Sys.time(),'%a, %d %b %Y %H:%M:%S %z'))
-                        ,',',db_quote(git_revision)
+                        ,',',db_quote(scm_revision)
                         ,',',db_quote(paste(log, collapse='\n'))
                         ,')'))
     db_stop(con)

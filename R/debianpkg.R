@@ -6,7 +6,7 @@ append_build_from_pkg <- function(pkg, builds) {
                            ,deb_revision = version_revision(pkg$debversion)
                            ,db_version = db_get_version()
                            ,date_stamp = pkg$date_stamp
-                           ,git_revision = git_revision
+                           ,git_revision = scm_revision
                            ,success = 1 # never used
                            ,log = ''    # never used
                            )
