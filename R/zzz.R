@@ -10,6 +10,7 @@
     global("dinstall_archive", '/etc/cran2deb/archive')
     global("r_depend_fields", c('Depends','Imports')) # Suggests, Enhances
     global("scm_revision", 'svn:$Id$')
+    global("patch_dir", '/etc/cran2deb/patches')
     global("changesfile", function(srcname,version='*') {
         return(file.path(pbuilder_results
                         ,paste(srcname,'_',version,'_'

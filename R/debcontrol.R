@@ -44,7 +44,7 @@ get_dependencies <- function(pkg,extra_deps) {
     depends <- lapply(depends,unique)
 
     # append the Debian dependencies
-    depends$build=c(depends$build,'debhelper (>> 4.1.0)','cdbs')
+    depends$build=c(depends$build,'debhelper (>> 4.1.0)','cdbs','dpatch')
     if (pkg$archdep) {
         depends$bin=c(depends$bin,'${shlibs:Depends}')
     }

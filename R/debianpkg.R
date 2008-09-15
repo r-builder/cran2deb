@@ -127,6 +127,7 @@ prepare_new_debian <- function(pkg,extra_deps) {
 
     pkg$license <- accept_license(pkg)
     pkg$depends <- get_dependencies(pkg,extra_deps)
+    apply_patches(pkg)
     generate_changelog(pkg)
     generate_rules(pkg)
     generate_copyright(pkg)
