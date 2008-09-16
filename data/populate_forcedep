@@ -2,7 +2,6 @@ force java rJava
 force autotools rJava 
 force sqlite RSQLite 
 force sqlite SQLiteDF 
-force boost RBGL 
 force netcdf ncdf 
 force cshell dse 
 force libgtk cairoDevice 
@@ -16,3 +15,14 @@ force libgtk rggobi
 force libxml rggobi 
 force sprng rsprng 
 force gmp rsprng 
+force java JavaGD 
+force boost RBGL 
+force netcdf RNetCDF 
+force libtiff biOps 
+force fftw-dev rimage 
+force r-recommended spBayes 
+force libxt Cairo 
+force autotools qp 
+force boost MBA 
+force mpich RScaLAPACK 
+force libblas odesolve 

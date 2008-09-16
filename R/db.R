@@ -53,16 +53,17 @@ db_start <- function() {
     if (!dbExistsTable(con,'builds')) {
         dbGetQuery(con,paste('CREATE TABLE builds ('
                   ,' id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL'
+                  ,',system TEXT NOT NULL'
                   ,',package TEXT NOT NULL'
                   ,',r_version TEXT NOT NULL'
                   ,',deb_epoch INTEGER NOT NULL'
                   ,',deb_revision INTEGER NOT NULL'
                   ,',db_version INTEGER NOT NULL'
                   ,',date_stamp TEXT NOT NULL'
-                  ,',git_revision TEXT NOT NULL'  # legacy: really scm_revision
+                  ,',scm_revision TEXT NOT NULL'
                   ,',success INTEGER NOT NULL'
                   ,',log TEXT'
-                  ,',UNIQUE(package,r_version,deb_epoch,deb_revision,db_version)'
+                  ,',UNIQUE(package,system,r_version,deb_epoch,deb_revision,db_version)'
                   ,')'))
     }
     return(con)
@@ -286,9 +287,10 @@ db_update_package_versions <- function() {
 db_record_build <- function(package, deb_version, log, success=F) {
     con <- db_start()
     dbGetQuery(con,paste('INSERT OR REPLACE INTO builds'
-                        ,'(package,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,git_revision,log)'
+                        ,'(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,scm_revision,log)'
                         ,'VALUES'
                         ,'(',db_quote(package)
+                        ,',',db_quote(which_system)
                         ,',',db_quote(version_upstream(deb_version))
                         ,',',db_quote(version_epoch(deb_version))
                         ,',',db_quote(version_revision(deb_version))
@@ -306,6 +308,7 @@ db_builds <- function(pkgname) {
     con <- db_start()
     build <- dbGetQuery(con, paste('SELECT * FROM builds'
                        ,'WHERE success = 1'
+                       ,'AND system =',db_quote(which_system)
                        ,'AND package =',db_quote(pkgname)))
     db_stop(con)
     if (length(build) == 0) {
@@ -319,6 +322,7 @@ db_latest_build <- function(pkgname) {
     con <- db_start()
     build <- dbGetQuery(con, paste('SELECT * FROM builds'
                        ,'NATURAL JOIN (SELECT package,max(id) AS max_id FROM builds'
+                       ,              'WHERE system =',db_quote(which_system)
                        ,              'GROUP BY package) AS last'
                        ,'WHERE id = max_id'
                        ,'AND builds.package =',db_quote(pkgname)))
@@ -353,6 +357,7 @@ db_outdated_packages <- function() {
                # extract the latest attempt at building each package
                ,      'SELECT * FROM builds'
                ,      'NATURAL JOIN (SELECT package,max(id) AS max_id FROM builds'
+               ,                    'WHERE system =',db_quote(which_system)
                ,                    'GROUP BY package) AS last'
                ,      'WHERE id = max_id) AS build'
                ,'ON build.package = packages.package'

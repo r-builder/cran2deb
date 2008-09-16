@@ -2,7 +2,7 @@
 ## DOC: cran2deb autobuild
 ## DOC:     automatically builds all out of date packages.
 ## DOC:
-suppressMessages(library(cran2deb))
+suppressPackageStartupMessages(library(cran2deb))
 
 if (exists('argv')) { # check for littler
     db_update_package_versions()

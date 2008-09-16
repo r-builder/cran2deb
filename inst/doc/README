@@ -13,12 +13,14 @@ To configure:
 1. You need a web server serving from say, /var/www/cran2deb/
 
 Let ROOT be the value returned by running: cran2deb root
+Let SYS be the system you wish to build for (e.g., debian-amd64)
 
 2. create /etc/cran2deb
-   a. copy ROOT/etc/* into /etc/cran2deb
+   a. copy ROOT/etc/* into /etc/cran2deb/sys/SYS/
    b. /etc/cran2deb/archive should be a symlink pointing to /var/www/cran2deb/
 
     $ ln -s /var/www/cran2deb/ /etc/cran2deb/archive
+    $ mkdir /var/www/cran2deb/SYS
 
    c. modify OTHERMIRROR of /etc/cran2deb/pbuilderrc.in to point to your webserver
 
@@ -26,7 +28,7 @@ Let ROOT be the value returned by running: cran2deb root
     /var/cache/cran2deb, writable by whichever user(s) will run cran2deb.
 4. run: cran2deb update
 5. Try building a simple package: cran2deb build zoo
-   (The result will be in /var/cache/cran2deb/results)
+   (The result will be in /var/cache/cran2deb/results/SYS)
 
 
 $ cran2deb help

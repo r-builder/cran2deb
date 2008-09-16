@@ -1,3 +1,9 @@
+*WARNING* This is not up to date! The major difference is that now we have
+*WARNING* system-specific configurations, archives and results, so that several
+*WARNING* of the paths have either a 'sys/FOO' part or a 'FOO' part where FOO
+*WARNING* is something like debian-amd64, debian-i386..
+
+
 git clone git://github.com/blundellc/cran2deb.git
 
 apt-get system requirements from DESCRIPTION

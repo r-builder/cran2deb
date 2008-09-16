@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+# Note: everything in the case needs to be system-independent!
 library(cran2deb)
 library(ctv)
 

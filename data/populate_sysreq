@@ -35,3 +35,20 @@ sysreq java java
 sysreq odbc %odbc% 
 sysreq ignore drivers. see readme. 
 sysreq ignore r must be compiled with --enable-r-shlib if the server is to be built 
+sysreq alias netcdf% 
+sysreq yacas yacas% 
+sysreq libtiff %libtiff% 
+sysreq ignore zlibdll 
+sysreq ignore jpegdll% 
+sysreq fftw fftw% 
+sysreq python python 
+sysreq ghostscript ghostscript 
+sysreq gsl libgsl 
+sysreq ignore rgl packages for rendering 
+sysreq grass grass 
+sysreq ignore internal files xba.cqv 
+sysreq ignore xba.regions 
+sysreq ignore lammpi or mpich 
+sysreq blas blas 
+sysreq blacs blacs 
+sysreq scalapack scalapack 

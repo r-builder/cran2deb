@@ -1,0 +1,7 @@
+#!/usr/bin/env r
+## DOC: cran2deb which_sys
+## DOC:     show which system cran2deb will build for next
+## DOC:
+suppressMessages(library(cran2deb))
+
+cat(which_system)

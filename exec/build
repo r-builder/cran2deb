@@ -2,7 +2,7 @@
 ## DOC: cran2deb build [-D extra_dep1,extra_dep2,...] package1 package2 ...
 ## DOC:     builds a particular package.
 ## DOC:
-suppressMessages(library(cran2deb))
+suppressPackageStartupMessages(library(cran2deb))
 
 if (exists('argv')) { # check for littler
     argc <- length(argv)

@@ -1,12 +1,13 @@
 append_build_from_pkg <- function(pkg, builds) {
     pkg_build <- data.frame(id = -1     # never used
                            ,package = pkg$name
+                           ,system = which_system
                            ,r_version = version_upstream(pkg$debversion)
                            ,deb_epoch = version_epoch(pkg$debversion)
                            ,deb_revision = version_revision(pkg$debversion)
                            ,db_version = db_get_version()
                            ,date_stamp = pkg$date_stamp
-                           ,git_revision = scm_revision
+                           ,scm_revision = scm_revision
                            ,success = 1 # never used
                            ,log = ''    # never used
                            )
@@ -24,7 +25,7 @@ generate_changelog_entry <- function(build, changelog) {
     # TODO: should say 'New upstream release' when necessary
     debversion <- version_new(build$r_version, build$deb_revision, build$deb_epoch)
     cat(paste(paste(build$srcname,' (',debversion,') unstable; urgency=low',sep='')
-             ,'' ,paste('  * cran2deb ',build$git_revision
+             ,'' ,paste('  * cran2deb ',build$scm_revision
                        ,' with DB version ',as.integer(build$db_version),'.',sep='')
              ,'',paste(' --',maintainer,'',build$date_stamp)
              ,'','','',sep='\n'),file=changelog, append=TRUE)
