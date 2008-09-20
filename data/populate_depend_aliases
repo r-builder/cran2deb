@@ -64,8 +64,8 @@ alias_run zlib zlib1g
 alias_build cshell tcsh|csh|c-shell 
 alias_run cshell tcsh|csh|c-shell 
 alias_build autotools autotools-dev 
-alias_build tcl tcl8.4-dev 
-alias_build tk tk8.4-dev 
+alias_build tcl tcl8.5-dev 
+alias_build tk tk8.5-dev 
 alias_build odbc unixodbc-dev 
 alias_build mysql libmysqlclient15-dev 
 alias_build mpi libopenmpi-dev 
