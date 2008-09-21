@@ -52,3 +52,4 @@ sysreq ignore lammpi or mpich
 sysreq blas blas 
 sysreq blacs blacs 
 sysreq scalapack scalapack 
+sysreq wordnet wndb-tar.gz%

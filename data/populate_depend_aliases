@@ -86,3 +86,5 @@ alias_build scalapack scalapack-mpich-dev
 alias_build mpich libmpich1.0-dev 
 alias_run libblas libblas3gf 
 alias_build libblas libblas-dev 
+alias_run wordnet wordnet-base
+alias_build wordnet wordnet-base
