@@ -34,3 +34,12 @@ Let SYS be the system you wish to build for (e.g., debian-amd64)
 $ cran2deb help
 will display a short summary of help for each cran2deb command.
 
+
+Concerning data/:
+This contains scripts necessary to recreate the database should you loose the
+database. It's a backup that can be versioned by SVN. There is a script called
+pull that, when run from the data directory will recreate all the files from
+the database EXCEPT for the licenses. The licenses cannot be recreated because
+licenses can be based on one-way hashes.  This process could certainly be
+improved.
+
