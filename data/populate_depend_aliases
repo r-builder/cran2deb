@@ -88,3 +88,4 @@ alias_run libblas libblas3gf
 alias_build libblas libblas-dev 
 alias_run wordnet wordnet-base
 alias_build wordnet wordnet-base
+alias_build postgresql libpq-dev

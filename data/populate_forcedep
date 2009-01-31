@@ -26,3 +26,4 @@ force autotools qp
 force boost MBA 
 force mpich RScaLAPACK 
 force libblas odesolve 
+force postgresql RPostgreSQL
