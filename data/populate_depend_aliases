@@ -56,7 +56,7 @@ alias_run pari-gp pari-gp
 alias_build proj proj 
 alias_run proj proj 
 alias_build quantlib libquantlib0-dev 
-alias_run quantlib libquantlib-0.9.6 
+alias_run quantlib libquantlib-0.9.7 
 alias_run sqlite libsqlite3-0 
 alias_build sqlite libsqlite3-dev 
 alias_build zlib zlib1g-dev 
