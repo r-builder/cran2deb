@@ -53,3 +53,4 @@ sysreq blas blas
 sysreq blacs blacs 
 sysreq scalapack scalapack 
 sysreq wordnet wndb-tar.gz%
+sysreq boost boost%
