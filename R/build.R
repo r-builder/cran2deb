@@ -24,13 +24,6 @@ build <- function(name,extra_deps,force=F) {
         if (pkg$debversion != version) {
             fail('expected Debian version',version,'not equal to actual version',pkg$debversion)
         }
-        # delete the current archive (XXX: assumes mini-dinstall)
-        for (subdir in c('mini-dinstall','unstable')) {
-            path = file.path(dinstall_archive,subdir)
-            if (file.exists(path)) {
-                unlink(path,recursive=T)
-            }
-        }
 
         # delete notes of upload
         file.remove(Sys.glob(file.path(pbuilder_results,'*.upload')))
@@ -41,23 +34,7 @@ build <- function(name,extra_deps,force=F) {
             fail('failed to create archive')
         }
 
-        # pull in all the R dependencies
         notice('R dependencies:',paste(pkg$depends$r,collapse=', '))
-        for (dep in pkg$depends$r) {
-            if (pkgname_as_debian(dep) %in% debian_pkgs) {
-                notice('using Debian package of',dep)
-                next
-            }
-            # otherwise, convert to source package name
-            srcdep = pkgname_as_debian(dep,binary=F)
-
-            notice('uploading',srcdep)
-            ret = log_system('umask 002;dput','-c',shQuote(dput_config),'local'
-                        ,changesfile(srcdep))
-            if (ret != 0) {
-                fail('upload of dependency failed! maybe you did not build it first?')
-            }
-        }
         build_debian(pkg)
 
         # upload the package
@@ -65,15 +42,6 @@ build <- function(name,extra_deps,force=F) {
                     ,changesfile(pkg$srcname,pkg$debversion))
         if (ret != 0) {
             fail('upload failed!')
-        }
-
-        # delete the current archive (XXX: assumes mini-dinstall)
-        # this is handy for group operation
-        for (subdir in c('mini-dinstall','unstable')) {
-            path = file.path(dinstall_archive,subdir)
-            if (file.exists(path)) {
-                unlink(path,recursive=T)
-            }
         }
 
         return(pkg$debversion)
