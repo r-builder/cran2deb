@@ -55,3 +55,4 @@ sysreq scalapack scalapack
 sysreq wordnet wndb-tar.gz%
 sysreq boost boost%
 sysreq jags jags
+sysreq ignore winbugs
