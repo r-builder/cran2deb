@@ -141,7 +141,7 @@ db_add_sysreq_override <- function(pattern,depend_alias) {
                     ,' ',db_quote(tolower(depend_alias))
                     ,',',db_quote(tolower(pattern))
                     ,')'))
-    db_stop(con,TRUE)
+    db_stop(con)
 }
 
 db_sysreq_overrides <- function() {
@@ -170,7 +170,7 @@ db_add_depends <- function(depend_alias,debian_pkg,build=F) {
                     ,',',as.integer(build)
                     ,',',db_quote(tolower(debian_pkg))
                     ,')'))
-    db_stop(con,TRUE)
+    db_stop(con)
 }
 
 db_depends <- function() {
@@ -199,7 +199,7 @@ db_add_forced_depends <- function(r_name, depend_alias) {
     dbGetQuery(con,
             paste('INSERT OR REPLACE INTO forced_depends (r_name, depend_alias)'
                  ,'VALUES (',db_quote(r_name),',',db_quote(depend_alias),')'))
-    db_stop(con,TRUE)
+    db_stop(con)
 }
 
 db_forced_depends <- function() {
@@ -233,7 +233,7 @@ db_add_license_override <- function(name,accept) {
                     ,' ',db_quote(tolower(name))
                     ,',',as.integer(accept)
                     ,')'))
-    db_stop(con,TRUE)
+    db_stop(con)
 }
 
 db_license_override_hash <- function(license_sha1) {
@@ -270,7 +270,7 @@ db_add_license_hash <- function(name,license_sha1) {
         ,' ',db_quote(tolower(name))
         ,',',db_quote(tolower(license_sha1))
         ,')'))
-    db_stop(con,TRUE)
+    db_stop(con)
 }
 
 

@@ -1,0 +1,9 @@
+#!/usr/bin/env r
+## DOC: cran2deb db_release
+## DOC:     make note of a substantial update of the database. causes all packages to rbe marked for ebuild.
+## DOC:
+
+suppressPackageStartupMessages(library(cran2deb))
+
+db_stop(db_start(),TRUE)
+
