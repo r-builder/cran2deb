@@ -1,4 +1,0 @@
-if [ -n "$(which java)" ]
-then
-    R CMD javareconf
-fi
