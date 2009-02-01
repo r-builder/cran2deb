@@ -35,7 +35,7 @@ sysreq java java
 sysreq odbc %odbc% 
 sysreq ignore drivers. see readme. 
 sysreq ignore r must be compiled with --enable-r-shlib if the server is to be built 
-sysreq alias netcdf% 
+sysreq netcdf netcdf% 
 sysreq yacas yacas% 
 sysreq libtiff %libtiff% 
 sysreq ignore zlibdll 
@@ -58,3 +58,4 @@ sysreq jags jags
 sysreq ignore winbugs
 sysreq ignore posix-compliant os
 sysreq curl curl%
+sysreq netcdf netcdf%
