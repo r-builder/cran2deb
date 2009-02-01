@@ -57,3 +57,4 @@ sysreq boost boost%
 sysreq jags jags
 sysreq ignore winbugs
 sysreq ignore posix-compliant os
+sysreq curl curl%
