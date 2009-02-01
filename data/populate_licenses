@@ -97,3 +97,11 @@ pkg NISTnls NISTnls
 pkg GPL NMMAPSlite
 pkg GPL PET
 pkg distrib-noncomm RLadyBug
+pkg GPL tsfa
+accept rtiff
+accept mvpart
+accept mmcm
+accept grade
+pkg GPL CDNmoney
+accept EUPL
+pkg EUPL EVER
