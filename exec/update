@@ -10,7 +10,6 @@ root=$1
 shift
 sys=`{cran2deb which_system}
 mkdir -p /var/cache/cran2deb/results/$sys || exit 1
-mini-dinstall --batch -c /etc/cran2deb/sys/$sys/mini-dinstall.conf >/dev/null 2>&1 || exit 1
 update_period=10800
 if (~ $1 full || ![ -e /var/cache/cran2deb/cache.rda ] ) {
     delta=`{awk 'END{print '^$update_period^'+1}' </dev/null}
