@@ -28,8 +28,16 @@ Let SYS be the system you wish to build for (e.g., debian-amd64)
 
 3. cran2deb needs a persistent cache outside of R's control. therefore, create
     /var/cache/cran2deb, writable by whichever user(s) will run cran2deb.
-4. run: cran2deb update
-5. Try building a simple package: cran2deb build zoo
+4. add to /etc/rc.local:
+	# one mini-dinstall daemon for each apt repo
+	for sys in debian-i386 debian-amd64
+	do
+        	mini-dinstall -c /etc/cran2deb/sys/$sys/mini-dinstall.conf
+	done
+   and execute.
+
+5. run: cran2deb update
+6. Try building a simple package: cran2deb build zoo
    (The result will be in /var/cache/cran2deb/results/SYS)
 
 

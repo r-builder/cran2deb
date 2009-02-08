@@ -28,12 +28,6 @@ build <- function(name,extra_deps,force=F) {
         # delete notes of upload
         file.remove(Sys.glob(file.path(pbuilder_results,'*.upload')))
 
-        # make mini-dinstall generate the skeleton of the archive
-        ret = log_system('umask 002;mini-dinstall --batch -c',dinstall_config)
-        if (ret != 0) {
-            fail('failed to create archive')
-        }
-
         notice('R dependencies:',paste(pkg$depends$r,collapse=', '))
         build_debian(pkg)
 
