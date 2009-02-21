@@ -69,6 +69,7 @@ needs_build <- function(name,version) {
         }
     } else {
         # always rebuild on failure or no record
+        notice('rebuilding',name,': no build record or previous build failed')
         return(T)
     }
     # see if it has already been built
@@ -85,6 +86,15 @@ needs_build <- function(name,version) {
         return(F)
     }
 
+    if (build$r_version != version_upstream(version)) {
+        notice('rebuilding',name,': new upstream version',build$r_version,'(old) vs',version_upstream(version),'(new)')
+    }
+    if (build$deb_epoch != version_epoch(version)) {
+        notice('rebuilding',name,': new cran2deb epoch',build$deb_epoch,'(old) vs',version_epoch(version),'(new)')
+    }
+    if (build$db_version != db_get_version()) {
+        notice('rebuilding',name,': new db version',build$db_version,'(old) vs',db_get_version(),'(new)')
+    }
     rm(debname,srcname)
     return(T)
 }
