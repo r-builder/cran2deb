@@ -68,8 +68,8 @@ db_start <- function() {
     }
     if (!dbExistsTable(con,'blacklist_packages')) {
         dbGetQuery(con,paste('CREATE TABLE blacklist_packages ('
-	              ,'package TEXT PRIMARY KEY NOT NULL '
-                  ,'reason TEXT NOT NULL '
+                  ,' package TEXT PRIMARY KEY NOT NULL '
+                  ,',reason TEXT NOT NULL '
                   ,')'))
     }
     return(con)
