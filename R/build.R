@@ -20,6 +20,10 @@ build <- function(name,extra_deps,force=F) {
             return(NULL)
         }
 
+        if (name %in% db_blacklist_packages()) {
+            fail('package',name,'is blacklisted. consult database for reason.')
+        }
+
         pkg <- prepare_new_debian(prepare_pkg(dir,name),extra_deps)
         if (pkg$debversion != version) {
             fail('expected Debian version',version,'not equal to actual version',pkg$debversion)
@@ -77,12 +81,6 @@ needs_build <- function(name,version) {
     debname <- pkgname_as_debian(name,binary=T)
     if (file.exists(changesfile(srcname, version))) {
         notice('already built',srcname,'version',version)
-        return(F)
-    }
-
-    # XXX: what about building newer versions of Debian packages?
-    if (debname %in% debian_pkgs) {
-        notice(srcname,' exists in Debian (perhaps a different version)')
         return(F)
     }
 

@@ -66,6 +66,12 @@ db_start <- function() {
                   ,',UNIQUE(package,system,r_version,deb_epoch,deb_revision,db_version)'
                   ,')'))
     }
+    if (!dbExistsTable(con,'blacklist_packages')) {
+        dbGetQuery(con,paste('CREATE TABLE blacklist_packages ('
+	              ,'package TEXT PRIMARY KEY NOT NULL '
+                  ,'reason TEXT NOT NULL '
+                  ,')'))
+    }
     return(con)
 }
 
@@ -377,3 +383,9 @@ db_outdated_packages <- function() {
     return(packages)
 }
 
+db_blacklist_packages <- function() {
+    con <- db_start()
+    packages <- dbGetQuery(con,'SELECT packages from blacklist_packages')$package
+    db_stop(con)
+    return(packages)
+}
