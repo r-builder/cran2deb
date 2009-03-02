@@ -385,7 +385,7 @@ db_outdated_packages <- function() {
 
 db_blacklist_packages <- function() {
     con <- db_start()
-    packages <- dbGetQuery(con,'SELECT packages from blacklist_packages')$package
+    packages <- dbGetQuery(con,'SELECT package from blacklist_packages')$package
     db_stop(con)
     return(packages)
 }
