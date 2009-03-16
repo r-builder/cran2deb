@@ -281,6 +281,11 @@ db_add_license_hash <- function(name,license_sha1) {
 
 
 db_update_package_versions <- function() {
+    # seems like the quickest way of doing this:
+    con <- db_start()
+    dbGetQuery(con, 'DROP TABLE packages')
+    db_stop(con)
+    # db_start re-makes all tables
     con <- db_start()
     for (package in available[,'Package']) {
         dbGetQuery(con, paste('INSERT OR REPLACE INTO packages (package,latest_r_version)'
