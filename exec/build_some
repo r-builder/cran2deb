@@ -8,9 +8,9 @@
 
 mkdir -p warn fail
 shift
-if [ ! -e all_pkgs ]; then
+if ([ ! -e all_pkgs ]) {
     cran2deb cran_pkgs $* >all_pkgs
-fi
+}
 
 for pkg in $(cat all_pkgs); do
     if (~ $pkg *..* */*) {
