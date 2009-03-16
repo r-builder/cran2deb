@@ -292,6 +292,7 @@ db_update_package_versions <- function() {
                              ,'VALUES (',db_quote(package)
                              ,',',db_quote(available[package,'Version']),')'))
     }
+    dbGetQuery(con,'DELETE FROM builds WHERE builds.package NOT IN (SELECT package FROM packages)')
     db_stop(con)
 }
 
