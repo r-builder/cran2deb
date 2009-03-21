@@ -14,7 +14,7 @@
     global("dinstall_config",   file.path('/etc/cran2deb/sys',which_system,'mini-dinstall.conf'))
     global("dinstall_archive",  file.path('/etc/cran2deb/archive',which_system))
     global("r_depend_fields", c('Depends','Imports')) # Suggests, Enhances
-    global("scm_revision", paste("svn revision", svnversion(), sep=""))
+    global("scm_revision", paste("svn revision", svnversion()))
     global("patch_dir", '/etc/cran2deb/patches')
     global("changesfile", function(srcname,version='*') {
         return(file.path(pbuilder_results
