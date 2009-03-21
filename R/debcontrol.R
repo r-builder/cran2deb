@@ -44,7 +44,10 @@ get_dependencies <- function(pkg,extra_deps) {
     depends <- lapply(depends,unique)
 
     # append the Debian dependencies
-    depends$build=c(depends$build,'debhelper (>> 4.1.0)','cdbs','dpatch')
+    depends$build=c(depends$build,'debhelper (>> 4.1.0)','cdbs')
+    if (file.exists(file.path(patch_dir, pkg$name))) {
+        depends$build <- c(depends$build,'dpatch')
+    }
     if (pkg$archdep) {
         depends$bin=c(depends$bin,'${shlibs:Depends}')
     }
@@ -110,7 +113,7 @@ generate_control <- function(pkg) {
     # construct control file
     control = data.frame()
     control[1,'Source'] = pkg$srcname
-    control[1,'Section'] = 'math'
+    control[1,'Section'] = 'math'  ## to be changed to 'gnu-r' once lintian groks it
     control[1,'Priority'] = 'optional'
     control[1,'Maintainer'] = maintainer
     control[1,'Build-Depends'] = paste(pkg$depends$build,collapse=', ')
