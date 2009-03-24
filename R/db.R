@@ -59,7 +59,7 @@ db_start <- function() {
                   ,',deb_epoch INTEGER NOT NULL'
                   ,',deb_revision INTEGER NOT NULL'
                   ,',db_version INTEGER NOT NULL'
-                  ,',date_stamp TEXT NOT NULL'
+                  ,',date_stamp INTEGER NOT NULL'
                   ,',scm_revision TEXT NOT NULL'
                   ,',success INTEGER NOT NULL'
                   ,',log TEXT'
@@ -308,7 +308,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
                         ,',',db_quote(version_revision(deb_version))
                         ,',',db_cur_version(con)
                         ,',',as.integer(success)
-                        ,',',db_quote(format(Sys.time(),'%a, %d %b %Y %H:%M:%S %z'))
+                        ,',',db_quote(Sys.time())
                         ,',',db_quote(scm_revision)
                         ,',',db_quote(paste(log, collapse='\n'))
                         ,')'))
@@ -327,6 +327,7 @@ db_builds <- function(pkgname) {
         return(NULL)
     }
     build$success <- as.logical(build$success)
+    build$date_stamp <- as.integer(build$date_stamp)
     return(build)
 }
 

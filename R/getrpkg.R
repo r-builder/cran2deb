@@ -16,7 +16,7 @@ download_pkg <- function(dir, pkgname) {
 
     # record some basic information
     pkg <- pairlist()
-    pkg$date_stamp = format(Sys.time(),'%a, %d %b %Y %H:%M:%S %z')
+    pkg$date_stamp = Sys.time()
     pkg$name = pkgname
     pkg$repoURL = available[pkgname,'Repository']
     pkg$repo = repourl_as_debian(pkg$repoURL)

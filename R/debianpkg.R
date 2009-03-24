@@ -27,7 +27,7 @@ generate_changelog_entry <- function(build, changelog) {
     cat(paste(paste(build$srcname,' (',debversion,') unstable; urgency=low',sep='')
              ,'' ,paste('  * cran2deb ',build$scm_revision
                        ,' with DB version ',as.integer(build$db_version),'.',sep='')
-             ,'',paste(' --',maintainer,'',build$date_stamp)
+             ,'',paste(' --',maintainer,'',format(build$date_stamp,'%a, %d %b %Y %H:%M:%S %z'))
              ,'','','',sep='\n'),file=changelog, append=TRUE)
 }
 
