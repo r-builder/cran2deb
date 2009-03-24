@@ -5,8 +5,8 @@ EXTRAPACKAGES='debhelper r-base-dev cdbs r-base-core lintian xvfb xauth xfonts-b
 REMOVEPACKAGES='lilo libldap-2.4-2 libopencdk10 libsasl2-2'
 # don't actually need aptitude, but pbuilder insists...
 #REMOVEPACKAGES+='aptitude libcwidget3 libept0 libncursesw5 libsigc++-2.0-0c2a libxapian15'
-DISTRIBUTION=unstable
-OTHERMIRROR='deb http://localhost/cran2deb/debian-i386 unstable/$(ARCH)/ | deb http://localhost/cran2deb/debian-i386 unstable/all/ | deb http://statmath.wu-wien.ac.at/AASC/debian/ testing main'
+DISTRIBUTION=testing
+OTHERMIRROR='deb http://localhost/cran2deb/debian-i386 testing/$(ARCH)/ | deb http://localhost/cran2deb/debian-i386 testing/all/ | deb http://statmath.wu-wien.ac.at/AASC/debian/ testing main'
 MIRRORSITE='http://ftp.at.debian.org/debian/'
 APTCACHE=''
 PBUILDERSATISFYDEPENDSCMD='/usr/lib/pbuilder/pbuilder-satisfydepends-classic'
