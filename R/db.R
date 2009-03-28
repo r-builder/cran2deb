@@ -59,7 +59,7 @@ db_start <- function() {
                   ,',deb_epoch INTEGER NOT NULL'
                   ,',deb_revision INTEGER NOT NULL'
                   ,',db_version INTEGER NOT NULL'
-                  ,',date_stamp INTEGER NOT NULL'
+                  ,',date_stamp TEXT NOT NULL'
                   ,',scm_revision TEXT NOT NULL'
                   ,',success INTEGER NOT NULL'
                   ,',log TEXT'
@@ -327,7 +327,6 @@ db_builds <- function(pkgname) {
         return(NULL)
     }
     build$success <- as.logical(build$success)
-    build$date_stamp <- as.integer(build$date_stamp)
     return(build)
 }
 
