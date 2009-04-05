@@ -60,6 +60,7 @@ db_start <- function() {
                   ,',deb_revision INTEGER NOT NULL'
                   ,',db_version INTEGER NOT NULL'
                   ,',date_stamp TEXT NOT NULL'
+                  ,',time_stamp TEXT NOT NULL'
                   ,',scm_revision TEXT NOT NULL'
                   ,',success INTEGER NOT NULL'
                   ,',log TEXT'
@@ -296,10 +297,14 @@ db_update_package_versions <- function() {
     db_stop(con)
 }
 
+db_date_format <- '%Y-%m-%d'
+db_time_format <- '%H:%M:%OS %Z'
+
 db_record_build <- function(package, deb_version, log, success=F) {
     con <- db_start()
+    o<-options(digits.secs = 6)
     dbGetQuery(con,paste('INSERT OR REPLACE INTO builds'
-                        ,'(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,scm_revision,log)'
+                        ,'(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)'
                         ,'VALUES'
                         ,'(',db_quote(package)
                         ,',',db_quote(which_system)
@@ -308,10 +313,12 @@ db_record_build <- function(package, deb_version, log, success=F) {
                         ,',',db_quote(version_revision(deb_version))
                         ,',',db_cur_version(con)
                         ,',',as.integer(success)
-                        ,',',db_quote(Sys.time())
+                        ,',',db_quote(format(Sys.time(), db_date_format))
+                        ,',',db_quote(format(Sys.time(), db_time_format))
                         ,',',db_quote(scm_revision)
                         ,',',db_quote(paste(log, collapse='\n'))
                         ,')'))
+    options(o)
     db_stop(con)
 }
 
@@ -326,8 +333,22 @@ db_builds <- function(pkgname) {
     if (length(build) == 0) {
         return(NULL)
     }
+    return(db_cleanup_builds(build))
+}
+
+db_cleanup_builds <- function(build) {
     build$success <- as.logical(build$success)
-    return(build)
+    o<-options(digits.secs = 6)
+    dt <- as.data.frame(t(data.frame(sapply(row.names(build),
+            function(r)
+                list(as.POSIXct(strptime(paste(build[r,]$date_stamp,build[r,]$time_stamp)
+                                        ,paste(db_date_format,db_time_format))))))))
+    options(o)
+    names(dt) <- 'date_stamp'
+    row.names(dt) <- row.names(build)
+    build$time_stamp <- NULL
+    build$date_stamp <- NULL
+    return(cbind(build,dt))
 }
 
 db_latest_build <- function(pkgname) {
@@ -342,8 +363,7 @@ db_latest_build <- function(pkgname) {
     if (length(build) == 0) {
         return(NULL)
     }
-    build$success <- as.logical(build$success)
-    return(build)
+    return(db_cleanup_builds(build))
 }
 
 db_latest_build_version <- function(pkgname) {
