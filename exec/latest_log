@@ -1,6 +1,7 @@
 #!/usr/bin/env r
 ## DOC: cran2deb latest_log package1 package2 ...
 ## DOC:     show the latest log output for <package>
+## DOC:
 suppressPackageStartupMessages(library(cran2deb))
 
 if (exists('argv')) {
