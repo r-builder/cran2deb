@@ -1,0 +1,34 @@
+#!/bin/sh
+
+db=/var/cache/cran2deb/cran2deb.db
+date=`date "+%Y-%m-%d"`
+
+usage_and_exit()
+{
+    cat <<EOF
+Usage: showbuilds [-d date] [-?|-h]"
+  Show build for given dates
+Options:
+  -d date       use given date, else default to current date
+  -h            show this help
+EOF
+    exit 0
+}
+
+options=':d:h?'
+while getopts "$options" i
+do
+    case "$i" in
+        d)
+            date=$OPTARG
+            ;;
+        h|?)
+            usage_and_exit
+            ;;
+    esac
+done
+
+cmd="select id,success,system,package,r_version,deb_epoch,deb_revision,scm_revision,db_version,date_stamp,time_stamp from builds where date_stamp = '${date}'"
+
+sqlite3 -header -column $db "$cmd"
+
