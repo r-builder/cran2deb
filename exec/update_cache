@@ -1,10 +1,10 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/r -t
 # Note: everything in the case needs to be system-independent!
 library(cran2deb)
 library(ctv)
 
-argv <- commandArgs()
-argv <- argv[-(1:match("--args", argv))]
+#argv <- commandArgs()
+#argv <- argv[-(1:match("--args", argv))]
 
 #mirror <- 'http://cran.uk.r-project.org/'
 mirror <- 'http://cran.r-project.org/'
