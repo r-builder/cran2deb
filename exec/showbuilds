@@ -1,5 +1,8 @@
 #!/bin/sh
-
+## DOC: cran2deb showbuilds [date]
+## DOC:     list build summary for given date
+## DOC:     default value for date is current day
+## DOC:
 db=/var/cache/cran2deb/cran2deb.db
 date=`date "+%Y-%m-%d"`
 
