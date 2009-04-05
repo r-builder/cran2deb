@@ -338,17 +338,16 @@ db_builds <- function(pkgname) {
 
 db_cleanup_builds <- function(build) {
     build$success <- as.logical(build$success)
-    o<-options(digits.secs = 6)
-    dt <- as.data.frame(t(data.frame(sapply(row.names(build),
-            function(r)
-                list(as.POSIXct(strptime(paste(build[r,]$date_stamp,build[r,]$time_stamp)
-                                        ,paste(db_date_format,db_time_format))))))))
-    options(o)
-    names(dt) <- 'date_stamp'
-    row.names(dt) <- row.names(build)
+    #o <-options(digits.secs = 6)
+    dt <- as.POSIXct(strptime(paste(as.character(build[,"date_stamp"]), as.character(build[,"time_stamp"])),
+                              paste(db_date_format, db_time_format)))
     build$time_stamp <- NULL
     build$date_stamp <- NULL
-    return(cbind(build,dt))
+    newdf <- data.frame(build, date_stamp=dt)
+    #print(newdf[, -grep("log", colnames(newdf))])
+    #options(o)
+    #print(newdf[, -grep("log", colnames(newdf))])
+    return(newdf)
 }
 
 db_latest_build <- function(pkgname) {
