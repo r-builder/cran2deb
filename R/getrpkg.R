@@ -100,6 +100,10 @@ repack_pkg <- function(pkg) {
                 ,'-type f -a '
                 ,   '! \\( -name configure -o -name cleanup \\)'
                 ,'-exec chmod -x {} \\;')
+    if (file.exists(file.path(basename(pkg$path),'debian'))) {
+        warn('debian/ directory found in tarball! removing...')
+        unlink(file.path(basename(pkg$path),'debian'),recursive=TRUE)
+    }
     # tar it all back up
     log_system('tar -czf',shQuote(debarchive),shQuote(basename(pkg$path)))
     setwd(wd)
