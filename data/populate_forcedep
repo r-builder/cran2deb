@@ -28,3 +28,7 @@ force mpich RScaLAPACK
 force libblas odesolve 
 force postgresql RPostgreSQL
 force udunits udunits
+force nlme primer
+force vcd biclust
+force vr mboost
+force colorspace mboost

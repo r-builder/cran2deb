@@ -93,3 +93,11 @@ alias_build jags jags
 alias_run jags jags
 alias_build udunits udunits
 alias_run udunits udunits
+alias_build nlme r-cran-nlme
+alias_run nlme r-cran-nlme
+alias_build vcd r-cran-vcd
+alias_run vcd r-cran-vcd
+alias_build vr r-cran-vr
+alias_run vr r-cran-vr
+alias_build colorspace r-cran-colorspace
+alias_run colorspace r-cran-colorspace
