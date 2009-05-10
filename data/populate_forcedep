@@ -32,3 +32,5 @@ force nlme primer
 force vcd biclust
 force vr mboost
 force colorspace mboost
+force vr party
+force colorspace party
