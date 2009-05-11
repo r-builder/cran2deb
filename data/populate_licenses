@@ -107,3 +107,5 @@ accept EUPL
 pkg EUPL EVER
 pkg GPL BayesDA
 accept AGPL
+accept scagnostics
+pkg scagnostics scagnostics

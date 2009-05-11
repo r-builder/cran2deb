@@ -101,3 +101,5 @@ alias_build vr r-cran-vr
 alias_run vr r-cran-vr
 alias_build colorspace r-cran-colorspace
 alias_run colorspace r-cran-colorspace
+alias_run rgrs xclip
+alias_run flac flac

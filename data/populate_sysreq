@@ -60,3 +60,5 @@ sysreq ignore posix-compliant os
 sysreq curl curl%
 sysreq netcdf netcdf%
 sysreq udunits udunits%
+sysreq rgrs xclip
+sysreq flac flac
