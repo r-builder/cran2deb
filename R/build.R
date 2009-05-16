@@ -45,10 +45,11 @@ build <- function(name,extra_deps,force=F) {
         # wait for mini-dinstall to get to work
         upload_success = FALSE
         for (i in seq(1,12)) {
-            if (file.exists(file.path(pbuilder_results, paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
+            if (file.exists(file.path(dinstall_archive,'testing','source',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
                 upload_success = TRUE
                 break
             }
+            warn(i,'/12: does not exist',file.path(dinstall_archive,which_system,'testing','source',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))
             Sys.sleep(5)
         }
         if (!upload_success) {
