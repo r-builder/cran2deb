@@ -166,5 +166,6 @@ generate_control <- function(pkg) {
 
     # Debian policy says 72 char width; indent minimally
     write.dcf(control,file=pkg$debfile('control.in'),indent=1,width=72)
+    write.dcf(control,indent=1,width=72)
 }
 

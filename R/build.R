@@ -42,6 +42,18 @@ build <- function(name,extra_deps,force=F) {
             fail('upload failed!')
         }
 
+        # wait for mini-dinstall to get to work
+        upload_success = FALSE
+        for (i in seq(1,12)) {
+            if (file.exists(file.path(pbuilder_results, paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
+                upload_success = TRUE
+                break
+            }
+            Sys.sleep(5)
+        }
+        if (!upload_success) {
+            warn('upload took too long; continuing as normal (some builds may fail temporarily)')
+        }
         return(pkg$debversion)
     })())
     cleanup(dir)

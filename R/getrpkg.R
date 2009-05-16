@@ -39,6 +39,7 @@ download_pkg <- function(dir, pkgname) {
         pkg$archive <- file.path(dir, basename(debfn))
         file.copy(debfn,pkg$archive)
         pkg$path = file.path(dir, paste(pkg$srcname ,pkg$version ,sep='-'))
+        notice('using an existing debianized source tarball:',debfn)
     } else {
         # see if we have a local mirror in /srv/R
         use_local = FALSE
@@ -82,6 +83,7 @@ download_pkg <- function(dir, pkgname) {
 
 repack_pkg <- function(pkg) {
     # re-pack into a Debian-named archive with a Debian-named directory.
+    notice('repacking into debian source archive.')
     debpath = file.path(dirname(pkg$archive)
                    ,paste(pkg$srcname
                          ,pkg$version
