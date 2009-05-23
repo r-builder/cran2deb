@@ -1,0 +1,17 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_makematchH.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Correct tcsh path
+
+@DPATCH@
+
+diff -ru MatchIt.orig/inst/doc/makematchH MatchIt/inst/doc/makematchH
+--- MatchIt.orig/inst/doc/makematchH	2005-03-10 14:25:54.000000000 +0100
++++ MatchIt/inst/doc/makematchH	2009-05-12 03:23:35.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/bin/tcsh
++#!/usr/bin/tcsh
+ source ~/.aliases
+ latex matchit
+ bibtex matchit

@@ -1,0 +1,17 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_python_path.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Correct python path
+
+@DPATCH@
+
+diff -ru rSymPy.orig/inst/jython/Lib/cgi.py rSymPy/inst/jython/Lib/cgi.py
+--- rSymPy.orig/inst/jython/Lib/cgi.py	2009-01-09 22:02:24.000000000 +0100
++++ rSymPy/inst/jython/Lib/cgi.py	2009-05-17 21:45:54.000000000 +0200
+@@ -1,4 +1,4 @@
+-#! /usr/local/bin/python
++#! /usr/bin/python
+ 
+ # NOTE: the above "/usr/local/bin/python" is NOT a mistake.  It is
+ # intentionally NOT "/usr/bin/env python".  On many systems

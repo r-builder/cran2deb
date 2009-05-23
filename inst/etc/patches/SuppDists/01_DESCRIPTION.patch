@@ -1,0 +1,17 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_DESCRIPTION.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add a space to separate Package: and SuppDists
+
+@DPATCH@
+
+diff -ru SuppDists.orig/DESCRIPTION SuppDists/DESCRIPTION
+--- SuppDists.orig/DESCRIPTION	2008-03-05 17:23:55.000000000 +0100
++++ SuppDists/DESCRIPTION	2009-05-11 04:57:47.000000000 +0200
+@@ -1,4 +1,4 @@
+-Package:SuppDists
++Package: SuppDists
+ Version: 1.1-2
+ Date: 2008/03/05
+ Title: Supplementary distributions

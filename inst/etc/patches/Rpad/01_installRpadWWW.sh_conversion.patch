@@ -1,0 +1,176 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_installRpadWWW.sh_conversion.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: dos to unix fileconversion
+
+@DPATCH@
+
+diff -Naur Rpad.orig/inst/serverversion/installRpadWWW.sh Rpad/inst/serverversion/installRpadWWW.sh
+--- Rpad.orig/inst/serverversion/installRpadWWW.sh	2007-04-24 17:47:26.000000000 +0200
++++ Rpad/inst/serverversion/installRpadWWW.sh	2009-04-09 04:25:13.000000000 +0200
+@@ -1,82 +1,82 @@
+-#!/bin/sh
+-# This installs the extra server files for Rpad on Debian.
+-# The defaults are to install to /var/www/Rpad.
+-# usage:
+-#   installRpadWWW.sh directory tree
+-# examples: 
+-#   installRpadWWW.sh /var/www/Rpad 
+-#   installRpadWWW.sh /var/www/Rpad /testingdir
+-#   installRpadWWW.sh /var/www/anotherdir
+-
+-RPAD=/var/www/Rpad
+-TREE=/.
+-if [ $# -eq 1 ]; then
+-  RPAD=$1
+-fi
+-if [ $# -eq 2 ]; then
+-  RPAD=$1
+-  TREE=$2
+-fi
+-
+-# copy the base files
+-mkdir -p $RPAD
+-cp -r ../basehtml/* $RPAD
+-cp -r ../basehtml/.RpadStartup.R $RPAD
+-
+-# fix the directory permissions
+-chmod a+w  $TREE$RPAD
+-chmod a+w  $TREE$RPAD/server
+-chmod a+x  $TREE$RPAD/server/*.pl
+-
+-# this link makes the help menu work
+-ln -s /usr/lib/R $TREE$RPAD/R
+-
+-# make a name for the apache config file
+-conf_d_name=`echo $RPAD | sed s^/^.^g`
+-
+-# apache configuration file (cgi or mod_perl)
+-mkdir -p $TREE/etc/apache2/conf.d
+-cat >> $TREE/etc/apache2/conf.d/Rpad$conf_d_name << EOF
+-<Directory $RPAD/server*>  
+-  <IfModule mod_perl.c>
+-    <Files *.pl> # requires mod_perl
+-      SetHandler perl-script
+-      PerlResponseHandler ModPerl::PerlRun
+-      PerlOptions +ParseHeaders
+-      Options -Indexes +ExecCGI
+-    </Files>
+-  </IfModule>
+-  Options +ExecCGI
+-  AddHandler cgi-script .pl
+-  <IfModule mod_expires.c>
+-    ExpiresActive on
+-    ExpiresDefault "now plus 0 seconds"
+-  </IfModule>
+-</Directory>
+-AddType text/x-component .htc
+-AddType text/html .Rpad
+-EOF
+-
+-# apache2 configuration file (cgi or mod_perl)
+-mkdir -p $TREE/etc/apache/conf.d
+-cat >> $TREE/etc/apache/conf.d/Rpad$conf_d_name << EOF
+-<Directory $RPAD/server*>  
+-  <IfModule mod_perl.c>
+-    <Files *.pl> # requires mod_perl
+-      SetHandler perl-script
+-      PerlHandler Apache::Registry
+-      Options +ExecCGI
+-      PerlSendHeader ON
+-    </Files>
+-  </IfModule>
+-  Options +ExecCGI
+-  AddHandler cgi-script .pl
+-  <IfModule mod_expires.c>
+-    ExpiresActive on
+-    ExpiresDefault "now plus 0 seconds"
+-  </IfModule>
+-</Directory>
+-AddType text/x-component .htc
+-AddType text/html .Rpad
+-EOF
+-
++#!/bin/sh
++# This installs the extra server files for Rpad on Debian.
++# The defaults are to install to /var/www/Rpad.
++# usage:
++#   installRpadWWW.sh directory tree
++# examples: 
++#   installRpadWWW.sh /var/www/Rpad 
++#   installRpadWWW.sh /var/www/Rpad /testingdir
++#   installRpadWWW.sh /var/www/anotherdir
++
++RPAD=/var/www/Rpad
++TREE=/.
++if [ $# -eq 1 ]; then
++  RPAD=$1
++fi
++if [ $# -eq 2 ]; then
++  RPAD=$1
++  TREE=$2
++fi
++
++# copy the base files
++mkdir -p $RPAD
++cp -r ../basehtml/* $RPAD
++cp -r ../basehtml/.RpadStartup.R $RPAD
++
++# fix the directory permissions
++chmod a+w  $TREE$RPAD
++chmod a+w  $TREE$RPAD/server
++chmod a+x  $TREE$RPAD/server/*.pl
++
++# this link makes the help menu work
++ln -s /usr/lib/R $TREE$RPAD/R
++
++# make a name for the apache config file
++conf_d_name=`echo $RPAD | sed s^/^.^g`
++
++# apache configuration file (cgi or mod_perl)
++mkdir -p $TREE/etc/apache2/conf.d
++cat >> $TREE/etc/apache2/conf.d/Rpad$conf_d_name << EOF
++<Directory $RPAD/server*>  
++  <IfModule mod_perl.c>
++    <Files *.pl> # requires mod_perl
++      SetHandler perl-script
++      PerlResponseHandler ModPerl::PerlRun
++      PerlOptions +ParseHeaders
++      Options -Indexes +ExecCGI
++    </Files>
++  </IfModule>
++  Options +ExecCGI
++  AddHandler cgi-script .pl
++  <IfModule mod_expires.c>
++    ExpiresActive on
++    ExpiresDefault "now plus 0 seconds"
++  </IfModule>
++</Directory>
++AddType text/x-component .htc
++AddType text/html .Rpad
++EOF
++
++# apache2 configuration file (cgi or mod_perl)
++mkdir -p $TREE/etc/apache/conf.d
++cat >> $TREE/etc/apache/conf.d/Rpad$conf_d_name << EOF
++<Directory $RPAD/server*>  
++  <IfModule mod_perl.c>
++    <Files *.pl> # requires mod_perl
++      SetHandler perl-script
++      PerlHandler Apache::Registry
++      Options +ExecCGI
++      PerlSendHeader ON
++    </Files>
++  </IfModule>
++  Options +ExecCGI
++  AddHandler cgi-script .pl
++  <IfModule mod_expires.c>
++    ExpiresActive on
++    ExpiresDefault "now plus 0 seconds"
++  </IfModule>
++</Directory>
++AddType text/x-component .htc
++AddType text/html .Rpad
++EOF
++

@@ -1,0 +1,21 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_DESCRIPTION.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add extended Description
+
+@DPATCH@
+
+diff -ru dlmap.orig/DESCRIPTION dlmap/DESCRIPTION
+--- dlmap.orig/DESCRIPTION	2008-11-14 11:15:01.000000000 +0100
++++ dlmap/DESCRIPTION	2009-05-18 04:13:29.000000000 +0200
+@@ -5,7 +5,8 @@
+ Date: 2008-11-11
+ Author: Emma Huang and Andrew George
+ Maintainer: Emma Huang <Emma.Huang@csiro.au>
+-Description: 
++Description: Detection Localization 
++	     Mapping for QTL 
+ License: GPL 2
+ Depends: qtl, ibdreg
+ Suggests: nlme, asreml

@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_mbart.cpp.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Add valarray header
+
+@DPATCH@
+
+diff -ru BayesTree.orig/src/mbart.cpp BayesTree/src/mbart.cpp
+--- BayesTree.orig/src/mbart.cpp        2006-10-16 18:25:18.000000000 -0500
++++ BayesTree/src/mbart.cpp     2009-05-11 19:32:57.000000000 -0500
+@@ -6,6 +6,7 @@
+ #include <ctime>
+ #include <search.h>
+ #include <vector>
++#include <valarray>
+
+ extern "C" {
+ #include <R.h>

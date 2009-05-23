@@ -1,0 +1,17 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_SimpleClient.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Correct tclsh path
+
+@DPATCH@
+
+diff -ru svSocket.orig/inst/etc/SimpleClient.Tcl svSocket/inst/etc/SimpleClient.Tcl
+--- svSocket.orig/inst/etc/SimpleClient.Tcl	2007-12-31 10:42:05.000000000 +0100
++++ svSocket/inst/etc/SimpleClient.Tcl	2009-05-18 04:23:04.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/tclsh8.4
++#!/usr/bin/tclsh8.4
+ # Open a terminal and issue
+ # $ tclsh SimpleClient.tcl
+ # when the R socket server is running

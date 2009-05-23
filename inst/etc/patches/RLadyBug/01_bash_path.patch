@@ -1,0 +1,26 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 01_bash_path.dpatch by  <edd@xmcorsairs.wu-wien.ac.at>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Correct bash path
+
+@DPATCH@
+
+diff -ru RLadyBug.orig/inst/LadyBug/bin/ladybug.sh RLadyBug/inst/LadyBug/bin/ladybug.sh
+--- RLadyBug.orig/inst/LadyBug/bin/ladybug.sh	2008-01-04 11:01:24.000000000 +0100
++++ RLadyBug/inst/LadyBug/bin/ladybug.sh	2009-05-12 03:34:02.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/bash
++#!/bin/bash
+ 
+ #The "executable"  version just uses the jar files in the bin directory
+ #In case you made modifications to the LadyBug source and
+diff -ru RLadyBug.orig/inst/LadyBug/bin/simsellke.sh RLadyBug/inst/LadyBug/bin/simsellke.sh
+--- RLadyBug.orig/inst/LadyBug/bin/simsellke.sh	2008-01-04 11:01:24.000000000 +0100
++++ RLadyBug/inst/LadyBug/bin/simsellke.sh	2009-05-12 03:34:19.000000000 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/bash
++#!/bin/bash
+ 
+ #The exec version just uses the jar files in the bin directory
+ #In case you made modifications to the LadyBug source and
