@@ -40,7 +40,7 @@ version_epoch <- function(pkgver) {
 
 version_revision <- function(pkgver) {
     # return the Debian revision of a Debian package version
-    return(as.integer(sub(paste('.*-([0-9]+',version_suffix,'[0-9]+)?([0-9]+)$',sep=''),'\\2',pkgver)))
+    return(as.integer(sub(paste('.*-([0-9]+',version_suffix,')?([0-9]+)$',sep=''),'\\2',pkgver)))
 }
 # version_revision . version_new(x) = id
 # version_revision(version_new(x)) = 1
