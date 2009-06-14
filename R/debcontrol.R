@@ -113,11 +113,11 @@ generate_control <- function(pkg) {
     # construct control file
     control = data.frame()
     control[1,'Source'] = pkg$srcname
-    control[1,'Section'] = 'math'  ## to be changed to 'gnu-r' once lintian groks it
+    control[1,'Section'] = 'gnu-r'
     control[1,'Priority'] = 'optional'
     control[1,'Maintainer'] = maintainer
     control[1,'Build-Depends'] = paste(pkg$depends$build,collapse=', ')
-    control[1,'Standards-Version'] = '3.8.0'
+    control[1,'Standards-Version'] = '3.8.1'
 
     control[2,'Package'] = pkg$debname
     control[2,'Architecture'] = 'all'
