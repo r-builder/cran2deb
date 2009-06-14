@@ -90,7 +90,7 @@ needs_build <- function(name,version) {
         notice('rebuilding',name,': no build record or previous build failed')
         return(T)
     }
-    # see if it has already been built
+    # see if it has already been built *and* successfully uploaded
     srcname <- pkgname_as_debian(name,binary=F)
     debname <- pkgname_as_debian(name,binary=T)
     if (file.exists(changesfile(srcname, version))) {
