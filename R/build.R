@@ -44,14 +44,14 @@ build <- function(name,extra_deps,force=F) {
 
         # wait for mini-dinstall to get to work
         upload_success = FALSE
-        for (i in seq(1,60)) {
-            if (file.exists(file.path(dinstall_archive,'testing','source',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
+        for (i in seq(1,12)) {
+            if (file.exists(file.path(dinstall_archive,'testing',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
                 upload_success = TRUE
                 break
             }
-            warn(i,'/60: does not exist',file.path(dinstall_archive,which_system,'testing','source',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))
+            warn(i,'/12: does not exist',file.path(dinstall_archive,'testing',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))
 
-            Sys.sleep(1)
+            Sys.sleep(5)
         }
         if (!upload_success) {
             warn('upload took too long; continuing as normal (some builds may fail temporarily)')
