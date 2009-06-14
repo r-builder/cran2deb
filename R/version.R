@@ -26,28 +26,28 @@ version_new <- function(rver,debian_revision=1, debian_epoch=db_get_base_epoch()
 
     # always add the '-1' Debian release; nothing is lost and rarely will R
     # packages be Debian packages without modification.
-    return(paste(pkgver,'-',debian_revision,sep=''))
+    return(paste(pkgver,'-',debian_revision,version_suffix,version_suffix_step,sep=''))
 }
 
 version_epoch <- function(pkgver) {
     # return the Debian epoch of a Debian package version
     if (!length(grep(':',pkgver)))
         return(0)
-    return(as.integer(sub('^([0-9]+):.*','\\1',pkgver)))
+    return(as.integer(sub('^([0-9]+):.*$','\\1',pkgver)))
 }
 # version_epoch . version_new(x,y) = id
 # version_epoch(version_new(x,y)) = base_epoch
 
 version_revision <- function(pkgver) {
     # return the Debian revision of a Debian package version
-    return(as.integer(sub('.*-([0-9]+)$','\\1',pkgver)))
+    return(as.integer(sub(paste('.*-([0-9]+)(',version_suffix,'[0-9]+)?$',sep=''),'\\1',pkgver)))
 }
 # version_revision . version_new(x) = id
 # version_revision(version_new(x)) = 1
 
 version_upstream <- function(pkgver) {
     # return the upstream version of a Debian package version
-    return(sub('-[0-9]+$','',sub('^[0-9]+:','',pkgver)))
+    return(sub('-[a-zA-Z0-9+.~]+$','',sub('^[0-9]+:','',pkgver)))
 }
 # version_upstream . version_new = id
 

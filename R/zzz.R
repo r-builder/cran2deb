@@ -21,6 +21,9 @@
                         ,paste(srcname,'_',version,'_'
                               ,host_arch,'.changes',sep='')))
     })
+    global("version_suffix","cran")
+    # perhaps db_cur_version() should be used instead?
+    global("version_suffix_step",1)
 
     cache <- file.path(cache_root,'cache.rda')
     if (file.exists(cache)) {
