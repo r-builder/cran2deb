@@ -149,7 +149,7 @@ generate_control <- function(pkg) {
         long_descr <- pkg$description[1,'Description']
     }
 
-    if (length(long_descr) < 1) {
+    if (length(long_descr) < 1 || long_descr == "") {
         # bypass lintian extended-description-is-empty for which we care not.
         long_descr <- paste('The author/maintainer of this package'
                            ,'did not care to enter a longer description.')
