@@ -11,7 +11,7 @@ accept GPL+ACM
 accept GPL+QHULL
 accept GPLQA
 accept LGPL
-accept MCLUST
+reject MCLUST
 accept MIT
 accept MPL
 accept NISTnls
@@ -110,3 +110,4 @@ pkg tripack tripack
 pkg BSD rtiff
 pkg MCLUST mclust02
 pkg distrib-noncomm xgobi
+pkg distrib-noncomm mapproj
