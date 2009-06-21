@@ -1,22 +1,33 @@
 accept AGPL
+accept AGPL
 accept APACHE
 accept ARTISTIC
 accept BSD
-accept CeCILL
 accept CPL
+accept CeCILL
+accept EUPL
 accept GPL
-accept GPLQA
+accept GPL+ACM
 accept GPL+QHULL
+accept GPLQA
 accept LGPL
+accept MCLUST
 accept MIT
 accept MPL
+accept NISTnls
 accept TCLTK2
+accept UNCLEAR
 accept UNLIMITED
 accept X11
-reject distrib-noncomm
-reject GPL+ACM
-reject MCLUST
-reject UNCLEAR
+accept acepack
+accept distrib-noncomm
+accept ff
+accept grade
+accept mmcm
+accept mvpart
+accept rtiff
+accept scagnostics
+accept tripack
 hash APACHE /usr/share/common-licenses/Apache-2.0
 hash ARTISTIC /usr/share/common-licenses/Artistic
 hash BSD /usr/share/common-licenses/BSD
@@ -25,38 +36,53 @@ hash GPL /usr/share/common-licenses/GPL-3
 hash LGPL /usr/share/common-licenses/LGPL-2
 hash LGPL /usr/share/common-licenses/LGPL-2.1
 hash LGPL /usr/share/common-licenses/LGPL-3
+pkg AGPL AIS
+pkg AGPL BARD
+pkg AGPL Zelig
+pkg AGPL accuracy
 pkg BSD minpack.lm
-pkg CeCILL LLAhclust
 pkg CPL lmom
-pkg distrib-noncomm Bhat
-pkg distrib-noncomm conf.design
-pkg distrib-noncomm gpclib
-pkg distrib-noncomm mlbench
-pkg distrib-noncomm poplab
-pkg distrib-noncomm PredictiveRegression
-pkg distrib-noncomm PTAk
-pkg distrib-noncomm siggenes
-pkg GPL+ACM akima
-pkg GPL+ACM tripack
+pkg CeCILL LLAhclust
+pkg EUPL EVER
+pkg GPL BayesDA
+pkg GPL CDNmoney
+pkg GPL HTMLapplets
+pkg GPL ICE
+pkg GPL ICEinfer
+pkg GPL NMMAPSlite
+pkg GPL PET
+pkg GPL PKtools
+pkg GPL RXshrink
+pkg GPL Rigroup
+pkg GPL TWIX
+pkg GPL aplpack
 pkg GPL degreenet
 pkg GPL ergm
+pkg GPL gllm
 pkg GPL gmodels
-pkg GPL ICE
+pkg GPL ibdreg
 pkg GPL latentnet
+pkg GPL moc
 pkg GPL network
 pkg GPL networksis
+pkg GPL partsm
 pkg GPL pastecs
 pkg GPL pbatR
-pkg GPL PKtools
-pkg GPL+QHULL geometry
+pkg GPL rake
 pkg GPL reldist
-pkg GPL RXshrink
 pkg GPL snpMatrix
 pkg GPL splancs
 pkg GPL statnet
+pkg GPL timsac
+pkg GPL tsfa
 pkg GPL uroot
+pkg GPL+ACM akima
+pkg GPL+ACM tripack
+pkg GPL+QHULL geometry
+pkg GPLQA regtest
 pkg LGPL R.huge
 pkg MCLUST mclust
+pkg NISTnls NISTnls
 pkg TCLTK2 tcltk2
 pkg UNCLEAR adapt
 pkg UNCLEAR cat
@@ -68,44 +94,19 @@ pkg UNCLEAR pan
 pkg UNCLEAR titecrm
 pkg UNCLEAR tlnise
 pkg UNLIMITED boolean
-pkg GPLQA regtest
-pkg GPL gllm
-pkg GPL rake
-pkg GPL Rigroup
-pkg GPL ICEinfer
-pkg GPL partsm
-pkg GPL timsac
-pkg GPL HTMLapplets
-pkg GPL moc
-pkg GPL ibdreg
-pkg AGPL accuracy
-pkg AGPL Zelig
-pkg GPL TWIX
-pkg GPL aplpack
-accept distrib-noncomm
-accept GPL+ACM
-accept MCLUST
-accept UNCLEAR
-accept acepack
-accept ff
 pkg acepack acepack
-pkg ff ff
-pkg AGPL AIS
-pkg AGPL BARD
-accept NISTnls
-pkg NISTnls NISTnls
-pkg GPL NMMAPSlite
-pkg GPL PET
+pkg distrib-noncomm Bhat
+pkg distrib-noncomm PTAk
+pkg distrib-noncomm PredictiveRegression
 pkg distrib-noncomm RLadyBug
-pkg GPL tsfa
-accept rtiff
-accept mvpart
-accept mmcm
-accept grade
-pkg GPL CDNmoney
-accept EUPL
-pkg EUPL EVER
-pkg GPL BayesDA
-accept AGPL
-accept scagnostics
+pkg distrib-noncomm conf.design
+pkg distrib-noncomm gpclib
+pkg distrib-noncomm mlbench
+pkg distrib-noncomm poplab
+pkg distrib-noncomm siggenes
+pkg ff ff
 pkg scagnostics scagnostics
+pkg tripack tripack
+pkg BSD rtiff
+pkg MCLUST mclust02
+pkg distrib-noncomm xgobi

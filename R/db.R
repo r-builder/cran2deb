@@ -70,7 +70,11 @@ db_start <- function() {
     if (!dbExistsTable(con,'blacklist_packages')) {
         dbGetQuery(con,paste('CREATE TABLE blacklist_packages ('
                   ,' package TEXT PRIMARY KEY NOT NULL '
-                  ,',reason TEXT NOT NULL '
+                  ,',nonfree INTEGER NOT NULL '
+                  ,',broken_dependency INTEGER NOT NULL '
+                  ,',unsatisfied_dependency INTEGER NOT NULL '
+                  ,',breaks_cran2deb INTEGER NOT NULL '
+                  ,',explanation TEXT NOT NULL '
                   ,')'))
     }
     return(con)
