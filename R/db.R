@@ -75,6 +75,7 @@ db_start <- function() {
                   ,',broken_dependency INTEGER NOT NULL DEFAULT 0'
                   ,',unsatisfied_dependency INTEGER NOT NULL DEFAULT 0'
                   ,',breaks_cran2deb INTEGER NOT NULL DEFAULT 0'
+                  ,',other INTEGER NOT NULL DEFAULT 0'
                   ,',explanation TEXT NOT NULL '
                   ,')'))
     }
