@@ -62,3 +62,12 @@ sysreq netcdf netcdf%
 sysreq udunits udunits%
 sysreq rgrs xclip
 sysreq flac flac
+sysreq perl perl
+sysreq ignore encode
+sysreq ignore parse::recdescent
+sysreq ignore getopt::long
+sysreq ignore file::basename
+sysreq ignore spreadsheet::writeexcel
+sysreq ignore file::glob
+sysreq writexls-perl text::csv_xs
+sysreq ignore ant
