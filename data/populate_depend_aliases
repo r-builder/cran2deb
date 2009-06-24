@@ -103,3 +103,9 @@ alias_build colorspace r-cran-colorspace
 alias_run colorspace r-cran-colorspace
 alias_run rgrs xclip
 alias_run flac flac
+alias_build latticist r-cran-vr
+alias_run latticist r-cran-vr
+alias_build writexls-perl libtext-csv-xs-perl
+alias_run writexls-perl libtext-csv-xs-perl
+alias_run perl perl
+alias_build perl libperl-dev
