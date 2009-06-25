@@ -36,3 +36,10 @@ force vr party
 force colorspace party
 force vr latticist
 force colorspace latticist
+force writexls-perl WriteXLS
+force fftw ReadImages
+force fftw-dev ReadImages
+force vr surveillance
+force colorspace surveillance
+force vr TIMP
+force colorspace TIMP
