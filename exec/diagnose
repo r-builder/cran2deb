@@ -1,72 +1,30 @@
-#!/usr/bin/rc
+#!/bin/sh
+last='natural join (select system,package,max(id) as id from builds where package not in (select package from blacklist_packages) group by package,system)'
 
-success=`{ls /var/cache/cran2deb/results/*.deb | wc -l}
-echo $success successful packages
-total=$success
+echo blacklist:
+sqlite3 -header -column /var/cache/cran2deb/cran2deb.db "select count(*) as total_blacklist,sum(nonfree) as num_nonfree, sum(obsolete) as num_obsolete, sum(broken_dependency) as num_broke_depend, sum(unsatisfied_dependency) as num_unsat_depend, sum(breaks_cran2deb) as num_break_cran2deb from blacklist_packages;"
 
-fn count_dup { sort | uniq -c | sort -n}# | awk '$1 > 1{print}' }
-fn collapse { a=`{echo $^* | sed -e 's/ | /|/g'}; echo $^a }
-echo 'warnings:'
-{for (x in (warn/* /dev/null)) cut -d: -f3- <$x | sort -u} | awk '{print $1}' | count_dup
+echo bad licenses:
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and log like '%No acceptable license:%' group by system;"
 echo
-
-faildep=('^Error: package ''.*'' could not be loaded'
-     '|' '^ERROR: lazy loading failed for package ''.*'''
-     '|' '^[[:space:]]*package .* is not available'
-     '|' 'there is no package called ''.*''')
-faildeb='do not know what to do with SystemRequirement:'
-faillic=('No acceptable license: ')
-failspc=': No space left on device'
-failhdr='error: .*\.hp?p?: No such file or directory'
-faildep=`{collapse $faildep}
-faildep=$^faildep
-faillic=`{collapse $faillic}
-faillic=$^faillic
-other=''
-
-nfaildep=`{grep -El $faildep fail/* /dev/null | wc -l}
-echo $nfaildep failed R dependencies.
-grep -Eh $faildep fail/* | count_dup
-other=$faildep
-#total=$total+$nfaildep
+echo bad system req:
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and log like '%do not know what to do with SystemRequirement:%' group by system;"
 echo
-
-nfaillic=`{grep -El $faillic `{grep -EL $other fail/*} /dev/null | wc -l}
-echo $nfaillic failed licenses.
-grep -Eh $faillic `{grep -EL $other fail/*} | count_dup
-other=$other^'|'^$faillic
-total=$total+$nfaillic
+echo 'c/c++ error (maybe):'
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and (log like '%error: %.h: No such file or directory%' or log like '%error: %.hpp: No such file or directory%') group by system;"
 echo
+echo 'missing r-cran- package:'
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and (log like \"%E: Couldn't find package r-cran-%\") group by system;"
 
-nfailspc=`{grep -El $failspc `{grep -EL $other fail/*} /dev/null | wc -l}
-echo $nfailspc out of space
-other=$other^'|'^$failspc
-total=$total+$nfailspc
 echo
+echo 'missing r-cran- package: (frequency, missing package)'
+cran2deb latest_log $(sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and (log like \"%E: Couldn't find package r-cran-%\") group by system;" | head -n 1 | cut -d'|' -f3- | tr ',' ' ') 2>/dev/null | grep "^E: Couldn't find package r-cran-" | awk '{print $5}' | sort | uniq -c | sort -rn
 
-nfailhdr=`{grep -El $failhdr `{grep -EL $other fail/*} /dev/null | wc -l}
-echo $nfailhdr missing C header
-grep -Eh $failhdr `{grep -EL $other fail/* /dev/null} | count_dup
-other=$other^'|'^$failhdr
-total=$total+$nfailhdr
 echo
-
-nfaildeb=`{grep -El $faildeb `{grep -EL $other fail/*} /dev/null | wc -l}
-echo $nfaildeb system requirement failures.
-grep -Eh $faildeb `{grep -EL $other fail/* /dev/null} | count_dup
-other=$other^'|'^$faildeb
-total=$total+$nfaildeb
+echo 'lintian:'
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and (log like \"%E: r-cran-%\") group by system;"
 echo
+echo some other dependency failure:
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and (log like '%Error: package % could not be loaded%' or log like '%ERROR: lazy loading failed for package%' or log like '%is not available%' or log like '%there is no package called%') and not (log like \"%E: Couldn't find package r-cran-%\") group by system;"
 
-nfailother=`{hoc -e `{grep -EL $other fail/* /dev/null | wc -l}^-1}
-echo $nfailother other failures.
-
-total=`{hoc -e $total}
-succrate=`{hoc -e $success/'('$total')*100'}
-echo $succrate% success rate '('$total' total)'
-#total=`{hoc -e $total-$nfaillic-$nfailspc-$nfailhdr}
-total=`{hoc -e $total-$nfaillic-$nfailspc}
-succrate=`{hoc -e $success/'('$total')*100'}
-echo $succrate% success rate with exclusions '('$total' total)'
-grep -EL $other fail/* /dev/null | xargs tail -n 20
 
