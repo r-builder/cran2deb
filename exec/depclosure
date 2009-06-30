@@ -1,0 +1,6 @@
+#!/usr/bin/r
+## DOC: cran2deb depclosure package1 [package2 ...]
+## DOC:     show the dependency closure for <package1> ...
+## DOC:
+suppressMessages(library(cran2deb))
+print(do.call(rbind, r_dependency_closure(argv,forward_arcs=F)))
