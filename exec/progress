@@ -1,0 +1,13 @@
+#!/bin/sh
+## DOC: cran2deb progress
+## DOC:     show summary report of aggregate build progress
+## DOC:
+last='natural join (select system,package,max(id) as id from builds where package not in (select package from blacklist_packages) group by package,system)'
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,(select count(*) from blacklist_packages),-1 from builds group by system;"
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),success from builds $last group by success,system"
+
+echo failures:
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,group_concat(package) from builds $last where success = 0 group by system"
+
+echo Xvfb failures:
+sqlite3 /var/cache/cran2deb/cran2deb.db "select system,group_concat(package) from builds $last where success = 0 and log like '%Xvfb failed to start%' group by system;"
