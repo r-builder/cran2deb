@@ -2,7 +2,8 @@
 last='natural join (select system,package,max(id) as id from builds where package not in (select package from blacklist_packages) group by package,system)'
 
 echo blacklist:
-sqlite3 -header -column /var/cache/cran2deb/cran2deb.db "select count(*) as total_blacklist,sum(nonfree) as num_nonfree, sum(obsolete) as num_obsolete, sum(broken_dependency) as num_broke_depend, sum(unsatisfied_dependency) as num_unsat_depend, sum(breaks_cran2deb) as num_break_cran2deb from blacklist_packages;"
+#sqlite3 -header -column /var/cache/cran2deb/cran2deb.db "select count(*) as total_blacklist,sum(nonfree) as num_nonfree, sum(obsolete) as num_obsolete, sum(broken_dependency) as num_broke_depend, sum(unsatisfied_dependency) as num_unsat_depend, sum(breaks_cran2deb) as num_break_cran2deb, sum(other) as num_other from blacklist_packages;"
+sqlite3 -header -column /var/cache/cran2deb/cran2deb.db "select count(*) as total,sum(nonfree) as nonfree, sum(obsolete) as obsolete, sum(broken_dependency) as broke_depend, sum(unsatisfied_dependency) as unsat_depend, sum(breaks_cran2deb) as break_cran2deb, sum(other) as other from blacklist_packages;"
 
 echo bad licenses:
 sqlite3 /var/cache/cran2deb/cran2deb.db "select system,count(package),group_concat(package) from builds $last where success = 0 and log like '%No acceptable license:%' group by system;"
