@@ -80,6 +80,10 @@ sysreqs_as_debian <- function(sysreq_text) {
         sysreq = gsub('(ht|f)tps?://[[:alnum:]!?*"\'(),%$_@.&+/=-]*','',sysreq)
         # squish out space
         sysreq = chomp(gsub('[[:space:]]+',' ',sysreq))
+        if (nchar(sysreq) == 0) {
+            notice('part of the SystemRequirement became nothing')
+            next
+        }
         alias <- db_sysreq_override(sysreq)
         if (is.null(alias)) {
             error('do not know what to do with SystemRequirement:',sysreq)

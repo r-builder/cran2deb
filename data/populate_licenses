@@ -1,5 +1,4 @@
 accept AGPL
-accept AGPL
 accept APACHE
 accept ARTISTIC
 accept BSD
@@ -95,19 +94,27 @@ pkg UNCLEAR titecrm
 pkg UNCLEAR tlnise
 pkg UNLIMITED boolean
 pkg acepack acepack
-pkg distrib-noncomm Bhat
-pkg distrib-noncomm PTAk
-pkg distrib-noncomm PredictiveRegression
-pkg distrib-noncomm RLadyBug
-pkg distrib-noncomm conf.design
-pkg distrib-noncomm gpclib
 pkg distrib-noncomm mlbench
-pkg distrib-noncomm poplab
-pkg distrib-noncomm siggenes
 pkg ff ff
 pkg scagnostics scagnostics
 pkg tripack tripack
 pkg BSD rtiff
 pkg MCLUST mclust02
-pkg distrib-noncomm xgobi
-pkg distrib-noncomm mapproj
+pkg distrib-noncomm CoCo
+accept GPL+AGPL
+pkg GPL+AGPL FAiR
+accept CPL
+pkg CPL Rcsdp
+accept CC-SA
+pkg CC-SA SGP
+accept ACM
+pkg ACM alphahull
+pkg ACM asypow
+accept caMassClass
+pkg caMassClass caMassClass
+pkg ARTISTIC matlab
+pkg GPL mmcm
+pkg GPL mvpart
+accept rwt
+pkg rwt rwt
+pkg UNCLEAR sgeostat
