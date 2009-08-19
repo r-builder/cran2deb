@@ -35,7 +35,6 @@ sysreq java java
 sysreq odbc %odbc% 
 sysreq ignore drivers. see readme. 
 sysreq ignore r must be compiled with --enable-r-shlib if the server is to be built 
-sysreq netcdf netcdf% 
 sysreq yacas yacas% 
 sysreq libtiff %libtiff% 
 sysreq ignore zlibdll 
@@ -52,22 +51,36 @@ sysreq ignore lammpi or mpich
 sysreq blas blas 
 sysreq blacs blacs 
 sysreq scalapack scalapack 
-sysreq wordnet wndb-tar.gz%
-sysreq boost boost%
-sysreq jags jags
-sysreq ignore winbugs
-sysreq ignore posix-compliant os
-sysreq curl curl%
-sysreq netcdf netcdf%
-sysreq udunits udunits%
-sysreq rgrs xclip
-sysreq flac flac
-sysreq perl perl
-sysreq ignore encode
-sysreq ignore parse::recdescent
-sysreq ignore getopt::long
-sysreq ignore file::basename
-sysreq ignore spreadsheet::writeexcel
-sysreq ignore file::glob
-sysreq writexls-perl text::csv_xs
-sysreq ignore ant
+sysreq wordnet wndb-tar.gz% 
+sysreq boost boost% 
+sysreq jags jags 
+sysreq ignore winbugs 
+sysreq ignore posix-compliant os 
+sysreq curl curl% 
+sysreq netcdf netcdf% 
+sysreq udunits udunits% 
+sysreq rgrs xclip 
+sysreq flac flac 
+sysreq perl perl 
+sysreq ignore encode 
+sysreq ignore parse::recdescent 
+sysreq ignore getopt::long 
+sysreq ignore file::basename 
+sysreq ignore spreadsheet::writeexcel 
+sysreq ignore file::glob 
+sysreq writexls-perl text::csv_xs 
+sysreq ignore ant 
+sysreq ignore linux/64bit 
+sysreq ignore linux/bit 
+sysreq tk tcl/tk 
+sysreq tktable tktable 
+sysreq tktable tktable% 
+sysreq ignore optional) 
+sysreq bwidget bwidget 
+sysreq ignore drivers. 
+sysreq graphviz dot graphviz 
+sysreq ignore berkeleydb 
+sysreq mpfr %mpfr% 
+sysreq ignore http://mpfr.org/% 
+sysreq gmp gmp (gnu multiple precision library 
+sysreq ignore see readme 
