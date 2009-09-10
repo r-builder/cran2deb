@@ -84,3 +84,4 @@ sysreq mpfr %mpfr%
 sysreq ignore http://mpfr.org/% 
 sysreq gmp gmp (gnu multiple precision library 
 sysreq ignore see readme 
+sysreq tk-img img 

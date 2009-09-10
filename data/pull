@@ -2,4 +2,5 @@
 cran2deb depend ls aliases >populate_depend_aliases
 cran2deb depend ls force >populate_forcedep
 cran2deb depend ls sysreq >populate_sysreq
+cran2deb license ls >populate_license_hashes
 echo NOTE: you need to update populate_licenses manually!

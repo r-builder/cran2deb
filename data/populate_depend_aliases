@@ -29,7 +29,7 @@ alias_run libfontconfig libfontconfig1
 alias_build libfreetype libfreetype6-dev 
 alias_run libfreetype libfreetype6 
 alias_build libgdal libgdal1-dev 
-alias_run libgdal libgdal1-1.5.0 
+alias_run libgdal libgdal1-1.6.0 
 alias_build libgd libgd2-noxpm-dev 
 alias_run libgd libgd2-noxpm 
 alias_build libgraphviz libgraphviz-dev 
@@ -117,3 +117,7 @@ alias_build graphviz graphviz
 alias_run graphviz graphviz 
 alias_build libdb libdb-dev 
 alias_build mpfr libmpfr-dev 
+alias_run tk-img libtk-img 
+alias_build tk-img libtk-img-dev 
+alias_build pkg-config pkg-config 
+alias_run pkg-config pkg-config 

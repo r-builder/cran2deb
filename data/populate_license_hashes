@@ -1,0 +1,120 @@
+accept apache 
+accept artistic 
+accept bsd 
+accept cecill 
+accept gpl 
+accept gplqa 
+accept gpl+qhull 
+accept lgpl 
+accept mit 
+accept mpl 
+accept unlimited 
+accept x11 
+accept distrib-noncomm 
+accept gpl+acm 
+accept unclear 
+accept acepack 
+accept ff 
+accept nistnls 
+accept rtiff 
+accept mvpart 
+accept mmcm 
+accept grade 
+accept eupl 
+accept agpl 
+accept scagnostics 
+accept akima 
+accept tripack 
+reject mclust 
+accept gpl+agpl 
+accept cpl 
+accept cc-sa 
+accept acm 
+accept camassclass 
+accept rwt 
+accept tcltk2 
+hash_sha1 apache 2b8b815229aa8a61e483fb4ba0588b8b6c491890 
+hash_sha1 artistic be0627fff2e8aef3d2a14d5d7486babc8a4873ba 
+hash_sha1 bsd 095d1f504f6fd8add73a4e4964e37f260f332b6a 
+hash_sha1 gpl 06877624ea5c77efe3b7e39b0f909eda6e25a4ec 
+hash_sha1 gpl 842745cb706f8f2126506f544492f7a80dbe29b3 
+hash_sha1 lgpl c08668a6ace9b36ba46940609040748161b03a37 
+hash_sha1 lgpl 9a1929f4700d2407c70b507b3b2aaf6226a9543c 
+hash_sha1 lgpl e7d563f52bf5295e6dba1d67ac23e9f6a160fab9 
+hash_sha1 bsd 691cf5d9d41c00bd9df4f71a769903cd3c1114e5 
+hash_sha1 cecill 7b5d0f2dcc332e487cfce45d67694829e2dc551f 
+hash_sha1 cpl 24f4880707f1a115710b08691a134fbcac8b3187 
+hash_sha1 distrib-noncomm fbcd040e3968045f82ec3eae01c0ee4d023aaf0a 
+hash_sha1 distrib-noncomm 6821f142965fb3093f42d4a3bf188966ef559947 
+hash_sha1 distrib-noncomm 430b61f55057719112e0a4fcea37bc05e1951cb8 
+hash_sha1 distrib-noncomm eff2ff3591871ede0ee8b4397bdc7ff059edd91e 
+hash_sha1 distrib-noncomm 56911f201d1c8e0d9a2c7bb8820369c31dd727b3 
+hash_sha1 distrib-noncomm 34cd71d41285f582be7c00f0c180eaf3ec6d6840 
+hash_sha1 distrib-noncomm 4aa695cbc309ab9fa4d74d28675a0e8e8ec299db 
+hash_sha1 gpl+acm f53f55135e38afd2993d3990fad973b49cd16bef 
+hash_sha1 gpl+acm 5ec09fa25a8aabad7d54901e5a4ee9e799b334ef 
+hash_sha1 gpl dd5ca2e0351075a5985dbc75aea9a579367c3603 
+hash_sha1 gpl 2c02993e7c8f22d0b5bb590125c37fa58a24637e 
+hash_sha1 gpl 37bcb2c23ebffb2a669d606391d4df1c4d794b37 
+hash_sha1 gpl 4ac49046f7c453d5d4992dc1695acd447effaebb 
+hash_sha1 gpl 811325c3b7f5e0b1073a382c4f53c37a47720e47 
+hash_sha1 gpl 67f006f04797fc844b71c55b911656ab8144317a 
+hash_sha1 gpl 31fe0bd96e05d07216701ff457b8adaf6462379b 
+hash_sha1 gpl f50f1034fc720a1c03875d5bf3b79d102c9d6605 
+hash_sha1 gpl+qhull 9b03de793e5641feb756a7b0ce2bfffdeb778ccd 
+hash_sha1 gpl 34f7b4fc3375c326ea742f053ba75e4e80795cf4 
+hash_sha1 gpl e6e02671a920a2a1befa8cebf2d152ef70d0ed20 
+hash_sha1 gpl b0909a630db543721dafe4a348ee755f85fbe001 
+hash_sha1 gpl 1fabda5fc86f494ae54cf8f8ad85fde49e0548c9 
+hash_sha1 lgpl bb3101315829c159125a337b1e11b9ad9e9bad31 
+hash_sha1 mclust bc98e96bfbbe8396c57d9decccb8bd6bcea99a04 
+hash_sha1 tcltk2 50424add056b71665e3e26b393f460e0908e9da2 
+hash_sha1 unclear 3d76287efb04bc6eb366ea0d49ac518d811bd32f 
+hash_sha1 unclear 8408f5eaded6ad4895fdf161c9cd38231dd072ad 
+hash_sha1 unclear 1ecc6e16f3390f00709b2516e609366f2efeabb7 
+hash_sha1 unclear eee8da9d5d6ac0f21d97b3038c0fc7f86a4891a0 
+hash_sha1 unclear 4932e4c94fb80efe20297bd9ace2fda86758874d 
+hash_sha1 unlimited b4323144ad3c121088025ff951028ae588ba3031 
+hash_sha1 gplqa b39206c5297bcea7e6abbc4981f8f15a76aef24f 
+hash_sha1 gpl 5b7c62c4726d772162e3e4fbf368dfaf65fe5e32 
+hash_sha1 gpl ecdf063f8a937c005c4f02450d0ecbdc3376acf6 
+hash_sha1 gpl 64ed18b138fcc9389a33f620eaa2f9479f367ff7 
+hash_sha1 gpl 931a2aaf2fac897138f90c96a27e5acaf74b4694 
+hash_sha1 gpl edde20802066923644c363328903121c05799bb6 
+hash_sha1 agpl 86d2ea18c092d87328f06d22d997af59cee10fc4 
+hash_sha1 gpl d093976b85026cb225a12908088bb19dd9d480b7 
+hash_sha1 gpl 0e9f026efef26009619f9048637eb2a498379c88 
+hash_sha1 acepack 6bdcfb412d82fe3ad5b64650d900c2845d08fbc6 
+hash_sha1 ff 0ce6a854127045f0b2efc9be8bacebb3da42a855 
+hash_sha1 agpl d3c31418974fd4d69032bc1f5c58e13c1634ca40 
+hash_sha1 agpl 6bdfdd431d081dd0bacf493ba3563f3480ab8936 
+hash_sha1 nistnls 735b08919865788221c3139506b4f508e6636dfa 
+hash_sha1 gpl 836f5f94473a04c4b7c48e6cb86c351131201ae9 
+hash_sha1 gpl dca3c7c942b9e09fa2dde956b00b1ceaa5b99e02 
+hash_sha1 distrib-noncomm 7d15a1e04d01df4fa36abccf1f6702ace54ec15f 
+hash_sha1 gpl 9e3914cc887ffa697e008b1990607dec00075d9e 
+hash_sha1 gpl 82a48e8a04d4a53a63cb7d84c57ca3908add375f 
+hash_sha1 eupl 7642ee2451a0d84de46a7e8236ccfd019e9595b4 
+hash_sha1 gpl f76132a54a079daad040663668572cd91a8bfae1 
+hash_sha1 scagnostics 5e059a7b25be224c8d9bae55bbdd7cb3675e36b5 
+hash_sha1 akima 485316717b03afbd6d20f7810f9123b4445c8660 
+hash_sha1 tripack b71ffb1e3a65c83693858fd3c8f1e557f97cc43c 
+hash_sha1 bsd 105de13a43220f6fc5d7d46d7b592298c4a23f64 
+hash_sha1 mclust 9ac21f87563664c2a2ebc6d4413ec61c8ebb84ff 
+hash_sha1 distrib-noncomm c14cd24b4e49bb78bb5b57472c6253781f6efed3 
+hash_sha1 distrib-noncomm a0ba68c1c804fda1edde14e8d42225b8225cb0b7 
+hash_sha1 distrib-noncomm e7f48dfecfde56adcf5c9bd57779a0d7d15c4f4b 
+hash_sha1 gpl+agpl 4c667eba3ef3f3cdd47170fe438b8abc1adcfaff 
+hash_sha1 cpl 69c37907f7adb8ec4d7189aed8a4dd12294056f2 
+hash_sha1 cc-sa c960bb1a7ed5e5f8c24591f77256eb8f5b9ae73b 
+hash_sha1 acm 1127f761137a717b10892c1b4df07fc14d70f659 
+hash_sha1 acm 4cfe0db3b018ae1f7ad70556753dec9c603ada50 
+hash_sha1 camassclass 8b455d73a369934c7e84b24e0a16886248285221 
+hash_sha1 artistic 07ce494c32b890b381e73b8fa4fdf87a8d946e1e 
+hash_sha1 gpl 78f806d7e93a3c1ec08836b9d4b689fecb1df19b 
+hash_sha1 gpl 756981bd0b95c68fd2d1c9123759261aefb51373 
+hash_sha1 rwt b6da6c2417cc2cd2be37db408543c2f8c2201034 
+hash_sha1 unclear befc3a63448173d57ad7304319ceaf01302ba035 
+hash_sha1 tcltk2 e7d59565ab5ec7245fbfea74384798e5f6a9f483 
+hash_sha1 tcltk2 7ddf1b18f9624b0a6ded40c70be329cadd074af8 
+hash_sha1 gpl 6866382245b1802189e6e8b956196ce4715fc67f 
