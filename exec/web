@@ -1,0 +1,38 @@
+#!/usr/bin/env r
+## DOC: cran2deb web
+## DOC:     generate cran2deb status web pages
+## DOC:
+
+suppressPackageStartupMessages(library(cran2deb))
+library(hwriter)
+
+banned_builds_path='/var/www/banned_packages.html'
+todays_builds_path='/var/www/todays_packages.html'
+latest_builds_path='/var/www/latest_packages.html'
+failed_builds_path='/var/www/failed_packages.html'
+
+links <- function(p) {
+    hwrite(c(
+            hwrite('Packages built today',link='/todays_packages.html')
+           ,hwrite('Successful packages',link='/latest_packages.html')
+           ,hwrite('Failed packages',link='/failed_packages.html')
+           ,hwrite('Banned packages',link='/banned_packages.html')
+           ),p,center=TRUE,border=0,style='padding: 6px 6px 6px 12px')
+}
+
+page <- function(content,path,title) {
+    p <- openPage(path,title=title)
+    hwrite(title,p,heading=1)
+    hwrite('Install instructions',p,center=TRUE,link='/')
+    links(p)
+    hwrite(content,p,center=TRUE,border=1,table.style='border-collapse: collapse; padding: 0px 0px 0px 0px; margin: 0'
+                  ,row.names=FALSE,row.bgcolor='#ffaaaa')
+    links(p)
+    closePage(p)
+}
+
+page(db_blacklist_reasons(),banned_builds_path,'Banned packages')
+page(db_todays_builds(),todays_builds_path,'Packages built today')
+page(db_successful_builds(),latest_builds_path,'Latest successfully built packages')
+page(db_failed_builds(),failed_builds_path,'Recent failed packages')
+

@@ -420,3 +420,48 @@ db_blacklist_packages <- function() {
     db_stop(con)
     return(packages)
 }
+
+db_blacklist_reasons <- function () {
+    con <- db_start()
+    packages <- dbGetQuery(con,'SELECT package,explanation from blacklist_packages')
+    db_stop(con)
+    return(packages)
+}
+
+db_todays_builds <- function() {
+    today <- db_quote(format(Sys.time(), db_date_format))
+    con <- db_start()
+    builds <- dbGetQuery(con,paste('select id,success,system,package,
+                                    r_version as version,deb_epoch as epo,
+                                    deb_revision as rev, scm_revision as svnrev,
+                                    db_version as db,date_stamp,time_stamp
+                                    from builds where date_stamp = ',today))
+    db_stop(con)
+    return(builds)
+}
+
+db_successful_builds <- function() {
+    con <- db_start()
+    builds <- dbGetQuery(con,'select system,package,r_version,date_stamp,time_stamp
+                              from builds natural join (select system,package,max(id) as id
+                                                        from builds
+                                                        where package not in
+                                                                (select package from blacklist_packages)
+                                                        group by package,system)
+                              where success = 1')
+    db_stop(con)
+    return(builds)
+}
+
+db_failed_builds <- function() {
+    con <- db_start()
+    builds <- dbGetQuery(con,'select system,package,r_version,date_stamp,time_stamp
+                              from builds natural join (select system,package,max(id) as id
+                                                        from builds
+                                                        where package not in
+                                                                (select package from blacklist_packages)
+                                                        group by package,system)
+                              where success = 0')
+    db_stop(con)
+    return(builds)
+}
