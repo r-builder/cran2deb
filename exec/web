@@ -21,6 +21,7 @@ links <- function(p) {
 }
 
 page <- function(content,path,title) {
+    title <- paste('cran2deb:',title)
     p <- openPage(path,title=title)
     hwrite(title,p,heading=1)
     hwrite('Install instructions',p,center=TRUE,link='/')
