@@ -48,3 +48,4 @@ force libdb RBerkeley
 force vr DoE.base 
 force colorspace DoE.base 
 force pkg-config mvgraph 
+force glade RGtk2 
