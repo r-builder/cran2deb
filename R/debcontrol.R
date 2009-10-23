@@ -163,7 +163,7 @@ generate_control <- function(pkg) {
     # the longer description does not begin on the synopsis line --- R's
     # write.dcf does not appear to have a nicer way of doing this.
     descr = paste(descr,'"\n\n', long_descr, sep='')
-    % add some extra nice info about the original R package
+    # add some extra nice info about the original R package
     for (r_info in c('Author','Maintainer','URL')) {
         if (r_info %in% colnames(pkg$description)) {
             descr = paste(descr,'\n\n',r_info,': ',pkg$description[1,r_info],sep='')
