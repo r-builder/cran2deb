@@ -1,0 +1,16 @@
+#!/usr/bin/env r
+## DOC: cran2deb build_all
+## DOC:		build all packages again
+## DOC:
+
+suppressPackageStartupMessages(library(cran2deb))
+
+if (exists('argv')) { # check for littler
+    db_update_package_versions()
+    pkgs <- dimnames(available)[1]
+    build_order <- r_dependency_closure(pkgs)
+    notice('build order',paste(build_order,collapse=', '))
+    for (pkg in build_order) {
+        build(pkg,c())
+    }
+}
