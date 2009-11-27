@@ -121,3 +121,5 @@ alias_run tk-img libtk-img
 alias_build tk-img libtk-img-dev 
 alias_build pkg-config pkg-config 
 alias_run pkg-config pkg-config 
+alias_build rgtk2 r-cran-rgtk2 
+alias_run rgtk2 r-cran-rgtk2 

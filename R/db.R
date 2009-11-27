@@ -307,6 +307,21 @@ db_date_format <- '%Y-%m-%d'
 db_time_format <- '%H:%M:%OS %Z'
 
 db_record_build <- function(package, deb_version, log, success=F) {
+    # if the log is more than 1kB, only keep the last 1kB.
+    # this is to work around a problem that seems to have appeared in R 2.10 causing calloc errors.
+    # if the log is not pruned then we get the following error:
+    # 
+    # Error in gsub("(['\"])", "\\1\\1", text) :
+    #   Calloc could not allocate (-197080581 of 1) memory
+    # Error in dbGetQuery(con, paste("INSERT OR REPLACE INTO builds", "(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)",  :
+    #   error in evaluating the argument 'statement' in selecting a method for function 'dbGetQuery'
+
+    log = paste(log,collapse='\n')
+    end = nchar(log)
+    max_log_len = 1024
+    if (end > max_log_len) {
+        log = db_quote(substr(log,end-max_log_len,end))
+    }
     con <- db_start()
     o<-options(digits.secs = 6)
     dbGetQuery(con,paste('INSERT OR REPLACE INTO builds'
@@ -322,7 +337,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
                         ,',',db_quote(format(Sys.time(), db_date_format))
                         ,',',db_quote(format(Sys.time(), db_time_format))
                         ,',',db_quote(scm_revision)
-                        ,',',db_quote(paste(log, collapse='\n'))
+                        ,',',log
                         ,')'))
     options(o)
     db_stop(con)
