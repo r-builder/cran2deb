@@ -322,7 +322,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
     if (end > max_log_len) {
         log <- db_quote(substr(log,end-max_log_len,end))
     } else {
-        log <- db_quote(substr(log))
+        log <- db_quote(log)
     }
     con <- db_start()
     o <- options(digits.secs = 6)
