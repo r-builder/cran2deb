@@ -316,14 +316,16 @@ db_record_build <- function(package, deb_version, log, success=F) {
     # Error in dbGetQuery(con, paste("INSERT OR REPLACE INTO builds", "(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)",  :
     #   error in evaluating the argument 'statement' in selecting a method for function 'dbGetQuery'
 
-    log = paste(log,collapse='\n')
-    end = nchar(log)
-    max_log_len = 1024
+    log <- paste(log,collapse='\n')
+    end <- nchar(log)
+    max_log_len <- 1024
     if (end > max_log_len) {
-        log = db_quote(substr(log,end-max_log_len,end))
+        log <- db_quote(substr(log,end-max_log_len,end))
+    } else {
+        log <- db_quote(substr(log))
     }
     con <- db_start()
-    o <-options(digits.secs = 6)
+    o <- options(digits.secs = 6)
     sqlcmd <- paste('INSERT OR REPLACE INTO builds'
                     ,'(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)'
                     ,'VALUES'
