@@ -33,7 +33,7 @@ if (exists('argv')) { # check for littler
         }
     }
     if (argc == 0) {
-        err('usage: cran2deb [-D extra_dep1,extra_dep2,...] package package ...')
+        err('usage: cran2deb build [-D extra_dep1,extra_dep2,...] package package ...')
     }
     build_order <- r_dependency_closure(c(extra_deps$r,argv))
     notice('build order',paste(build_order,collapse=', '))
