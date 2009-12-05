@@ -310,7 +310,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
     # if the log is more than 1kB, only keep the last 1kB.
     # this is to work around a problem that seems to have appeared in R 2.10 causing calloc errors.
     # if the log is not pruned then we get the following error:
-    # 
+    #
     # Error in gsub("(['\"])", "\\1\\1", text) :
     #   Calloc could not allocate (-197080581 of 1) memory
     # Error in dbGetQuery(con, paste("INSERT OR REPLACE INTO builds", "(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)",  :
@@ -323,22 +323,24 @@ db_record_build <- function(package, deb_version, log, success=F) {
         log = db_quote(substr(log,end-max_log_len,end))
     }
     con <- db_start()
-    o<-options(digits.secs = 6)
-    dbGetQuery(con,paste('INSERT OR REPLACE INTO builds'
-                        ,'(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)'
-                        ,'VALUES'
-                        ,'(',db_quote(package)
-                        ,',',db_quote(which_system)
-                        ,',',db_quote(version_upstream(deb_version))
-                        ,',',db_quote(version_epoch(deb_version))
-                        ,',',db_quote(version_revision(deb_version))
-                        ,',',db_cur_version(con)
-                        ,',',as.integer(success)
-                        ,',',db_quote(format(Sys.time(), db_date_format))
-                        ,',',db_quote(format(Sys.time(), db_time_format))
-                        ,',',db_quote(scm_revision)
-                        ,',',log
-                        ,')'))
+    o <-options(digits.secs = 6)
+    sqlcmd <- paste('INSERT OR REPLACE INTO builds'
+                    ,'(package,system,r_version,deb_epoch,deb_revision,db_version,success,date_stamp,time_stamp,scm_revision,log)'
+                    ,'VALUES'
+                    ,'(',db_quote(package)
+                    ,',',db_quote(which_system)
+                    ,',',db_quote(version_upstream(deb_version))
+                    ,',',db_quote(version_epoch(deb_version))
+                    ,',',db_quote(version_revision(deb_version))
+                    ,',',db_cur_version(con)
+                    ,',',as.integer(success)
+                    ,',',db_quote(format(Sys.time(), db_date_format))
+                    ,',',db_quote(format(Sys.time(), db_time_format))
+                    ,',',db_quote(scm_revision)
+                    ,',',log
+                    ,')')
+    print(sqlcmd)
+    try(dbGetQuery(con,sqlcmd))
     options(o)
     db_stop(con)
 }
