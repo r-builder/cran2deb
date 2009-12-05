@@ -341,7 +341,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
                     ,',',db_quote(scm_revision)
                     ,',',log
                     ,')')
-    print(sqlcmd)
+    ##print(sqlcmd)
     try(dbGetQuery(con,sqlcmd))
     options(o)
     db_stop(con)

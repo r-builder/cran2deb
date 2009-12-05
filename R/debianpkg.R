@@ -133,6 +133,8 @@ prepare_new_debian <- function(pkg,extra_deps) {
     generate_rules(pkg)
     generate_copyright(pkg)
     generate_control(pkg)
+    ## debdir <- file.path(pkg$path,'debian')
+    ## system(paste("ls ", debdir, "; ls -l ", debdir, "/patches/*", sep=""))
 
     # convert text to utf8 (who knows what the original character set is --
     # let's hope iconv DTRT).
