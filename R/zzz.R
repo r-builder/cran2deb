@@ -16,6 +16,7 @@
     global("r_depend_fields", c('Depends','Imports')) # Suggests, Enhances
     global("scm_revision", paste("svn:", svnversion()))
     global("patch_dir", '/etc/cran2deb/patches')
+    global("lintian_dir", '/etc/cran2deb/lintian')
     global("changesfile", function(srcname,version='*') {
         return(file.path(pbuilder_results
                         ,paste(srcname,'_',version,'_'
