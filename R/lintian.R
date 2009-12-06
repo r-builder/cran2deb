@@ -1,4 +1,4 @@
-apply_lintian <- function(pkg) {
+generate_lintian <- function(pkg) {
     lintian_src = file.path(lintian_dir, pkg$name)
     if (!file.exists(lintian_src)) {
         notice('no lintian overrides ', lintian_src)
