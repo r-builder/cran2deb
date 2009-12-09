@@ -115,20 +115,21 @@ map_aliases_to_debian <- function(aliases) {
 
 generate_control <- function(pkg) {
     # construct control file
-    control = data.frame()
-    control[1,'Source'] = pkg$srcname
-    control[1,'Section'] = 'gnu-r'
-    control[1,'Priority'] = 'optional'
-    control[1,'Maintainer'] = maintainer
-    control[1,'Build-Depends'] = paste(pkg$depends$build,collapse=', ')
-    control[1,'Standards-Version'] = '3.8.3'
 
-    control[2,'Package'] = pkg$debname
-    control[2,'Architecture'] = 'all'
+    control <- data.frame()
+    control[1,'Source'] <- pkg$srcname
+    control[1,'Section'] <- 'gnu-r'
+    control[1,'Priority'] <- 'optional'
+    control[1,'Maintainer'] <- maintainer
+    control[1,'Build-Depends'] <- paste(pkg$depends$build, collapse=', ')
+    control[1,'Standards-Version'] <- '3.8.3'
+
+    control[2,'Package'] <- pkg$debname
+    control[2,'Architecture'] <- 'all'
     if (pkg$archdep) {
-        control[2,'Architecture'] = 'any'
+        control[2,'Architecture'] <- 'any'
     }
-    control[2,'Depends'] = paste(pkg$depends$bin,collapse=', ')
+    control[2,'Depends'] <- paste(pkg$depends$bin,collapse=', ')
 
 #   # bundles provide virtual packages of their contents
 #   # unnecessary for now; cran2deb converts R bundles itself
@@ -141,11 +142,11 @@ generate_control <- function(pkg) {
 #    }
 
     # generate the description
-    descr = 'GNU R package "'
+    descr <- 'GNU R package "'
     if ('Title' %in% colnames(pkg$description)) {
-        descr = paste(descr,pkg$description[1,'Title'],sep='')
+        descr <- paste(descr,pkg$description[1,'Title'],sep='')
     } else {
-        descr = paste(descr,pkg$name,sep='')
+        descr <- paste(descr,pkg$name,sep='')
     }
     if (pkg$is_bundle) {
         long_descr <- pkg$description[1,'BundleDescription']
@@ -162,14 +163,17 @@ generate_control <- function(pkg) {
     # using \n\n.\n\n is not very nice, but is necessary to make sure
     # the longer description does not begin on the synopsis line --- R's
     # write.dcf does not appear to have a nicer way of doing this.
-    descr = paste(descr,'"\n\n', long_descr, sep='')
+    descr <- paste(descr,'"\n\n', long_descr, sep='')
     # add some extra nice info about the original R package
     for (r_info in c('Author','Maintainer','URL')) {
         if (r_info %in% colnames(pkg$description)) {
-            descr = paste(descr,'\n\n',r_info,': ',pkg$description[1,r_info],sep='')
+            descr <- paste(descr,'\n\n',r_info,': ',pkg$description[1,r_info],sep='')
         }
     }
-    control[2,'Description'] = descr
+    if (Encoding(descr) == "unknown")
+        Encoding(descr) <- "latin1"     # or should it be UTF-8
+
+    control[2,'Description'] <- descr
 
     # Debian policy says 72 char width; indent minimally
     write.dcf(control,file=pkg$debfile('control.in'),indent=1,width=72)

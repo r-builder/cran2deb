@@ -30,7 +30,10 @@ license_text_reduce <- function(license) {
     # these reduction steps are sound for all conformant R license
     # specifications.
 
-    # compress spaces into a single space
+    if (Encoding(license) == "unknown")
+        Encoding(license) <- "latin1"   # or should it be UTF-8 ?
+
+    ## compress spaces into a single space
     license = gsub('[[:space:]]+',' ',license)
     # make all characters lower case
     license = tolower(license)
@@ -87,11 +90,19 @@ get_license <- function(pkg,license) {
             file = gsub('file ','',license)
             path = file.path(pkg$path, file)
             if (file.exists(path)) {
-                license <- license_text_reduce(readChar(path,file.info(path)$size))
+                #license <- license_text_reduce(readChar(path,file.info(path)$size))
+                con <- file(path, "rb")
+                content <- paste(readLines(con), collapse="\n")
+                close(con)
+                license <- license_text_reduce(content)
             } else {
                 path = file.path(pkg$path, 'inst', file)
                 if (file.exists(path)) {
-                    license <- license_text_reduce(readChar(path,file.info(path)$size))
+                    #license <- license_text_reduce(readChar(path,file.info(path)$size))
+                    con <- file(path, "rb")
+                    content <- paste(readLines(con), collapse="\n")
+                    close(con)
+                    license <- license_text_reduce(content)
                 } else {
                     error('said to look at a license file but license file is missing')
                 }
