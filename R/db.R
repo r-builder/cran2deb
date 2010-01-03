@@ -318,7 +318,7 @@ db_record_build <- function(package, deb_version, log, success=F) {
 
     log <- paste(log,collapse='\n')
     end <- nchar(log)
-    max_log_len <- 1024
+    max_log_len <- 10240
     if (end > max_log_len) {
         log <- db_quote(substr(log,end-max_log_len,end))
     } else {
