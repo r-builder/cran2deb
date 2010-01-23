@@ -442,7 +442,7 @@ db_blacklist_packages <- function() {
 
 db_blacklist_reasons <- function () {
     con <- db_start()
-    packages <- dbGetQuery(con,'SELECT package,explanation from blacklist_packages')
+    packages <- dbGetQuery(con,'SELECT package,explanation from blacklist_packages group by explanation')
     db_stop(con)
     return(packages)
 }
