@@ -19,12 +19,11 @@ available <- available.packages(contrib.url(mirror))
 message('updating list of available R task views...')
 ctv.available <- available.views(repo=mirror)
 
-#message('updating list of base R packages...')
-#base_pkgs <- readLines(pipe(paste('sudo pbuilder --execute --override-config --configfile'
-#                                 ,shQuote(pbuilder_config),'-- /usr/bin/R --vanilla 2>&1 >/dev/null <'
-#                                 ,shQuote(file.path(root,'exec/get_base_pkgs'))
-#                                 ,'| grep -v ^W:')))
-base_pkgs <- ''
+message('updating list of base R packages...')
+base_pkgs <- readLines(pipe(paste('sudo pbuilder --execute --override-config --configfile'
+                                 ,shQuote(pbuilder_config),'-- /usr/bin/R --vanilla 2>&1 >/dev/null <'
+                                 ,shQuote(file.path(root,'exec/get_base_pkgs'))
+                                 ,'| grep -v ^W:')))
 
 message('updating list of existing Debian packages...')
 debian_pkgs <- readLines(pipe('apt-cache rdepends r-base-core | sed -e "/^  r-cran/{s/^[[:space:]]*r/r/;p}" -e d | sort -u'))
