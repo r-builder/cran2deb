@@ -1,6 +1,6 @@
 #!/usr/bin/env r
 instPkgs <- installed.packages(lib.loc="/usr/lib/R/library")
 instPkgs <- instPkgs[ instPkgs[,"Priority"] == 'base', ]
-for (pkg in rownames(instPkgs())) {
+for (pkg in rownames(instPkgs)) {
 	message(pkg)
 }
