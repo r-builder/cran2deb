@@ -56,7 +56,7 @@ alias_run pari-gp pari-gp
 alias_build proj proj 
 alias_run proj proj 
 alias_build quantlib libquantlib0-dev 
-alias_run quantlib libquantlib-0.9.7 
+alias_run quantlib libquantlib-0.9.9 
 alias_run sqlite libsqlite3-0 
 alias_build sqlite libsqlite3-dev 
 alias_build zlib zlib1g-dev 
@@ -67,7 +67,7 @@ alias_build autotools autotools-dev
 alias_build tcl tcl8.5-dev 
 alias_build tk tk8.5-dev 
 alias_build odbc unixodbc-dev 
-alias_build mysql libmysqlclient15-dev 
+alias_build mysql libmysqlclient-dev 
 alias_build mpi libopenmpi-dev 
 alias_build pvm pvm-dev 
 alias_build hdf5 libhdf5-serial-dev 
@@ -123,3 +123,11 @@ alias_build pkg-config pkg-config
 alias_run pkg-config pkg-config 
 alias_build rgtk2 r-cran-rgtk2 
 alias_run rgtk2 r-cran-rgtk2 
+alias_build libitpp libitpp-dev 
+alias_build libxerces-c libxerces-c-dev 
+alias_build protobuf-compiler protobuf-compiler 
+alias_build libprotobuf-dev libprotobuf-dev 
+alias_build libprotoc-dev libprotoc-dev 
+alias_build postgresql_java libpg-java 
+alias_run postgresql_java libpg-java 
+alias_build armadillo libarmadillo-dev 

@@ -20,7 +20,6 @@ force boost RBGL
 force netcdf RNetCDF 
 force libtiff biOps 
 force fftw-dev rimage 
-force r-recommended spBayes 
 force libxt Cairo 
 force autotools qp 
 force boost MBA 
@@ -50,3 +49,18 @@ force colorspace DoE.base
 force pkg-config mvgraph 
 force glade RGtk2 
 force rgtk2 rattle 
+force libitpp psgp 
+force java farmR 
+force gsl mvabund 
+force colorspace nnDiag 
+force autotools fftw 
+force protobuf-compiler RProtoBuf 
+force libprotobuf-dev RProtoBuf 
+force libprotoc-dev RProtoBuf 
+force pkg-config RProtoBuf 
+force colorspace simPopulation 
+force java RpgSQL 
+force netcdf ncdf4 
+force colorspace vcdExtra 
+force boost RcppArmadillo 
+force pkg-config fftw 

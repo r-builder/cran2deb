@@ -13,14 +13,11 @@ accept x11
 accept distrib-noncomm 
 accept gpl+acm 
 accept unclear 
-accept acepack 
-accept ff 
 accept nistnls 
 accept rtiff 
 accept mvpart 
 accept mmcm 
 accept grade 
-accept eupl 
 accept agpl 
 accept scagnostics 
 accept akima 
@@ -33,6 +30,20 @@ accept acm
 accept camassclass 
 accept rwt 
 accept tcltk2 
+accept agpl-3 
+accept gpl-2-qa 
+accept ff_license 
+accept rindex_license 
+accept eupl 
+accept statnet 
+accept degreenet 
+accept geometry 
+accept ergm 
+accept acepack 
+accept ff 
+accept mspath 
+accept ever 
+accept latentnet 
 hash_sha1 apache 2b8b815229aa8a61e483fb4ba0588b8b6c491890 
 hash_sha1 artistic be0627fff2e8aef3d2a14d5d7486babc8a4873ba 
 hash_sha1 bsd 095d1f504f6fd8add73a4e4964e37f260f332b6a 
@@ -85,7 +96,6 @@ hash_sha1 agpl 86d2ea18c092d87328f06d22d997af59cee10fc4
 hash_sha1 gpl d093976b85026cb225a12908088bb19dd9d480b7 
 hash_sha1 gpl 0e9f026efef26009619f9048637eb2a498379c88 
 hash_sha1 acepack 6bdcfb412d82fe3ad5b64650d900c2845d08fbc6 
-hash_sha1 ff 0ce6a854127045f0b2efc9be8bacebb3da42a855 
 hash_sha1 agpl d3c31418974fd4d69032bc1f5c58e13c1634ca40 
 hash_sha1 agpl 6bdfdd431d081dd0bacf493ba3563f3480ab8936 
 hash_sha1 nistnls 735b08919865788221c3139506b4f508e6636dfa 
@@ -118,3 +128,26 @@ hash_sha1 unclear befc3a63448173d57ad7304319ceaf01302ba035
 hash_sha1 tcltk2 e7d59565ab5ec7245fbfea74384798e5f6a9f483 
 hash_sha1 tcltk2 7ddf1b18f9624b0a6ded40c70be329cadd074af8 
 hash_sha1 gpl 6866382245b1802189e6e8b956196ce4715fc67f 
+hash_sha1 agpl-3 70ae9c1442b696a7b3ded90579785030ff7bdbb4 
+hash_sha1 agpl-3 a596e7f3a3125045173253bddfc8e4b3cba09004 
+hash_sha1 rindex_license fa72fc5a881001769d691af7ab529699c08edda0 
+hash_sha1 eupl 4418cb312744f1b1a76420cf3ed43dded454e1a2 
+hash_sha1 eupl 4b4f67314d4b0cbdcf18e8c765374bfc49c699d1 
+hash_sha1 statnet 73d704179dcbe75498f174941036db921e4aab98 
+hash_sha1 statnet d6cfab1f34efdeb09ff17948ef37eb82bb151d71 
+hash_sha1 degreenet bcfb8b637a823520e18cd00570ab67ac34355e9b 
+hash_sha1 degreenet c1a8f1e9fda548a222131a42db976a9b841a8b84 
+hash_sha1 geometry 4265480ee7ad0ef41f684d20c8204356e12c525c 
+hash_sha1 geometry c52bef65629df25bcd18e97236f5405e7c408097 
+hash_sha1 ergm 2f7fb32f8c752f73fd9f32e92af697c8395ad3ae 
+hash_sha1 ergm e36db453758cb8173f7cd80561feaea796f767ce 
+hash_sha1 acepack 698e04a130a50d9e0b990f4bd2569fa54366102a 
+hash_sha1 acepack 44801e90a3c00a7fe4f5a6bff8c9eaf743d717f4 
+hash_sha1 ff 220e79fccd4f8e4874b8c8c481fe7ff9b8e3c850 
+hash_sha1 ff 1e0f7f00f430604860afdb5fe911be5db07d5913 
+hash_sha1 mspath 58c267c9ae997b5814c5fcaaf6233783f937a2c3 
+hash_sha1 mspath 0a4121a7735852e842112b0dd667160f99df39d4 
+hash_sha1 ever a3ab3a534d3514d56ae1ea76414e51543af5bef8 
+hash_sha1 ever 8b25578cf5d509b042115c54824e8423d95f4061 
+hash_sha1 latentnet a67ae6964aa0ede190721cfd17c2509b7799e881 
+hash_sha1 latentnet d72813ddddb94f752d9929bdbe622179a623986b 

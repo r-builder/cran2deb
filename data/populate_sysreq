@@ -85,3 +85,18 @@ sysreq ignore http://mpfr.org/%
 sysreq gmp gmp (gnu multiple precision library 
 sysreq ignore see readme 
 sysreq tk-img img 
+sysreq ignore activetcl 
+sysreq libitpp libitpp 
+sysreq libxerces-c libxerces-c 
+sysreq ignore java runtime 
+sysreq protobuf protocol buffer compiler (to create c++ header 
+sysreq ignore Protocol Buffer compiler (% 
+sysreq ignore source files .proto % 
+sysreq ignore library (version 2.2.0 or later) 
+sysreq ignore library 
+sysreq libpng libpng% 
+sysreq postgresql postgresql 
+sysreq postgresql_java postgresql jdbc driver 
+sysreq ignore gmt 
+sysreq armadillo armadillo 
+sysreq java jri 

@@ -1,5 +1,5 @@
 
-build <- function(name,extra_deps,force=F) {
+build <- function(name,extra_deps,force=F,do_cleanup=T) {
     # can't, and hence don't need to, build base packages
     if (name %in% base_pkgs) {
         return(T)
@@ -58,7 +58,11 @@ build <- function(name,extra_deps,force=F) {
         }
         return(pkg$debversion)
     })())
-    cleanup(dir)
+    if (do_cleanup) {
+        cleanup(dir)
+    } else {
+        notice('output is in',dir,'. you must clean this up yourself.')
+    }
     if (is.null(result)) {
         # nothing was done so escape asap.
         return(result)

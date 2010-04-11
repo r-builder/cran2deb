@@ -1,6 +1,7 @@
 #!/usr/bin/env r
-## DOC: cran2deb build [-D extra_dep1,extra_dep2,...] package1 package2 ...
+## DOC: cran2deb build [-d] [-D extra_dep1,extra_dep2,...] package1 package2 ...
 ## DOC:     builds a particular package.
+## DOC:		-d   leave the staging directory around for debugging.
 ## DOC:
 suppressPackageStartupMessages(library(cran2deb))
 
@@ -9,7 +10,8 @@ if (exists('argv')) { # check for littler
     extra_deps = list()
     extra_deps$deb = c()
     extra_deps$r = c()
-    opts = c('-D','-R')
+    do_cleanup = T
+    opts = c('-D','-R','-d')
     # first argument is the root --- this is dealt with elsewhere.
     for (i in 2:argc) {
         if (!(argv[i] %in% opts)) {
@@ -31,13 +33,16 @@ if (exists('argv')) { # check for littler
             extra_deps$r = c(extra_deps$r,strsplit(chomp(argv[i+1]),',')[[1]])
             extra_deps$deb = c(extra_deps$deb,lapply(extra_deps$r,pkgname_as_debian))
         }
+        if (argv[i] == '-d') { #debug
+            do_cleanup = F
+        }
     }
     if (argc == 0) {
-        err('usage: cran2deb build [-D extra_dep1,extra_dep2,...] package package ...')
+        err('usage: cran2deb build [-d] [-D extra_dep1,extra_dep2,...] package package ...')
     }
     build_order <- r_dependency_closure(c(extra_deps$r,argv))
     notice('build order',paste(build_order,collapse=', '))
     for (pkg in build_order) {
-        build(pkg,extra_deps,force=pkg %in% argv)
+        build(pkg,extra_deps,force=pkg %in% argv, do_cleanup)
     }
 }

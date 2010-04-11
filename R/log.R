@@ -54,6 +54,7 @@ log_system <- function(...) {
     if (inherits(r,'try-error')) {
         fail('system failed on:',paste(...))
     }
+    log_add(paste('C:',...))
     for (line in r[[2]]) {
         if (!length(grep('^[WENI]:',line))) {
             line = paste('I:',line)
