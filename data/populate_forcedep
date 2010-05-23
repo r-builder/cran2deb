@@ -64,3 +64,6 @@ force netcdf ncdf4
 force colorspace vcdExtra 
 force boost RcppArmadillo 
 force pkg-config fftw 
+force boost SV 
+force gsl magnets 
+force mpi npRmpi 

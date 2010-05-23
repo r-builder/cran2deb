@@ -14,7 +14,7 @@ alias_build gsl libgsl0-dev
 alias_run gsl libgsl0ldbl 
 alias_build ignore build-essential 
 alias_build java openjdk-6-jdk 
-alias_build java libgcj9-dev 
+alias_build java libgcj10-dev 
 alias_run java openjdk-6-jre 
 alias_build libatk libatk1.0-dev 
 alias_run libatk libatk1.0-0 
@@ -131,3 +131,5 @@ alias_build libprotoc-dev libprotoc-dev
 alias_build postgresql_java libpg-java 
 alias_run postgresql_java libpg-java 
 alias_build armadillo libarmadillo-dev 
+alias_build rpcgen libc-dev-bin 
+alias_run rpcgen libc-dev-bin 

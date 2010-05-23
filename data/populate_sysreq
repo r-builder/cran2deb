@@ -100,3 +100,8 @@ sysreq postgresql_java postgresql jdbc driver
 sysreq ignore gmt 
 sysreq armadillo armadillo 
 sysreq java jri 
+sysreq rpcgen rpcgen 
+sysreq ignore lapack_atlas 
+sysreq ignore libgsl0ldbl 
+sysreq ignore libgslldbl 
+sysreq ignore libgsldev 
