@@ -304,7 +304,7 @@ db_update_package_versions <- function() {
 }
 
 db_date_format <- '%Y-%m-%d'
-db_time_format <- '%H:%M:%OS %Z'
+db_time_format <- '%H:%M:%OS'
 
 db_record_build <- function(package, deb_version, log, success=F) {
     # if the log is more than 1kB, only keep the last 1kB.
