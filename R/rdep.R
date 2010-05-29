@@ -1,5 +1,9 @@
 
 r_bundle_of <- function(pkgname) {
+    return(NULL) ## there are no more bundles as of R 2.11.0
+
+    ## -- old code below, never reached
+    ##
     # returns the bundle containing pkgname or NA
     bundles <- names(available[!is.na(available[, 'Bundle']), 'Contains'])
     # use the first bundle
