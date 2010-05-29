@@ -36,26 +36,25 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
         build_debian(pkg)
 
         # upload the package
-        ret = log_system('umask 002;dput','-c',shQuote(dput_config),'local'
-                    ,changesfile(pkg$srcname,pkg$debversion))
+##         ret = log_system('umask 002;dput','-c',shQuote(dput_config),'local' ,changesfile(pkg$srcname,pkg$debversion))
+        ret = log_system('umask 002; cd /var/www/rep; reprepro -b . include testing', changesfile(pkg$srcname,pkg$debversion))
         if (ret != 0) {
             fail('upload failed!')
         }
+##         # wait for mini-dinstall to get to work
+##         upload_success = FALSE
+##         for (i in seq(1,12)) {
+##             if (file.exists(file.path(dinstall_archive,'testing',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
+##                 upload_success = TRUE
+##                 break
+##             }
+##             warn(i,'/12: does not exist',file.path(dinstall_archive,'testing',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))
 
-        # wait for mini-dinstall to get to work
-        upload_success = FALSE
-        for (i in seq(1,12)) {
-            if (file.exists(file.path(dinstall_archive,'testing',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))) {
-                upload_success = TRUE
-                break
-            }
-            warn(i,'/12: does not exist',file.path(dinstall_archive,'testing',paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep='')))
-
-            Sys.sleep(5)
-        }
-        if (!upload_success) {
-            warn('upload took too long; continuing as normal (some builds may fail temporarily)')
-        }
+##             Sys.sleep(5)
+##         }
+##         if (!upload_success) {
+##             warn('upload took too long; continuing as normal (some builds may fail temporarily)')
+##         }
         return(pkg$debversion)
     })())
     if (do_cleanup) {
