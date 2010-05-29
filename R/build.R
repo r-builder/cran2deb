@@ -21,7 +21,9 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
         }
 
         if (name %in% db_blacklist_packages()) {
-            fail('package',name,'is blacklisted. consult database for reason.')
+            #fail('package',name,'is blacklisted. consult database for reason.')
+            notice('package',name,'is blacklisted. consult database for reason.')
+            return(NULL)
         }
 
         pkg <- prepare_new_debian(prepare_pkg(dir,name),extra_deps)
