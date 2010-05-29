@@ -122,7 +122,7 @@ generate_control <- function(pkg) {
     control[1,'Priority'] <- 'optional'
     control[1,'Maintainer'] <- maintainer
     control[1,'Build-Depends'] <- paste(pkg$depends$build, collapse=', ')
-    control[1,'Standards-Version'] <- '3.8.3'
+    control[1,'Standards-Version'] <- '3.8.4'
 
     control[2,'Package'] <- pkg$debname
     control[2,'Architecture'] <- 'all'
