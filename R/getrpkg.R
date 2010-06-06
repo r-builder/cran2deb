@@ -117,18 +117,8 @@ repack_pkg <- function(pkg) {
 
 prepare_pkg <- function(dir, pkgname) {
     # download and extract an R package named pkgname
-    # OR the bundle containing pkgname
 
     # based loosely on library/utils/R/packages2.R::install.packages
-
-    # first a little trick; change pkgname if pkgname is contained in a bundle
-    if (!(pkgname %in% rownames(available))) {
-        bundle <- r_bundle_of(pkgname)
-        if (is.null(bundle)) {
-            fail('package',pkgname,'is unavailable')
-        }
-        pkgname <- bundle
-    }
 
     # grab the archive and some metadata
     pkg <- download_pkg(dir, pkgname)
@@ -167,10 +157,8 @@ prepare_pkg <- function(dir, pkgname) {
         }
     }
 
-    pkg$is_bundle = 'Bundle' %in% names(pkg$description[1,])
     # note subtly of short circuit operators (no absorption)
-    if ((!pkg$is_bundle && pkg$description[1,'Package'] != pkg$name) ||
-        ( pkg$is_bundle && pkg$description[1,'Bundle'] != pkg$name)) {
+    if (pkg$description[1,'Package'] != pkg$name) {
         fail('package name mismatch')
     }
     return(pkg)

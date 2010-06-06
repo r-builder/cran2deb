@@ -1,37 +1,6 @@
 
-r_bundle_of <- function(pkgname) {
-    return(NULL) ## there are no more bundles as of R 2.11.0
-
-    ## -- old code below, never reached
-    ##
-    # returns the bundle containing pkgname or NA
-    bundles <- names(available[!is.na(available[, 'Bundle']), 'Contains'])
-    # use the first bundle
-    for (bundle in bundles) {
-        if (pkgname %in% r_bundle_contains(bundle)) {
-            return(bundle)
-        }
-    }
-    return(NULL)
-}
-
-r_bundle_contains <- function(bundlename) {
-    return(strsplit(available[bundlename,'Contains'],'[[:space:]]+')[[1]])
-}
 
 r_requiring <- function(names) {
-    #for (name in names) {
-    #    if (!(name %in% base_pkgs) && !(name %in% rownames(available))) {
-    #        bundle <- r_bundle_of(name)
-    #        if (!is.null(bundle)) {
-    #            name = bundle
-    #            names <- c(names,bundle)
-    #        }
-    #    }
-    #    if (name %in% rownames(available) && !is.na(available[name,'Contains'])) {
-    #        names <- c(names,r_bundle_contains(name))
-    #    }
-    #}
     # approximately prune first into a smaller availability
     candidates <- rownames(available)[sapply(rownames(available)
                                             ,function(name)
@@ -40,7 +9,7 @@ r_requiring <- function(names) {
     if (length(candidates) == 0) {
         return(c())
     }
-    # find a logical index into available of every package/bundle
+    # find a logical index into available of every package
     # whose dependency field contains at least one element of names.
     # (this is not particularly easy to read---sorry---but is much faster than
     # the alternatives i could think of)
@@ -71,13 +40,8 @@ r_dependencies_of <- function(name=NULL,description=NULL) {
     }
     if (is.null(description)) {
         if (!(name %in% rownames(available))) {
-            bundle <- r_bundle_of(name)
-            if (!is.null(bundle)) {
-                name <- bundle
-            } else {
-                # unavailable packages don't depend upon anything
-                return(data.frame())
-            }
+            # unavailable packages don't depend upon anything
+            return(data.frame())
         }
         description <- data.frame()
         # keep only the interesting fields
@@ -117,12 +81,6 @@ r_parse_dep_field <- function(dep) {
     }
     version = sub(pat,'\\3',dep)
     dep = sub(pat,'\\1',dep)
-    if (!(dep %in% rownames(available))) {
-        depb <- r_bundle_of(dep)
-        if (!is.null(depb)) {
-            dep <- depb
-        }
-    }
     return(list(name=dep,version=version))
 }
 

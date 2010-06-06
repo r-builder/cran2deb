@@ -28,12 +28,6 @@ pkgname_as_debian <- function(name,repopref=NULL,version=NULL,binary=T,build=F) 
     } else {
         # XXX: data.frame rownames are unique, so always override repopref for
         #      now.
-        if (!(name %in% rownames(available))) {
-            bundle <- r_bundle_of(name)
-            if (!is.null(bundle)) {
-                name <- bundle
-            }
-        }
         debname = tolower(name)
         if (binary) {
             if (name %in% rownames(available)) {

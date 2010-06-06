@@ -131,16 +131,6 @@ generate_control <- function(pkg) {
     }
     control[2,'Depends'] <- paste(pkg$depends$bin,collapse=', ')
 
-#   # bundles provide virtual packages of their contents
-#   # unnecessary for now; cran2deb converts R bundles itself
-#    if (pkg$is_bundle) {
-#        control[2,'Provides'] = paste(
-#                    lapply(r_bundle_contains(pkg$name)
-#                          ,function(name) return(pkgname_as_debian(paste(name)
-#                                                                  ,repopref=pkg$repo)))
-#                          ,collapse=', ')
-#    }
-
     # generate the description
     descr <- 'GNU R package "'
     if ('Title' %in% colnames(pkg$description)) {
@@ -148,11 +138,7 @@ generate_control <- function(pkg) {
     } else {
         descr <- paste(descr,pkg$name,sep='')
     }
-    if (pkg$is_bundle) {
-        long_descr <- pkg$description[1,'BundleDescription']
-    } else {
-        long_descr <- pkg$description[1,'Description']
-    }
+    long_descr <- pkg$description[1,'Description']
 
     if (length(long_descr) < 1 || long_descr == "") {
         # bypass lintian extended-description-is-empty for which we care not.

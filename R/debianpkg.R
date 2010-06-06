@@ -109,18 +109,7 @@ prepare_new_debian <- function(pkg,extra_deps) {
     # says: ``The sources and headers for the compiled code are in src, plus
     # optionally file Makevars or Makefile.'' It seems unlikely that
     # architecture independent code would end up here.
-    if (pkg$is_bundle) {
-        # if it's a bundle, check each of the packages
-        pkg$archdep = F
-        for (pkgname in r_bundle_contains(pkg$name)) {
-            pkg$archdep = file.exists(file.path(pkg$path,pkgname,'src'))
-            if (pkg$archdep) {
-                break
-            }
-        }
-    } else {
-        pkg$archdep = file.exists(file.path(pkg$path,'src'))
-    }
+    pkg$archdep = file.exists(file.path(pkg$path,'src'))
     pkg$arch <- 'all'
     if (pkg$archdep) {
         pkg$arch <- host_arch()
