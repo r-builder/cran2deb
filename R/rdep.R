@@ -20,18 +20,18 @@ r_bundle_contains <- function(bundlename) {
 }
 
 r_requiring <- function(names) {
-    for (name in names) {
-        if (!(name %in% base_pkgs) && !(name %in% rownames(available))) {
-            bundle <- r_bundle_of(name)
-            if (!is.null(bundle)) {
-                name = bundle
-                names <- c(names,bundle)
-            }
-        }
-        if (name %in% rownames(available) && !is.na(available[name,'Contains'])) {
-            names <- c(names,r_bundle_contains(name))
-        }
-    }
+    #for (name in names) {
+    #    if (!(name %in% base_pkgs) && !(name %in% rownames(available))) {
+    #        bundle <- r_bundle_of(name)
+    #        if (!is.null(bundle)) {
+    #            name = bundle
+    #            names <- c(names,bundle)
+    #        }
+    #    }
+    #    if (name %in% rownames(available) && !is.na(available[name,'Contains'])) {
+    #        names <- c(names,r_bundle_contains(name))
+    #    }
+    #}
     # approximately prune first into a smaller availability
     candidates <- rownames(available)[sapply(rownames(available)
                                             ,function(name)
