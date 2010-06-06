@@ -7,4 +7,10 @@ if [ ! -x "$root/exec/$cmd" ]; then
     echo unknown command $cmd
     exit 1
 fi
-"$root/exec/$cmd" "$root" $*
+
+precmd=""
+if [ "$(id -un)" != c2d ]; then
+	precmd="sudo -u c2d -E"
+fi
+
+$precmd "$root/exec/$cmd" "$root" $*
