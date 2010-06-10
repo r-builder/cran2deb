@@ -37,6 +37,9 @@ generate_rules <- function(pkg) {
              ,'include /usr/share/R/debian/r-cran.mk'
              ,'',sep='\n')
        ,file=pkg$debfile('rules'))
+    if (pkg$name %in% c("Rmpi", "npRmpi")) {
+        cat("extraInstallFlags=\"--no-test-load\"\n", file=pkg$debfile('rules'), append=TRUE)
+    }      
     Sys.chmod(pkg$debfile('rules'),'0700')
 }
 
