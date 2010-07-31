@@ -67,3 +67,4 @@ force pkg-config fftw
 force boost SV 
 force gsl magnets 
 force mpi npRmpi 
+force rggobi geozoo 

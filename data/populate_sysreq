@@ -105,3 +105,4 @@ sysreq ignore lapack_atlas
 sysreq ignore libgsl0ldbl 
 sysreq ignore libgslldbl 
 sysreq ignore libgsldev 
+sysreq ignore svmlight 
