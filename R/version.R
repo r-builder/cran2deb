@@ -1,4 +1,5 @@
-version_new <- function(rver,debian_revision=1, debian_epoch=db_get_base_epoch()) {
+version_new <- function(rver, debian_revision=1, debian_epoch=db_get_base_epoch(), verbose=FALSE) {
+    if (verbose) {cat("rver:",rver," debian_revision:",debian_revision," debian_epoch:",debian_epoch,"\n")}
     # generate a string representation of the Debian version of an
     # R version of a package
     pkgver = rver
@@ -6,7 +7,7 @@ version_new <- function(rver,debian_revision=1, debian_epoch=db_get_base_epoch()
     # ``Writing R extensions'' says that the version consists of at least two
     # non-negative integers, separated by . or -
     if (!length(grep('^([0-9]+[.-])+[0-9]+$',rver))) {
-        fail('Not a valid R package version',rver)
+        fail(paste("Not a valid R package version: '",rver,"'",sep=""))
     }
 
     # Debian policy says that an upstream version should start with a digit and
@@ -45,13 +46,15 @@ version_revision <- function(pkgver) {
 # version_revision . version_new(x) = id
 # version_revision(version_new(x)) = 1
 
-version_upstream <- function(pkgver) {
+version_upstream <- function(pkgver, verbose=FALSE) {
+    if (verbose) {cat("version_upstream:"," pkgver:",pkgver,"\n")}
     # return the upstream version of a Debian package version
     return(sub('-[a-zA-Z0-9+.~]+$','',sub('^[0-9]+:','',pkgver)))
 }
 # version_upstream . version_new = id
 
-version_update <- function(rver, prev_pkgver, prev_success) {
+version_update <- function(rver, prev_pkgver, prev_success, verbose=TRUE) {
+    if (verbose) cat("version_update:"," rver:",rver," prev_pkgver:",prev_pkgver," prev_success:",prev_success,"\n")
     # return the next debian package version
     prev_rver <- version_upstream(prev_pkgver)
     if (prev_rver == rver) {
@@ -73,13 +76,17 @@ version_update <- function(rver, prev_pkgver, prev_success) {
                       ))
 }
 
-new_build_version <- function(pkgname) {
+new_build_version <- function(pkgname, verbose=FALSE) {
+    cat("new_build_version: "," pkgname:",pkgname,"\n")
     if (!(pkgname %in% rownames(available))) {
         fail('tried to discover new version of',pkgname,'but it does not appear to be available')
     }
     db_ver <- db_latest_build_version(pkgname)
+    if (verbose) {cat("db_ver: '",db_ver,"'\n",sep="")}
     db_succ <- db_latest_build_status(pkgname)[[1]]
+    if (verbose) {cat("db_succ: '",db_succ,"'\n",sep="")}
     latest_r_ver <- available[pkgname,'Version']
+    if (verbose) {cat("latest_r_ver: '",latest_r_ver,"'\n",sep="")}
     if (!is.null(db_ver)) {
         return(version_update(latest_r_ver, db_ver, db_succ))
     }
