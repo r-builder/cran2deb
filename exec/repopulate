@@ -1,17 +1,29 @@
 #!/bin/sh
+
 ## DOC: cran2deb repopulate
 ## DOC:     repopulate the cran2deb database and configurations from a new cran2deb release
 ## DOC:
 
+set -e
+
+dir=/etc/cran2deb
+if [ ! -d "$dir" ]; then
+       echo "Dir $dir not existing."
+       exit -1
+fi
+
 umask 002
+echo "Setting 'root' var to '$1'."
 root=$1
 shift
 for x in $(find /etc/cran2deb/ -type f -name '*.in'); do
+    #echo "x=$x"
     y=$(echo $x | sed -e 's,.in$,,')
     sed -e "s:@ROOT@:$root:g" <"$x" >"$y"
 done
 
 # now do an update to reflect any config changes
+echo "Starting '$root/exec/update"
 "$root/exec/update" "$root"
 
 (for fn in populate_licenses quit; do

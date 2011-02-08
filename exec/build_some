@@ -24,14 +24,18 @@ for (pkg in `{cat all_pkgs}) {
         fail=0
         cran2deb build $pkg >fail/$pkg >[2=1] || fail=1
         if (~ $fail 0) {
-            echo success
             grep '^[WE]:' fail/$pkg >warn/$pkg
 #            if (~ `{stat -c '%s' warn/$pkg} 0) {
 #                rm -f warn/$pkg
 #            }
-            rm -f fail/$pkg
+           if ( grep -q '^E:' warn/$pkg) {
+               echo ' failure'
+           } else {
+               echo ' success'
+               rm -f fail/$pkg
+           }
         } else {
-            echo FAILED
+            echo " FAILED"
         }
     }
 }

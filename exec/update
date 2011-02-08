@@ -1,4 +1,5 @@
 #!/usr/bin/rc
+
 ## DOC: cran2deb update
 ## DOC:     update the cran2deb cache and database
 ## DOC: cran2deb update full
@@ -7,16 +8,22 @@
 
 umask 002
 root=$1
+if ([ -z "$root" ]) {
+       echo "You need to specify the root of your installation, i.e. the folder in which to find the exec subdirectory."
+       exit 1
+}
+
 shift
 sys=`{cran2deb which_system}
 mkdir -p /var/cache/cran2deb/results/$sys || exit 1
-update_period=10800
+#update_period=10800
+update_period=108
 if (~ $1 full || ![ -e /var/cache/cran2deb/cache.rda ] ) {
     delta=`{awk 'END{print '^$update_period^'+1}' </dev/null}
     echo Forcing cache update
 } else {
     delta=`{awk 'END{print '^`{date +%s}^-^`{stat -c '%Y' /var/cache/cran2deb/cache.rda}^'}' </dev/null}
-    echo Cache is $delta seconds out of date.
+    echo Cache is $delta seconds out of date, auto-update after $update_period seconds.
 }
 if (![ -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]) {
     mode=create
@@ -24,7 +31,9 @@ if (![ -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]) {
         mode=update
     }
     echo C: sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
+    echo "Executing sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc"
     sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
+    echo "Executing $root/exec/update_cache $root"
     $root/exec/update_cache $root
 }
 

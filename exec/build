@@ -43,6 +43,9 @@ if (exists('argv')) { # check for littler
     build_order <- r_dependency_closure(c(extra_deps$r,argv))
     notice('build order',paste(build_order,collapse=', '))
     for (pkg in build_order) {
+        #cat("Invoking build of '",pkg,"'\n",sep="")
         build(pkg,extra_deps,force=pkg %in% argv, do_cleanup)
     }
+} else {
+   cat("exec/build: argv not existing.\n")
 }
