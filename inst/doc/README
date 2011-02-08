@@ -1,11 +1,22 @@
 To install:
 
-$ cd ..
-$ R CMD INSTALL cran2deb
+Please install a series of packages that you will need to
+run cran2deb successfully:
 
-copy cran2deb/exec/cran2deb into somewhere in your executable path (e.g.,
-/usr/local/bin, $home/bin)
+	sudo apt-get install pbuilder python-gpgme gnupg-agent
 
+You may install cran2deb manually
+
+	$ cd ..
+	$ R CMD INSTALL cran2deb
+
+	copy cran2deb/exec/cran2deb into somewhere in your executable path (e.g.,
+	/usr/local/bin, $home/bin)
+
+or prepare a Debian package for it
+
+	fakeroot debian/rules binary
+	sudo dpkg -i ../r-*cran2deb*.deb
 
 
 To configure:
@@ -14,6 +25,7 @@ To configure:
 
 Let ROOT be the value returned by running: cran2deb root
 Let SYS be the system you wish to build for (e.g., debian-amd64)
+Create user "c2d" who shall have write permissions to the archive.
 
 2. create /etc/cran2deb
    a. copy ROOT/etc/* into /etc/cran2deb/
@@ -23,11 +35,23 @@ Let SYS be the system you wish to build for (e.g., debian-amd64)
     $ ln -s /var/www/cran2deb/ /etc/cran2deb/archive
     $ mkdir /var/www/cran2deb/SYS
 
-   d. modify OTHERMIRROR of /etc/cran2deb/sys/SYS/pbuilderrc.in to point to your webserver
+   d. modify OTHERMIRROR of /etc/cran2deb/sys/SYS/pbuilderrc.in to point to your webserver.
+      As long as the packages on debian.cran.r-project.org are not signed with a
+      current key, just rebuild also the architecture-dependent packages or find
+      a way for pbuilder to ignore the failing gpg signature check.
+
+      Example:
+      OTHERMIRROR='deb http://master.dermacloud.uni-luebeck.de/cran2deb/rep testing main'
+
+      The above URL works for the reprepro tool. For mini-dinstall the URL
+      may be slightly different. Please check after the first packages have been
+      built that do not depend on other packages external to Debian.
+
    e. run: cran2deb repopulate
 
 3. cran2deb needs a persistent cache outside of R's control. therefore, create
     /var/cache/cran2deb, writable by whichever user(s) will run cran2deb.
+
 4. add to /etc/rc.local:
 	# one mini-dinstall daemon for each apt repo
 	for sys in debian-i386 debian-amd64
@@ -36,13 +60,83 @@ Let SYS be the system you wish to build for (e.g., debian-amd64)
 	done
    and execute.
 
-5. run: cran2deb update
-6. Try building a simple package: cran2deb build zoo
+5. manual change - allow cran2deb user to execute pdebuild as root via sudo
+	c2d      ALL=(ALL) SETENV: NOPASSWD: /usr/sbin/pdebuild
+   The "SETENV:" is important.
+
+6. run: cran2deb update
+   This will also create the pbuilder environment if not already existing.
+
+7. manual changes - create a gpg key for your packages
+	gpg --genkey
+   and read through 'man gpg-agent' to set it up. Add that key to the
+   pbuilder environment so the packages you signed and uploaded are 
+   indeed acceptable to the distribution.
+
+	pbuilder --login \
+		 --basetgz /var/cache/pbuilder/base-cran2deb-debian-amd64.tgz \
+		 --save-after-login
+
+   Once logged in, in a separate shell perform as cran2deb user a
+
+	gpg --export -a
+
+   which should only be one (your) public key. Copy it with the mouse and
+   add it to your pbuilder login shell via
+
+	apt-key add -
+
+   (return) to expect the key from stdin. Paste it, press CTRL-D to end
+   the input. Another CTRL-D or 'exit' to leave the shell and have the
+   base.tgz updated.
+
+   Also, you should allow the arch-independent R packages to be retrieved
+   from the public cran2deb effort. This also requires that key to be
+   available. From a local shell copy again that key
+
+	gpg --recv-key BFAEA5C2
+	gpg --export -a BFAEA5C2
+
+   and use 'apt-key add -' as before.
+
+8. Try building a simple package: cran2deb build zoo
    (The result will be in /var/cache/cran2deb/results/SYS)
 
+9. Check the specification of your pbuilder settings and run
+   'cran2deb update'. Do not run 'cran2deb update full' which
+   creates a new pbuilder environment and will require the
+   adding of keys again.
+
+To think about
+
+1. After several updates of the repository, we have many outdated
+   Debian packages in the archive cache. I prefer removing them
+   with a skriptlet like
+
+	cd /var/cache/apt/archives \
+	&& for i in $(ls | cut -f1 -d_ | uniq -c | egrep -v "^ *1 " | sed -e 's/^\s*[0-9]*\s//')
+	   do 
+		ls -t ${i}_* | tail -n +2 | xargs -r rm
+	   done
+
+2. To investigate which packages are already available in your repository
+   and which ones are not, you may add your packages list to your /etc/apt/sources.list
+   and perform
+
+	sudo apt-get update
+	for i in `grep -i net all_pkgs `
+	do
+		a=`echo $i|tr 'A-Z' 'a-z'`
+		echo "$i:$a"
+		apt-cache search r-cran-$a
+	done
+
+To debug:
 
 $ cran2deb help
 will display a short summary of help for each cran2deb command.
+
+The -d option will prevent the cleaning of the unpacked source code.
 
 
 Concerning data/:
