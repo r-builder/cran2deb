@@ -8,20 +8,46 @@ library(ctv)
 #argv <- argv[-(1:match("--args", argv))]
 
 #mirror <- 'http://cran.uk.r-project.org/'
-mirror <- 'http://cran.r-project.org/'
 
-verbose<-FALSE
+available <- NULL
+ctv.available <- NULL
 
-message('updating list of available R packages...')
-available <- available.packages(contrib.url(mirror))
+mirrors <- NULL
+mirrors <- c(mirrors,CRAN='http://cran.r-project.org')
+#mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/2.7')
+
+verbose<-TRUE
+
+for (mirror.name in names(mirrors)) {
+	mirror.url<-mirrors[mirror.name]
+	message(paste("Updating list of available R packages from ",mirror.name," [",mirror.url,"].\n",sep=""))
+	packages.retrieved <- NULL
+	if ("CRAN" == mirror.name) {
+		packages.retrieved <- available.packages(contrib.url(mirror.url))
+	} else if ("BioC" == mirror.name) {
+		for (s in c('bioc')) {
+			packages.retrieved <- rbind(packages.retrieved,contrib.url(available.packages(paste(mirror.url,s,sep="/"))))
+		}
+	} else {
+		packages.retrieved <- available.packages(mirror.url)
+	}
+	if (verbose) message(paste("Retrieved ",nrow(packages.retrieved)," package descriptions.\n",sep=""))
+	available <- rbind(available, packages.retrieved)
+	message('updating list of available R task views...')
+	ctv.available <- rbind(ctv.available,available.views(repo=mirror.url))
+}
 
 #available <- rbind(available,available.packages(contrib.url('http://www.bioconductor.org/')))
-#dupes <- duplicated(rownames(available), fromLast=T)
-#available <- available[!dupes,]
 
-message('updating list of available R task views...')
-ctv.available <- available.views(repo=mirror)
+dupes <- duplicated(rownames(available), fromLast=T)
+if (sum(dupes)>0) {
+	if (verbose) cat("Found ",sum(dupes)," packages with the same name in different distributions. Those are now removed.\n",sep="")
+	available <- available[!dupes,,drop=F]
+} else {
+	if (length(mirrors)>1) cat("All packages have different names.")
+}
 
+# TODO: Check if not better a dedicated tool should be called for this
 message('updating list of base R packages...')
 base_pkgs <- readLines(pipe(paste('sudo pbuilder --execute --override-config --configfile'
                                  ,shQuote(pbuilder_config),'-- /usr/bin/R --vanilla 2>&1 >/dev/null <'

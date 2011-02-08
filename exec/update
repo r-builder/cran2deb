@@ -21,11 +21,13 @@ mkdir -p /var/cache/cran2deb/results/$sys
 #update_period=10800
 update_period=108
 
-if [ ! $1 = full -o !-e /var/cache/cran2deb/cache.rda ]; then
+if [ ! $1 = full ] || [ ! -e /var/cache/cran2deb/cache.rda ]; then
     delta=$(($update_period+1))
     echo Forcing cache update
 else
-    delta=$(awk 'END{print '^`{date +%s}^-^`{stat -c '%Y' /var/cache/cran2deb/cache.rda}^'}' < /dev/null)
+    seconds_time=$(date +%s)
+    seconds_file=$(stat -c '%Y' /var/cache/cran2deb/cache.rda)
+    delta=$(($seconds_time-$seconds_file))
     echo Cache is $delta seconds out of date, auto-update after $update_period seconds.
 fi
 
@@ -33,11 +35,11 @@ if [ ! -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]; then
     mode=create
     if [ -e /var/cache/pbuilder/base-cran2deb-$sys.tgz ]; then
         mode=update
-    ]
+    fi
     echo C: sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
     echo "Executing sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc"
     sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
     echo "Executing $root/exec/update_cache $root"
     $root/exec/update_cache $root
-}
+fi
 
