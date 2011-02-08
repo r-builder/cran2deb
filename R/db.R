@@ -1,7 +1,9 @@
 
 db_start <- function() {
     drv <- dbDriver('SQLite')
+    if (is.null(drv)) stop("db_start: Could not access driver for SQLite.\n")
     con <- dbConnect(drv, dbname=file.path(cache_root,'cran2deb.db'))
+    if (is.null(con)) stop("db_start: Could open connection to file 'cran2deb.db' in directory",cache_root,".\n")
     if (!dbExistsTable(con,'sysreq_override')) {
         dbGetQuery(con,paste('CREATE TABLE sysreq_override ('
                   ,' depend_alias TEXT NOT NULL'
@@ -361,7 +363,7 @@ db_builds <- function(pkgname) {
     return(db_cleanup_builds(build))
 }
 
-db_cleanup_builds <- function(build) {
+db_cleanup_builds <- function(build,verbose=FALSE) {
     build$success <- as.logical(build$success)
     #o <-options(digits.secs = 6)
     dt <- as.POSIXct(strptime(paste(as.character(build[,"date_stamp"]), as.character(build[,"time_stamp"])),
@@ -369,38 +371,62 @@ db_cleanup_builds <- function(build) {
     build$time_stamp <- NULL
     build$date_stamp <- NULL
     newdf <- data.frame(build, date_stamp=dt)
+    if (verbose) {
+       cat("db_cleanup_builds: newdf")
+       print(newdf)
+    }
     #print(newdf[, -grep("log", colnames(newdf))])
     #options(o)
     #print(newdf[, -grep("log", colnames(newdf))])
     return(newdf)
 }
 
-db_latest_build <- function(pkgname) {
+db_latest_build <- function(pkgname,verbose=FALSE,debug=FALSE) {
+    if (verbose) {cat("db_latest_build: pkgname:",pkgname,"\n")}
     con <- db_start()
+    if (debug) {
+	cat("       connection was opened\n")
+    }
     build <- dbGetQuery(con, paste('SELECT * FROM builds'
                        ,'NATURAL JOIN (SELECT package,max(id) AS max_id FROM builds'
                        ,              'WHERE system =',db_quote(which_system)
                        ,              'GROUP BY package) AS last'
                        ,'WHERE id = max_id'
                        ,'AND builds.package =',db_quote(pkgname)))
+    if (debug) {
+	cat("       dbGetQuery was executed:\n")
+	cat("       print(build):\n")
+	print(build)
+    }
     db_stop(con)
+    if (debug) {
+	cat("       connection was closed\n")
+    }
     if (length(build) == 0) {
+        return(NULL)
+    } else if (0 == nrow(build)) {
         return(NULL)
     }
     return(db_cleanup_builds(build))
 }
 
-db_latest_build_version <- function(pkgname) {
+db_latest_build_version <- function(pkgname,verbose=FALSE) {
+    if (verbose) {cat("db_latest_build_version: pkgname:",pkgname,"\n")}
     build <- db_latest_build(pkgname)
     if (is.null(build)) {
+        return(NULL)
+    } else if (0 == nrow(build)) {
         return(NULL)
     }
     return(version_new(build$r_version, build$deb_revision, build$deb_epoch))
 }
 
-db_latest_build_status <- function(pkgname) {
+db_latest_build_status <- function(pkgname,verbose=FALSE) {
+    if (verbose) {cat("db_latest_build_status: pkgname:",pkgname,"\n")}
     build <- db_latest_build(pkgname)
     if (is.null(build)) {
+        return(NULL)
+    } else if (0 == nrow(build)) {
         return(NULL)
     }
     return(list(build$success,build$log))
