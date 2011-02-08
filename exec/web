@@ -5,19 +5,51 @@
 
 suppressPackageStartupMessages(library(cran2deb))
 library(hwriter)
+library(getopt)
 
-banned_builds_path='/var/www/banned_packages.html'
-todays_builds_path='/var/www/todays_packages.html'
-latest_builds_path='/var/www/latest_packages.html'
-failed_builds_path='/var/www/failed_packages.html'
+opt<-getopt(matrix(c(
+	'verbose','v', 0, "logical",
+	'debug',  'd', 0, "logical",
+	'help',   'h', 0, "logical",
+	'root',   'r', 2, "character"	
+),byrow=TRUE,ncol=4))
+
+.Last <- function() { if (!is.null(opt$verbose)) {cat("Printing the traceback, just to be sure:\n"); print(traceback())} }
+
+web.cran2deb.root<-"/var/www/cran2deb"
+if (!is.null(opt$root)) {
+	web.cran2deb.root <- opt$root
+}
+
+if (!is.null(opt$debug)) {
+	cat("Settings:\n")
+	cat(" * root: ",web.cran2deb.root,"\n",sep="")
+	cat("\n")
+	print(opt)
+	q()
+}
+
+
+if (!is.null(opt$verbose)) cat("building banned_packages.html\n")
+banned_builds_path=paste(web.cran2deb.root,"banned_packages.html",sep="/")
+
+if (!is.null(opt$verbose)) cat("building todays_packages.html\n")
+todays_builds_path=paste(web.cran2deb.root,"todays_packages.html",sep="/")
+
+if (!is.null(opt$verbose)) cat("building latest_packages.html\n")
+latest_builds_path=paste(web.cran2deb.root,"latest_packages.html",sep="/")
+
+if (!is.null(opt$verbose)) cat("building failed_packages.html\n")
+failed_builds_path=paste(web.cran2deb.root,"failed_packages.html",sep="/")
 
 links <- function(p) {
     hwrite(c(
-            hwrite('Packages built today',link='/todays_packages.html')
-           ,hwrite('Successful packages',link='/latest_packages.html')
-           ,hwrite('Failed packages',link='/failed_packages.html')
-           ,hwrite('Banned packages',link='/banned_packages.html')
+            hwrite('Packages built today',link='todays_packages.html')
+           ,hwrite('Successful packages',link='latest_packages.html')
+           ,hwrite('Failed packages',link='failed_packages.html')
+           ,hwrite('Banned packages',link='banned_packages.html')
            ),p,center=TRUE,border=0,style='padding: 6px 6px 6px 12px')
+    if (!is.null(opt$verbose)) cat("Wrote links for ",p,".\n",sep="")
 }
 
 page <- function(content,path,title) {
@@ -26,9 +58,14 @@ page <- function(content,path,title) {
     hwrite(title,p,heading=1)
     hwrite('Install instructions',p,center=TRUE,link='/')
     links(p)
-    hwrite(content,p,center=TRUE,border=1,table.style='border-collapse: collapse; padding: 0; margin: 0'
+    if (nrow(content)>0) {
+	    hwrite(content,p,center=TRUE,border=1
+		  ,table.style='border-collapse: collapse; padding: 0; margin: 0'
                   ,row.names=FALSE,row.bgcolor='#ffaaaa')
-    links(p)
+    	    links(p)
+    } else {
+	    hwrite("None",p,center=TRUE)
+    }
     closePage(p)
 }
 

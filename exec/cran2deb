@@ -2,15 +2,26 @@
 umask 002
 root=$(r -e 'suppressMessages(library(cran2deb));cat(system.file(package="cran2deb"),file=stdout())')
 cmd=$1
-shift
+
+if [ "x" = "x$cmd" ]; then
+    cmd="help"
+fi
+
 if [ ! -x "$root/exec/$cmd" ]; then
     echo unknown command $cmd
     exit 1
 fi
+
+shift
 
 precmd=""
 if [ "$(id -un)" != c2d ]; then
 	precmd="sudo -u c2d -E"
 fi
 
-$precmd "$root/exec/$cmd" "$root" $*
+if [ "web" = "$cmd" ]; then 
+	# web uses getopt and would be irritated by the "$root" argument
+	$precmd "$root/exec/$cmd" $*
+else
+	$precmd "$root/exec/$cmd" "$root" $*
+fi
