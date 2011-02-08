@@ -122,14 +122,17 @@ generate_control <- function(pkg) {
     control[1,'Priority'] <- 'optional'
     control[1,'Maintainer'] <- maintainer
     control[1,'Build-Depends'] <- paste(pkg$depends$build, collapse=', ')
-    control[1,'Standards-Version'] <- '3.8.4'
+    control[1,'Standards-Version'] <- '3.9.1'
+    if ('URL' %in% colnames(pkg$description)) {
+        control[1,'Homepage'] <- pkg$description[1,'URL']
+    }
 
     control[2,'Package'] <- pkg$debname
     control[2,'Architecture'] <- 'all'
     if (pkg$archdep) {
         control[2,'Architecture'] <- 'any'
     }
-    control[2,'Depends'] <- paste(pkg$depends$bin,collapse=', ')
+    control[2,'Depends'] <- paste(pkg$depends$bin,collapse=', ',sep='')
 
     # generate the description
     descr <- 'GNU R package "'
@@ -151,7 +154,7 @@ generate_control <- function(pkg) {
     # write.dcf does not appear to have a nicer way of doing this.
     descr <- paste(descr,'"\n\n', long_descr, sep='')
     # add some extra nice info about the original R package
-    for (r_info in c('Author','Maintainer','URL')) {
+    for (r_info in c('Author','Maintainer')) {
         if (r_info %in% colnames(pkg$description)) {
             descr <- paste(descr,'\n\n',r_info,': ',pkg$description[1,r_info],sep='')
         }
