@@ -1,4 +1,4 @@
-#!/usr/bin/rc
+#!/bin/bash
 ## DOC: cran2deb build_some [taskview1 taskview2 ...]
 ## DOC:     build some packages, logging warnings into ./warn/$package
 ## DOC:     and failures into ./fail/$package. with no arguments a random
@@ -8,34 +8,31 @@
 
 mkdir -p warn fail
 shift
-if ([ ! -e all_pkgs ]) {
+if [ ! -e all_pkgs ]; then
     cran2deb cran_pkgs $* >all_pkgs
-}
+fi
 
-for (pkg in `{cat all_pkgs}) {
-    if (~ $pkg *..* */*) {
-        echo bad name $pkg >>fail/ERROR
-    } else if ([ -e warn/$pkg ]) {
-        echo skipping $pkg...
-    } else if ([ -e fail/$pkg ]) {
-        echo skipping failed $pkg...
-    } else {
+for pkg in $(cat all_pkgs | egrep -v '(\.\.|/)')
+do
+    if [ -e warn/$pkg ]; then
+        echo "skipping $pkg [warned] ..."
+    elif [ -e fail/$pkg ]; then
+        echo "skipping $pkg [fails] ..."
+    else 
         echo -n .. package $pkg
-        fail=0
-        cran2deb build $pkg >fail/$pkg >[2=1] || fail=1
-        if (~ $fail 0) {
+        if cran2deb build $pkg >fail/$pkg 2>&1; then
             grep '^[WE]:' fail/$pkg >warn/$pkg
 #            if (~ `{stat -c '%s' warn/$pkg} 0) {
 #                rm -f warn/$pkg
 #            }
-           if ( grep -q '^E:' warn/$pkg) {
+           if grep -q '^E:' warn/$pkg; then
                echo ' failure'
-           } else {
+           else
                echo ' success'
                rm -f fail/$pkg
-           }
-        } else {
+           fi
+        else
             echo " FAILED"
-        }
-    }
-}
+        fi
+    fi
+done
