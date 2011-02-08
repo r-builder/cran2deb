@@ -10,7 +10,7 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
     # obtain the Debian version-to-be
     version <- try(new_build_version(name))
     if (inherits(version,'try-error')) {
-        error('failed to build',name)
+        error('failed to build in new_build_version: ',name)
         return(NULL)
     }
 
@@ -35,14 +35,24 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
         file.remove(Sys.glob(file.path(pbuilder_results,'*.upload')))
 
         notice('R dependencies:',paste(pkg$depends$r,collapse=', '))
+	#if (debug) notice(paste("build_debian(",pkg,") invoked\n",sep=""))
         build_debian(pkg)
+	#if (debug) notice(paste("build_debian(",pkg,") completed.\n",sep=""))
+
 
         # upload the package
+	notice("Package upload")
 ##         ret = log_system('umask 002;dput','-c',shQuote(dput_config),'local' ,changesfile(pkg$srcname,pkg$debversion))
-        ret = log_system('umask 002; cd /var/www/rep; reprepro -b . include testing', changesfile(pkg$srcname,pkg$debversion))
+
+	cmd = paste('umask 002; cd /var/www/cran2deb/rep && reprepro -b . include testing', changesfile(pkg$srcname,pkg$debversion),sep=" ")
+        #if (verbose) notice('Executing: ',cmd)
+        ret = log_system(cmd)
         if (ret != 0) {
-            fail('upload failed!')
-        }
+            #fail('upload failed!')
+	    notice("Upload failed, ignored.")
+        } else {
+	    notice("Upload successful.")
+	}
 ##         # wait for mini-dinstall to get to work
 ##         upload_success = FALSE
 ##         for (i in seq(1,12)) {
@@ -112,16 +122,20 @@ needs_build <- function(name,version) {
     if (build$db_version != db_get_version()) {
         notice('rebuilding',name,': new db version',build$db_version,'(old) vs',db_get_version(),'(new)')
     }
+    notice(paste("Now deleting ",debname,", ",srcname,".\n",sep=""))
     rm(debname,srcname)
     return(T)
 }
 
 build_debian <- function(pkg) {
     wd <- getwd()
+    #notice(paste("Now in path ",wd,"\n",sep=""))
     setwd(pkg$path)
+    
     notice('building Debian package'
                  ,pkg$debname
                  ,paste('(',pkg$debversion,')',sep='')
+                 ,'in',getwd(),
                  ,'...')
 
     cmd = paste('pdebuild --configfile',shQuote(pbuilder_config))
@@ -129,10 +143,12 @@ build_debian <- function(pkg) {
         cmd = paste(cmd,'--debbuildopts','-sd')
         notice('build should exclude original source')
     }
+    notice(paste("Executing '",cmd,"' from directory '",getwd(),"'.\n",sep=""))
     ret = log_system(cmd)
     setwd(wd)
     if (ret != 0) {
         fail('Failed to build package.')
     }
+    return(ret);
 }
 
