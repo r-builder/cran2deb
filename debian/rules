@@ -3,8 +3,6 @@
 
 include /usr/share/R/debian/r-cran.mk
 
-DEB_COMPRESS_EXCLUDE := .pdf
-
 install/$(package)::
 	# Require a number equal or superior than the R version the package was built with.
 	echo "R:Depends=r-base-core (>= $(shell R --version | head -n1 | perl -ne 'print / +([0-9]\.[0-9]+\.[0-9])/')~)" >> debian/r-$(debRreposname)-$(cranName).substvars
