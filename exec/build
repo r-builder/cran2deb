@@ -41,7 +41,8 @@ if (exists('argv')) { # check for littler
         err('usage: cran2deb build [-d] [-D extra_dep1,extra_dep2,...] package package ...')
     }
     build_order <- r_dependency_closure(c(extra_deps$r,argv))
-    notice('build order',paste(build_order,collapse=', '))
+    #cat("build_order: "); print(build_order);
+    notice('build order',ifelse(0<length(build_order),paste(build_order,collapse=', ',sep="")," nothing to be built"))
     for (pkg in build_order) {
         #cat("Invoking build of '",pkg,"'\n",sep="")
         build(pkg,extra_deps,force=pkg %in% argv, do_cleanup)

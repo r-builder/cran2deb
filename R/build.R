@@ -132,18 +132,14 @@ build_debian <- function(pkg) {
     #notice(paste("Now in path ",wd,"\n",sep=""))
     setwd(pkg$path)
     
-    notice('building Debian package'
-                 ,pkg$debname
-                 ,paste('(',pkg$debversion,')',sep='')
-                 ,'in',getwd(),
-                 ,'...')
+    notice('building Debian package',pkg$debname,paste('(',pkg$debversion,')',sep=''),'in',getwd(),'...')
 
     cmd = paste('pdebuild --configfile',shQuote(pbuilder_config))
     if (version_revision(pkg$debversion) > 2) {
         cmd = paste(cmd,'--debbuildopts','-sd')
         notice('build should exclude original source')
     }
-    notice(paste("Executing '",cmd,"' from directory '",getwd(),"'.\n",sep=""))
+    notice(paste("Executing ",'"',cmd,'"'," from directory '",getwd(),"'.\n",sep=""))
     ret = log_system(cmd)
     setwd(wd)
     if (ret != 0) {
