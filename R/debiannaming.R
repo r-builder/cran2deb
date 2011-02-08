@@ -2,9 +2,12 @@ repourl_as_debian <- function(url) {
     # map the url to a repository onto its name in debian package naming
     if (length(grep('cran',url))) {
         return('cran')
-    }
-    if (length(grep('bioc',url))) {
+    } else if (length(grep('bioc',url))) {
         return('bioc')
+    } else if (length(grep('omegahat',url))) {
+        return('omegahat')
+    } else if (length(grep('rforge',url))) {
+        return('rforge')
     }
     fail('unknown repository',url)
 }
