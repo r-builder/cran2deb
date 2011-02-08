@@ -1,0 +1,29 @@
+# These binary names are too generic to appear in /usr/bin
+# The cran2deb application is the only application that
+# will be allowed in
+
+#/usr/lib/R/site-library/cran2deb/exec/autobuild  /usr/bin/autobuild
+#/usr/lib/R/site-library/cran2deb/exec/build  /usr/bin/build
+#/usr/lib/R/site-library/cran2deb/exec/build_all  /usr/bin/build_all
+#/usr/lib/R/site-library/cran2deb/exec/build_ctv  /usr/bin/build_ctv
+#/usr/lib/R/site-library/cran2deb/exec/build_some  /usr/bin/build_some
+#/usr/lib/R/site-library/cran2deb/exec/copy_find  /usr/bin/copy_find
+/usr/lib/R/site-library/cran2deb/exec/cran2deb  /usr/bin/cran2deb
+#/usr/lib/R/site-library/cran2deb/exec/cran_pkgs  /usr/bin/cran_pkgs
+#/usr/lib/R/site-library/cran2deb/exec/db_release  /usr/bin/db_release
+#/usr/lib/R/site-library/cran2deb/exec/depclosure  /usr/bin/depclosure
+#/usr/lib/R/site-library/cran2deb/exec/depend  /usr/bin/depend
+#/usr/lib/R/site-library/cran2deb/exec/diagnose  /usr/bin/diagnose
+#/usr/lib/R/site-library/cran2deb/exec/diagnose_ctv  /usr/bin/diagnose_ctv
+#/usr/lib/R/site-library/cran2deb/exec/get_base_pkgs  /usr/bin/get_base_pkgs
+#/usr/lib/R/site-library/cran2deb/exec/help  /usr/bin/help
+#/usr/lib/R/site-library/cran2deb/exec/latest_log  /usr/bin/latest_log
+#/usr/lib/R/site-library/cran2deb/exec/license  /usr/bin/license
+#/usr/lib/R/site-library/cran2deb/exec/progress  /usr/bin/progress
+#/usr/lib/R/site-library/cran2deb/exec/repopulate  /usr/bin/repopulate
+#/usr/lib/R/site-library/cran2deb/exec/root  /usr/bin/root
+#/usr/lib/R/site-library/cran2deb/exec/showbuilds  /usr/bin/showbuilds
+#/usr/lib/R/site-library/cran2deb/exec/update  /usr/bin/update
+#/usr/lib/R/site-library/cran2deb/exec/update_cache  /usr/bin/update_cache
+#/usr/lib/R/site-library/cran2deb/exec/web  /usr/bin/web
+#/usr/lib/R/site-library/cran2deb/exec/which_system  /usr/bin/which_system

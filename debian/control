@@ -1,0 +1,25 @@
+Source: r-cran-cran2deb
+Section: gnu-r
+Priority: optional
+Maintainer: Steffen Moeller <moeller@debian.org>
+DM-Upload-Allowed: yes
+Build-Depends: debhelper (>= 7.0), cdbs, r-base-dev
+Homepage: http://debian.cran.r-project.org/
+Standards-Version: 3.9.1
+
+Package: r-cran-cran2deb
+Architecture: any
+Depends: ${shlibs:Depends}, ${R:Depends}, littler, r-cran-digest, rc, r-cran-ctv, reprepro, r-cran-rsqlite, xvfb, curl
+Recommends: mini-dinstall
+Suggests: r-cran-hwriter, r-cran-getopt
+Description: GNU R initiative to prepare Debian packages
+ The cran2deb repository provides Debian apt repositories of
+ essentially all R packages found in CRAN. cran2deb builds new
+ packages daily to provide the latest packages from CRAN as
+ Debian packages, with correct dependencies upon other Debian
+ and Debianized R packages.
+ .
+ This package provides the software with which the repository
+ is maintained. This may be of interest for a support of other
+ architectures than i386 of cran2deb, or to address another
+ repository than cran2deb's CRAN alone.

@@ -1,0 +1,5 @@
+r-cran-cran2deb (0.0.1) unstable; urgency=low
+
+  * Some initial testing of the packaging.
+
+ -- Steffen Moeller <moeller@debian.org>  Tue, 08 Feb 2011 14:47:28 +0100

@@ -1,0 +1,26 @@
+Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
+Upstream-Author: Charles Blundell <blundellc@gmail.com> and Dirk Eddelbuettel <edd@debian.org>
+Packaged-By: Steffen Moeller <moeller@debian.org>
+Packaged-Date: Mon, 24 Nov 2008 13:12:38 +0100
+Upstream-Source: https://r-forge.r-project.org/projects/cran2deb/
+
+Files: *
+License: GPL-3
+Copyright: 2010-2011 Charles Blundell <blundellc@gmail.com> and Dirk Eddelbuettel <edd@debian.org>
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+X-Comment: On Debian systems, the complete text of the GNU Public
+ License can be found in `/usr/share/common-licenses/GPL-3'.
+
+Files: debian/*
+Copyright: © 2010-2011 Steffen Moeller <moeller@debian.org>
+License: Same as cran2deb itelf (see above)
