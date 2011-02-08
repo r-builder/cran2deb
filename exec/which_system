@@ -4,4 +4,4 @@
 ## DOC:
 suppressMessages(library(cran2deb))
 
-cat(which_system)
+cat(which_system,"\n",sep="")
