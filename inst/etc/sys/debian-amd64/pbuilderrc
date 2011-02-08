@@ -10,3 +10,4 @@ OTHERMIRROR='deb http://localhost/cran2deb/debian-amd64 testing/$(ARCH)/ | deb h
 MIRRORSITE='http://ftp.at.debian.org/debian/'
 APTCACHE=''
 PBUILDERSATISFYDEPENDSCMD='/usr/lib/pbuilder/pbuilder-satisfydepends-classic'
+HOOKDIR=/etc/cran2deb/sys/hookdir
