@@ -11,3 +11,4 @@ MIRRORSITE='http://ftp.at.debian.org/debian/'
 APTCACHE=''
 PBUILDERSATISFYDEPENDSCMD='/usr/lib/pbuilder/pbuilder-satisfydepends-classic'
 DEBOOTSTRAPOPTS='--arch=i386'
+HOOKDIR=/etc/cran2deb/sys/hookdir
