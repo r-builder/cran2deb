@@ -1,4 +1,4 @@
-#!/usr/bin/rc
+#!/bin/bash
 
 ## DOC: cran2deb update
 ## DOC:     update the cran2deb cache and database
@@ -6,30 +6,34 @@
 ## DOC:     force a full update of the cran2deb cache and database
 ## DOC:
 
+set -e
+
 umask 002
 root=$1
-if ([ -z "$root" ]) {
+if [ -z "$root" ]; then
        echo "You need to specify the root of your installation, i.e. the folder in which to find the exec subdirectory."
        exit 1
-}
+fi
 
 shift
-sys=`{cran2deb which_system}
-mkdir -p /var/cache/cran2deb/results/$sys || exit 1
+sys=$(cran2deb which_system)
+mkdir -p /var/cache/cran2deb/results/$sys
 #update_period=10800
 update_period=108
-if (~ $1 full || ![ -e /var/cache/cran2deb/cache.rda ] ) {
-    delta=`{awk 'END{print '^$update_period^'+1}' </dev/null}
+
+if [ ! $1 = full -o !-e /var/cache/cran2deb/cache.rda ]; then
+    delta=$(($update_period+1))
     echo Forcing cache update
-} else {
-    delta=`{awk 'END{print '^`{date +%s}^-^`{stat -c '%Y' /var/cache/cran2deb/cache.rda}^'}' </dev/null}
+else
+    delta=$(awk 'END{print '^`{date +%s}^-^`{stat -c '%Y' /var/cache/cran2deb/cache.rda}^'}' < /dev/null)
     echo Cache is $delta seconds out of date, auto-update after $update_period seconds.
-}
-if (![ -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]) {
+fi
+
+if [ ! -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]; then
     mode=create
-    if ([ -e /var/cache/pbuilder/base-cran2deb-$sys.tgz ]) {
+    if [ -e /var/cache/pbuilder/base-cran2deb-$sys.tgz ]; then
         mode=update
-    }
+    ]
     echo C: sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
     echo "Executing sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc"
     sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
