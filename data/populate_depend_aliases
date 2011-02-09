@@ -38,8 +38,8 @@ alias_build libgtk libgtk2.0-dev
 alias_run libgtk libgtk2.0-0 
 alias_build libjpeg libjpeg62-dev 
 alias_run libjpeg libjpeg62 
-alias_build libmagick libmagick9-dev 
-alias_run libmagick libmagick9 
+alias_build libmagick libmagick++-dev
+alias_run libmagick libmagick++
 alias_build libpango libpango1.0-dev 
 alias_run libpango libpango1.0-0 
 alias_build libpng libpng12-dev 
