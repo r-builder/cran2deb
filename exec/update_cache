@@ -14,9 +14,11 @@ ctv.available <- NULL
 
 mirrors <- NULL
 mirrors <- c(mirrors,CRAN='http://cran.r-project.org')
-#mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/2.7')
+#mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/2.2')
+mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/2.7')
 
 verbose<-TRUE
+debug<-FALSE
 
 for (mirror.name in names(mirrors)) {
 	mirror.url<-mirrors[mirror.name]
@@ -25,8 +27,17 @@ for (mirror.name in names(mirrors)) {
 	if ("CRAN" == mirror.name) {
 		packages.retrieved <- available.packages(contrib.url(mirror.url))
 	} else if ("BioC" == mirror.name) {
-		for (s in c('bioc')) {
-			packages.retrieved <- rbind(packages.retrieved,contrib.url(available.packages(paste(mirror.url,s,sep="/"))))
+		repos <- c(
+			"bioc"
+			,"data/annotation"
+			,"data/experiment"
+			,"extra"
+		)
+		for (s in repos) {
+			packages.retrieved <- rbind(
+				packages.retrieved,
+				available.packages(contrib.url(paste(mirror.url,s,sep="/")))
+			)
 		}
 	} else {
 		packages.retrieved <- available.packages(mirror.url)
@@ -62,7 +73,7 @@ if (any(grep("^E:",base_pkgs,value=FALSE))) {
 }
 
 
-if (verbose) {
+if (debug) {
 	cat("The following base packages were determined:\n")
 	print(base_pkgs)
 }
