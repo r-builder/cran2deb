@@ -33,7 +33,7 @@ alias_run libgdal libgdal1-1.6.0
 alias_build libgd libgd2-noxpm-dev 
 alias_run libgd libgd2-noxpm 
 alias_build libgraphviz libgraphviz-dev 
-alias_run libgraphviz libgraphviz4 
+alias_run libgraphviz libgraphviz-dev
 alias_build libgtk libgtk2.0-dev 
 alias_run libgtk libgtk2.0-0 
 alias_build libjpeg libjpeg62-dev 

@@ -138,6 +138,13 @@ will display a short summary of help for each cran2deb command.
 
 The -d option will prevent the cleaning of the unpacked source code.
 
+To improve:
+
+ * The runtime dependencies for Rgraphviz are outdated (there is no libraphviz4
+   any more). To get the package run (theoretically) this was not changed
+   to "alias_run libgraphviz libgraphviz-dev" but this can certainly be
+   optimised.
+
 
 Concerning data/:
 This contains scripts necessary to recreate the database should you lose the
