@@ -107,11 +107,89 @@ Create user "c2d" who shall have write permissions to the archive.
    creates a new pbuilder environment and will require the
    adding of keys again.
 
+10. Educate yourself about the schema of the sqlite3 database,
+   which is likely to reside at ~/cache/cran2deb.db 
+   and is directly accessible via calling from the 
+   UNIX command line 'sqlite3 ~/cache/cran2deb.db' .
+
+   The sqlite3 shell will directly attach to the database.
+   See the tables first
+
+	sqlite> .tables
+	blacklist_packages  debian_dependency   license_override  
+	builds              forced_depends      packages          
+	database_versions   license_hashes      sysreq_override   
+
+   and then the schema of the one or other table of interest, e.g.
+
+   sqlite> .schema debian_dependency
+	CREATE TABLE debian_dependency (
+		id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		alias TEXT NOT NULL,
+		build INTEGER NOT NULL,
+		debian_pkg TEXT NOT NULL ,
+		UNIQUE (alias,build,debian_pkg) );
+   sqlite> .schema forced_depends
+	CREATE TABLE forced_depends (
+		r_name TEXT NOT NULL,
+		depend_alias TEXT NOT NULL,
+		PRIMARY KEY (r_name,depend_alias) );
+   sqlite> .schema blacklist_packages
+	CREATE TABLE blacklist_packages (
+		package TEXT PRIMARY KEY NOT NULL,
+		nonfree INTEGER NOT NULL DEFAULT 0,
+		obsolete INTEGER NOT NULL DEFAULT 0,
+		broken_dependency INTEGER NOT NULL DEFAULT 0,
+		unsatisfied_dependency INTEGER NOT NULL DEFAULT 0,
+		breaks_cran2deb INTEGER NOT NULL DEFAULT 0,
+		other INTEGER NOT NULL DEFAULT 0,
+		explanation TEXT NOT NULL);
+   sqlite> .schema builds
+	CREATE TABLE builds (
+		id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		system TEXT NOT NULL ,package TEXT NOT NULL,
+		r_version TEXT NOT NULL ,deb_epoch INTEGER NOT NULL,
+		deb_revision INTEGER NOT NULL ,db_version INTEGER NOT NULL,
+		date_stamp TEXT NOT NULL ,time_stamp TEXT NOT NULL,
+		scm_revision TEXT NOT NULL ,success INTEGER NOT NULL,
+		log TEXT,
+		UNIQUE(package,system,r_version,deb_epoch,deb_revision,db_version));
+   sqlite> .schema database_versions
+	CREATE TABLE database_versions (
+		version INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		version_date INTEGER NOT NULL,
+		base_epoch INTEGER NOT NULL );
+   sqlite> .schema license_hashes
+	CREATE TABLE license_hashes (
+		name TEXT NOT NULL,
+		sha1 TEXT PRIMARY KEY NOT NULL );
+   sqlite> .schema license_override
+	CREATE TABLE license_override (
+		name TEXT PRIMARY KEY NOT NULL,
+		accept INT NOT NULL );
+   sqlite> .schema packages
+	CREATE TABLE packages (
+		package TEXT PRIMARY KEY NOT NULL,
+		latest_r_version TEXT );
+   sqlite> .schema sysreq_override
+	CREATE TABLE sysreq_override (
+		depend_alias TEXT NOT NULL,
+		r_pattern TEXT PRIMARY KEY NOT NULL );
+
+   The sqlite3 shell allows to modify all those entries. For a
+   restart with defaults entries distributed via svn, run "cran2deb
+   repopulate". To update the data stored in svn, change to the data
+   directory and run "./pull". Caveat, prior to that, make sure the
+   license data was read in by you. This is not performed automatically in
+   repopulate, a bit to protect us and stress that everyone is reponsible
+   for their own respective interpretation of a license's constraints
+   and the effect on a redistribution of source and/or binary.
+
 To think about
 
 1. After several updates of the repository, we have many outdated
-   Debian packages in the archive cache. I prefer removing them
-   with a skriptlet like
+   Debian packages in the pbuilder's archive cache. I prefer removing
+   them with a skriptlet like
 
 	cd /var/cache/apt/archives \
 	&& for i in $(ls | cut -f1 -d_ | uniq -c | egrep -v "^ *1 " | sed -e 's/^\s*[0-9]*\s//')
@@ -141,9 +219,9 @@ The -d option will prevent the cleaning of the unpacked source code.
 To improve:
 
  * The runtime dependencies for Rgraphviz are outdated (there is no libraphviz4
-   any more). To get the package run (theoretically) this was not changed
-   to "alias_run libgraphviz libgraphviz-dev" but this can certainly be
-   optimised.
+   any more). To get the package run  this was not changed to "alias_run
+   libgraphviz libgraphviz-dev" but this can certainly be optimised
+   towards something less resource-hungry.
 
 
 Concerning data/:
