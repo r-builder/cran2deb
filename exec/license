@@ -139,7 +139,8 @@ if (argc > 1) {
     exec_cmd(argc-1,argv[c(2:argc)])
 } else {
     while(T) {
-        argv <- strsplit(readline('license> '),'[[:space:]]+')[[1]]
+	cat("license> ");
+        argv <- strsplit(readLines(n=1),'[[:space:]]+')[[1]]
         exec_cmd(length(argv),argv)
     }
 }
