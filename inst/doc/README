@@ -68,14 +68,15 @@ Create user "c2d" who shall have write permissions to the archive.
    This will also create the pbuilder environment if not already existing.
 
 7. manual changes - create a gpg key for your packages
+
 	gpg --genkey
+
    and read through 'man gpg-agent' to set it up. Add that key to the
    pbuilder environment so the packages you signed and uploaded are 
    indeed acceptable to the distribution.
 
-	pbuilder --login \
-		 --basetgz /var/cache/pbuilder/base-cran2deb-debian-amd64.tgz \
-		 --save-after-login
+	sudo pbuilder  --login --save-after-login \
+	     --basetgz /var/cache/pbuilder/base-cran2deb-debian-amd64.tgz
 
    Once logged in, in a separate shell perform as cran2deb user a
 
@@ -184,6 +185,31 @@ Create user "c2d" who shall have write permissions to the archive.
    repopulate, a bit to protect us and stress that everyone is reponsible
    for their own respective interpretation of a license's constraints
    and the effect on a redistribution of source and/or binary.
+
+11.Add licenses the way you think it is right. The script in 
+   'exec/repopulate' may offer ideas on how to mass-include what
+   you find in the svn. For new entries, you may prefer using
+   'cran2deb' license that expects to learn from from the command
+   line how to treat individual licenses:
+
+      $ cran2deb license accept akima
+      I: cran2deb svn: 344 building for debian-amd64 at 2011-02-11 18:46:21
+      N: adding akima accept? TRUE
+
+      $ cran2deb license hash_sha1 akima 485316717b03afbd6d20f7810f9123b4445c8660
+      I: cran2deb svn: 344 building for debian-amd64 at 2011-02-11 18:46:37
+      N: adding hash 485316717b03afbd6d20f7810f9123b4445c8660 for akima
+
+      $ cran2deb license ls
+      I: cran2deb svn: 344 building for debian-amd64 at 2011-02-11 18:46:53
+      accept akima 
+      hash_sha1 akima 485316717b03afbd6d20f7810f9123b4445c8660 
+
+   What happens here is that a license file was read and if that is
+   having the same hash value, then it is mapped to the license 'akima'.
+   The license 'akima' then again is told to be acceptable. It happened
+   here that the license is of the same name as the package that it 
+   occurs in.
 
 To think about
 
