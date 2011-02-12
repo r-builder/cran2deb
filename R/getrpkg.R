@@ -1,3 +1,7 @@
+
+curl.maxtime<-60*60  # 60 minutes max download time (some bioconductor packages are truly big and take time)
+curl.retries<-0	     # No retries (connections are commonly good enough)
+
 setup <- function() {
     # set up the working directory
     tmp <- tempfile('cran2deb')
@@ -61,7 +65,9 @@ download_pkg <- function(dir, pkgname) {
             # dodgy network connections (hello BT 'OpenWorld', bad ISP)
             url <- paste(available[pkgname,'Repository'], fn, sep='/')
             # don't log the output -- we don't care!
-            ret <- system(paste('curl','-o',shQuote(archive),'-m 720 --retry 5',shQuote(url)))
+            ret <- system(paste('curl','-o',shQuote(archive),
+                          paste('-m',curl.maxtime,'--retry',curl.retries,sep=' '),
+                          shQuote(url)))
             if (ret != 0) {
                 fail('failed to download',url)
             }
