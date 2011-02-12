@@ -48,7 +48,7 @@ alias_build libxml libxml2-dev
 alias_run libxml libxml2 
 alias_build msttcorefonts ttf-liberation 
 alias_run msttcorefonts ttf-liberation 
-alias_run netcdf libnetcdf4 
+alias_run netcdf libnetcdf6 
 alias_build opengl libgl1-mesa-dev 
 alias_run opengl libgl1-mesa-glx 
 alias_build pari-gp pari-gp 
