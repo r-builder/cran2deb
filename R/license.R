@@ -1,5 +1,8 @@
 is_acceptable_license <- function(license,verbose=FALSE,debug=FALSE) {
-    if (verbose) cat("is_acceptable_license: license:",license,"\n",sep="")
+    if (verbose) cat("is_acceptable_license: license: ",
+			#paste(license,collapse="@",sep=""),
+			license,
+			"'\n",sep="")
     # determine if license text is acceptable
 
     if (length(grep('^file ',license))) {
@@ -102,47 +105,45 @@ license_text_hash_reduce <- function(text,verbose=TRUE) {
     return(chomp(tolower(gsub('[[:space:]]+',' ',text))))
 }
 
-get_license <- function(pkg,license) {
-    license <- chomp(gsub('[[:space:]]+',' ',license))
-    if (length(grep('^file ',license))) {
-        if (length(grep('^file LICEN[CS]E$',license))) {
-            file = gsub('file ','',license)
+get_license <- function(pkg,license,verbose=FALSE) {
+    license <- gsub('[[:space:]]+$',' ',license)
+    if (length(grep('^file\\s',license))) {
+        notice("License recognised as 'file'-based license.")
+        if (length(grep('^file\\s+LICEN[CS]E$',license))) {
+            file = gsub('file\\s+','',license)
             path = file.path(pkg$path, file)
             if (file.exists(path)) {
-                #license <- license_text_reduce(readChar(path,file.info(path)$size))
-                con <- file(path, "rb")
-                content <- paste(readLines(con), collapse="\n")
-                close(con)
-                license <- license_text_reduce(content)
+                license <- readChar(path,file.info(path)$size)
             } else {
                 path = file.path(pkg$path, 'inst', file)
                 if (file.exists(path)) {
-                    #license <- license_text_reduce(readChar(path,file.info(path)$size))
-                    con <- file(path, "rb")
-                    content <- paste(readLines(con), collapse="\n")
-                    close(con)
-                    license <- license_text_reduce(content)
+                    license <- readChar(path,file.info(path)$size)
                 } else {
-                    error('said to look at a license file but license file is missing')
+                    error(paste("Could not locate license file expected at '",
+				path,"' or at '",
+				file.path(pkg$path, file),"'.\n",sep=""))
                 }
             }
         } else {
-            error('invalid license file specification',license)
+            error("invalid license file specification, expected 'LICENSE' as filename, got: ",license)
             return(NA)
         }
     }
     return(license)
 }
 
-get_license_hash <- function(pkg,license) {
-    return(digest(get_license(pkg,license),algo='sha1',serialize=FALSE))
+get_license_hash <- function(pkg,license,verbose=FALSE) {
+    return(digest(get_license(pkg,license,verbose=verbose),algo='sha1',serialize=FALSE))
 }
 
-is_acceptable_hash_license <- function(pkg,license,verbose=TRUE) {
-    license_sha1 <- get_license_hash(pkg,license)
+is_acceptable_hash_license <- function(pkg,license,verbose=TRUE,debug=TRUE) {
+    if (debug) cat(paste("is_acceptable_hash_license: pkg$name='",pkg$name,"', license='",license,"'.\n",sep=""))
+    license_sha1 <- get_license_hash(pkg,license,verbose=verbose)
     if (is.null(license_sha1)) {
 	if (verbose) cat("is_acceptable_hash_license: get_license_hash(pkg,license) returned NULL, returning FALSE.\n")
         return(FALSE)
+    } else if (verbose) {
+        notice(paste("is_acceptable_hash_license, license_sha1 determined: '",license_sha1,"'",sep=""))
     }
     action = db_license_override_hash(license_sha1)
     if (is.null(action)) {
@@ -162,7 +163,7 @@ is_acceptable_hash_license <- function(pkg,license,verbose=TRUE) {
 }
 
 
-accept_license <- function(pkg,verbose=FALSE) {
+accept_license <- function(pkg,verbose=TRUE) {
     # check the license
     if (!('License' %in% names(pkg$description[1,]))) {
         fail('package has no License: field in description!')
@@ -178,7 +179,7 @@ accept_license <- function(pkg,verbose=FALSE) {
         if (is_acceptable_license(l)) {
             accept=l
             break
-        } else if (is_acceptable_hash_license(pkg,l)) {
+        } else if (is_acceptable_hash_license(pkg,l,verbose=verbose)) {
             accept=l
             break
         } else {
