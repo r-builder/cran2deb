@@ -235,6 +235,28 @@ To think about
 		apt-cache search r-cran-$a
 	done
 
+3. If running on a separate partition, the place reserved for cran2deb is not unlikely
+   to exceed your expectation, especially when also running BioConductor. You may
+   consider running cran2deb on logical volumes, like by LVM. Together with a file
+   system that allows its extension, the process is rather straight forward:
+
+	# lvextend -L+40G /dev/vg0/cran2deb 
+	Extending logical volume cran2deb to 115.04 GiB
+        Logical volume cran2deb successfully resized
+        # xfs_growfs /dev/vg0/cran2deb
+        meta-data=/dev/dm-6              isize=256    agcount=21, agsize=983040 blks
+                 =                       sectsz=512   attr=2
+        data     =                       bsize=4096   blocks=19671040, imaxpct=25
+                 =                       sunit=0      swidth=0 blks
+        naming   =version 2              bsize=4096   ascii-ci=0
+        log      =internal               bsize=4096   blocks=2560, version=2
+                 =                       sectsz=512   sunit=0 blks, lazy-count=1
+        realtime =none                   extsz=4096   blocks=0, rtextents=0
+        data blocks changed from 19671040 to 30156800
+
+   The directory does not even need to unmounted for that with XFS. 
+
+
 To debug:
 
 $ cran2deb help
@@ -256,5 +278,5 @@ database. It's a backup that can be versioned by SVN. There is a script called
 pull that, when run from the data directory will recreate all the files from
 the database EXCEPT for the licenses. The licenses cannot be recreated because
 licenses can be based on one-way hashes.  This process could certainly be
-improved.
+improved. But one gets the hang of it ater a while. So don't despair.
 
