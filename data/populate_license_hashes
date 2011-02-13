@@ -157,3 +157,6 @@ hash_sha1 sgeostat c66e00dc696a8e22dff8f1f180612ac535c0706c
 hash_sha1 sgeostat 8c36b0a6a8bf9a031086c85ff41eb7081ba2ae62 
 hash_sha1 networksis fef50483de2ece9917bff64e06c5bdce24e56fae 
 hash_sha1 networksis 831085cab8ce77a0a8895e1eaab8a1e71996c9bf 
+hash_sha1 cosmo d049e14cfddf8d55b28bd3b78c5458c136da93fd 
+hash_sha1 mirbase a67c7796cf2c2724a335dfd220c030e1530f8f49 
+hash_sha1 cc-sa 6497cfff108209ec6f86c03d52838d325ff7468d 
