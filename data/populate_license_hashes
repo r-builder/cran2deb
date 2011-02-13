@@ -46,6 +46,7 @@ accept ever
 accept latentnet 
 accept sgeostat 
 accept networksis 
+accept mirbase
 hash_sha1 apache 2b8b815229aa8a61e483fb4ba0588b8b6c491890 
 hash_sha1 artistic be0627fff2e8aef3d2a14d5d7486babc8a4873ba 
 hash_sha1 bsd 095d1f504f6fd8add73a4e4964e37f260f332b6a 
