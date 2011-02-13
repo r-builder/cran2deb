@@ -136,3 +136,4 @@ alias_build rggobi r-cran-rggobi
 alias_run rggobi r-cran-rggobi 
 alias_build netcdf libnetcdf-dev 
 alias_build netcdf netcdf-bin 
+alias_build imagemagick imagemagick 

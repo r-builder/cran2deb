@@ -70,3 +70,4 @@ force mpi npRmpi
 force rggobi geozoo 
 force graphviz Rgraphviz 
 force gsl flowClust 
+force imagemagick flowQ 
