@@ -72,7 +72,6 @@ alias_build mpi libopenmpi-dev
 alias_build pvm pvm-dev 
 alias_build hdf5 libhdf5-serial-dev 
 alias_build sprng libsprng2-dev 
-alias_build netcdf libnetcdf-dev 
 alias_build libtiff libtiff4-dev 
 alias_build fftw libfftw3-dev 
 alias_build fftw-dev fftw-dev 
@@ -135,3 +134,5 @@ alias_build rpcgen libc-dev-bin
 alias_run rpcgen libc-dev-bin 
 alias_build rggobi r-cran-rggobi 
 alias_run rggobi r-cran-rggobi 
+alias_build netcdf libnetcdf-dev 
+alias_build netcdf netcdf-bin 
