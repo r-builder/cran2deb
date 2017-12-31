@@ -13,7 +13,11 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
         error('failed to build in new_build_version: ',name)
         return(NULL)
     }
-
+	
+#	if (name == "sp"){
+#		version <- paste("1:",version,sep="")
+#		}
+	
     result <- try((function() {
         if (!force && !needs_build(name,version)) {
             notice('skipping build of',name)
@@ -36,6 +40,7 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
 
         notice('R dependencies:',paste(pkg$depends$r,collapse=', '))
 	#if (debug) notice(paste("build_debian(",pkg,") invoked\n",sep=""))
+
         build_debian(pkg)
 	#if (debug) notice(paste("build_debian(",pkg,") completed.\n",sep=""))
 
@@ -44,7 +49,9 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
 	notice("Package upload")
 ##         ret = log_system('umask 002;dput','-c',shQuote(dput_config),'local' ,changesfile(pkg$srcname,pkg$debversion))
 
-	cmd = paste('umask 002; cd /var/www/cran2deb/rep && reprepro -b . include testing', changesfile(pkg$srcname,pkg$debversion),sep=" ")
+#	cmd = paste('umask 002; cd /var/www/cran2deb/rep && reprepro -b . include testing', changesfile(pkg$srcname,pkg$debversion),sep=" ")
+    cmd = paste('umask 002; cd /var/www/cran2deb/rep && reprepro --ignore=wrongdistribution --ignore=missingfile -b . include rbuilders', changesfilesrc(pkg$srcname,pkg$debversion,dir),sep=" ")
+	notice('Executing: ',cmd)
         #if (verbose) notice('Executing: ',cmd)
         ret = log_system(cmd)
         if (ret != 0) {
@@ -91,6 +98,25 @@ build <- function(name,extra_deps,force=F,do_cleanup=T) {
 
 needs_build <- function(name,version) {
     # see if the last build was successful
+    # Check to see if current version is available in a PPA or repository
+#    debname <- pkgname_as_debian(name,binary=T)
+#    ubuntu.version <- strsplit(readLines(pipe('lsb_release -c')),"\t")[[1]][2]
+#    cmd <- paste('apt-cache show --no-all-versions',debname,'| grep  Version')
+#    aval.version <- readLines(pipe(cmd))
+#    u.version <- strsplit(try(new_build_version(name)),"cran")[[1]][1]
+#    closeAllConnections()
+#    if (length(aval.version)>0) {
+#      aval.version <- strsplit(aval.version,ubuntu.version)[[1]][1]
+#      aval.version <- strsplit(aval.version,": ")[[1]][2]
+#      aval.version <- strsplit(aval.version,"cran")[[1]][1]
+#      aval.version
+#      if (gsub("-",".",u.version) == gsub("-",".",aval.version)) {
+#        notice('Current version of',name,'exists in MAIN, CRAN, or PPA')
+#        return(F)
+#      } else {
+#        notice('Older version of',name,'exists in MAIN, CRAN, or PPA')
+#      }
+#    }
     build <- db_latest_build(name)
     if (!is.null(build) && build$success) {
         # then something must have changed for us to attempt this
@@ -132,19 +158,51 @@ build_debian <- function(pkg) {
     #notice(paste("Now in path ",wd,"\n",sep=""))
     setwd(pkg$path)
     
-    notice('building Debian package',pkg$debname,paste('(',pkg$debversion,')',sep=''),'in',getwd(),'...')
+    notice('building Debian source package',pkg$debname,paste('(',pkg$debversion,')',sep=''),'in',getwd(),'...')
 
-    cmd = paste('pdebuild --configfile',shQuote(pbuilder_config))
+    cmd = paste('debuild -us -uc -S')
     if (version_revision(pkg$debversion) > 2) {
-        cmd = paste(cmd,'--debbuildopts','-sd')
+        cmd = paste(cmd,'-sd')
         notice('build should exclude original source')
     }
     notice(paste("Executing ",'"',cmd,'"'," from directory '",getwd(),"'.\n",sep=""))
     ret = log_system(cmd)
     setwd(wd)
     if (ret != 0) {
-        fail('Failed to build package.')
+        fail('Failed to build source package.')
     }
     return(ret);
 }
 
+changesfilesrc <- function(srcname,version='*',dir) {
+        return(file.path(dir
+                        ,paste(srcname,'_',version,'_'
+                              ,'source','.changes',sep='')))
+    }
+
+needs_upload <- function(name,version) {
+    # Check to see if current version is available in a PPA or repository
+    debname <- pkgname_as_debian(name,binary=T)
+    ubuntu.version <- strsplit(readLines(pipe('lsb_release -c')),"\t")[[1]][2]
+    cmd <- paste('apt-cache show --no-all-versions',debname,'| grep  Version')
+    aval.version <- readLines(pipe(cmd))
+    u.version <- strsplit(version,"cran")[[1]][1]
+    if (length(aval.version)>0) {
+      aval.version <- strsplit(aval.version,ubuntu.version)[[1]][1]
+      aval.version <- strsplit(aval.version,": ")[[1]][2]
+      aval.version <- strsplit(aval.version,"cran")[[1]][1]
+      if (gsub("-",".",u.version) == gsub("-",".",aval.version)) {
+        notice('Current version of',name,'exists in MAIN, CRAN, or PPA')
+        closeAllConnections()
+        return(F)
+      } else {
+        notice('Older version of',name,'exists in MAIN, CRAN, or PPA')
+        closeAllConnections()
+        return(T)
+      }
+    } else {
+      notice('No version of',name,'exisits in MAIN, CRAN, or PPA')
+      closeAllConnections()
+      return(T)
+    }
+}

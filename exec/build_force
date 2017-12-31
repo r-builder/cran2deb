@@ -46,10 +46,10 @@ if (exists('argv')) { # check for littler
     notice('build order',ifelse(0<length(build_order),paste(build_order,collapse=', ',sep="")," nothing to be built"))
     for (pkg in build_order) {
         #cat("Invoking build of '",pkg,"'\n",sep="")
-        #build(pkg,extra_deps,force=pkg %in% argv, do_cleanup)               
+        build(pkg,extra_deps,force=pkg %in% argv, do_cleanup)               
         # Force the build if the package is in the argument
         # Do I want that? I don't think so.  If it exists, don't build it.
-        build(pkg,extra_deps,force=F, do_cleanup)
+        #build(pkg,extra_deps,force=F, do_cleanup)
     }
 #   notice('Starting upload section!')
 #    upload_order <- c()

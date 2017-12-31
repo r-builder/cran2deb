@@ -16,7 +16,7 @@ shift
 
 precmd=""
 if [ "$(id -un)" != c2d ]; then
-	precmd="sudo -u c2d -E"
+	precmd="sudo -u mrutter -E"
 fi
 
 if [ "web" = "$cmd" ]; then 

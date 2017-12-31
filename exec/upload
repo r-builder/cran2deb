@@ -1,0 +1,30 @@
+#!/usr/bin/env r
+## DOC: cran2deb upload 
+## DOC:     upload unbuilt packages to cran2deb4ubuntu Launchpad PPA
+## DOC:		
+suppressPackageStartupMessages(library(cran2deb))
+
+aval.src.pkgs <- readLines(pipe('cat /var/lib/apt/lists/192.168.1.129_cran2deb_rep_dists_c2d4u_main_source_Sources | grep Package'))
+to.upload <- c()
+for (pkg in aval.src.pkgs) {
+  pkg.name <- strsplit(pkg,": ")[[1]][2]
+  ubuntu.version <- strsplit(readLines(pipe('lsb_release -c')),"\t")[[1]][2]
+  version <- strsplit(readLines(pipe(
+                paste('apt-cache showsrc',pkg.name
+                ,'| grep Version | grep cran | grep -v',ubuntu.version)))
+                ,": ")[[1]][2]
+  if (needs_upload(pkg.name,version)) {
+    to.upload <- paste(to.upload,tolower(pkg.name)," ",sep="")
+    }
+  }
+
+if (length(to.upload) > 0) { 
+   cmd <- paste('/home/mrutter/R/c2d4u/update-c2d4u.sh -p',to.upload,sep=" ")
+   notice('upload command:',cmd)
+   ret <- log_system(cmd)
+   if (ret != 0) {
+      fail('Failed to upload packages.')
+    }
+ } else {
+   notice('Nothing to upload to launchpad.')
+ }

@@ -51,24 +51,24 @@ if (exists('argv')) { # check for littler
         # Do I want that? I don't think so.  If it exists, don't build it.
         build(pkg,extra_deps,force=F, do_cleanup)
     }
-#   notice('Starting upload section!')
-#    upload_order <- c()
-#    for (pkg in build_order) {
-#       version <- try(new_build_version(pkg))
-#       if (needs_upload(pkg,version)) {
-#       upload_order <- paste(upload_order,tolower(pkg))
-#      }
-#    }
-#    if (length(upload_order) > 0) { 
-#      cmd <- paste('/home/mrutter/R/c2d4u/update-c2d4u.sh -p',upload_order,sep="")
-#      notice('upload command:',cmd)
-#      ret <- log_system(cmd)
-#      if (ret != 0) {
-#        fail('Failed to upload packages.')
-#      }
-#    } else {
-#    notice('Nothing to upload to launchpad.')
-#    }
+   notice('Starting upload section!')
+    upload_order <- c()
+    for (pkg in build_order) {
+       version <- try(new_build_version(pkg))
+       if (needs_upload(pkg,version)) {
+       upload_order <- paste(upload_order,tolower(pkg))
+      }
+    }
+    if (length(upload_order) > 0) { 
+      cmd <- paste('/home/mrutter/R/c2d4u/update-c2d4u.sh -p',upload_order,sep="")
+      notice('upload command:',cmd)
+     ret <- log_system(cmd)
+      if (ret != 0) {
+        fail('Failed to upload packages.')
+      }
+    } else {
+      notice('Nothing to upload to launchpad.')
+    }
 } else {
    cat("exec/build: argv not existing.\n")
 }

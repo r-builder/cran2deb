@@ -34,7 +34,8 @@ pkgname_as_debian <- function(name,repopref=NULL,version=NULL,binary=T,build=F) 
         debname = tolower(name)
         if (binary) {
             if (name %in% rownames(available)) {
-                repopref <- tolower(repourl_as_debian(available[name,'Repository']))
+#                repopref <- tolower(repourl_as_debian(available[name,'Repository']))
+				 repopref <- tolower(repourl_as_debian(available[tolower(row.names(available))==tolower(name),'Repository']))
             } else if (is.null(repopref)) {
                 repopref <- 'unknown'
             }

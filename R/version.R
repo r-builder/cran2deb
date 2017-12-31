@@ -1,4 +1,4 @@
-version_new <- function(rver, debian_revision=1, debian_epoch=db_get_base_epoch(), verbose=FALSE) {
+version_new <- function(rver, debian_revision=1, debian_epoch=db_get_base_epoch(), verbose=TRUE) {
     if (verbose) {cat("rver:",rver," debian_revision:",debian_revision," debian_epoch:",debian_epoch,"\n")}
     # generate a string representation of the Debian version of an
     # R version of a package
@@ -28,6 +28,7 @@ version_new <- function(rver, debian_revision=1, debian_epoch=db_get_base_epoch(
     # always add the '-1' Debian release; nothing is lost and rarely will R
     # packages be Debian packages without modification.
     return(paste(pkgver,'-',version_suffix_step,version_suffix,debian_revision,sep=''))
+#    return(paste(pkgver,'-',2,version_suffix,debian_revision,sep=''))
 }
 
 version_epoch <- function(pkgver) {

@@ -24,10 +24,11 @@ generate_changelog <- function(pkg) {
 generate_changelog_entry <- function(build, changelog) {
     # TODO: should say 'New upstream release' when necessary
     debversion <- version_new(build$r_version, build$deb_revision, build$deb_epoch)
+    print(maintainer_c2d)
     cat(paste(paste(build$srcname,' (',debversion,') testing; urgency=low',sep='')
              ,'' ,paste('  * cran2deb ',build$scm_revision
                        ,' with DB version ',as.integer(build$db_version),'.',sep='')
-             ,'',paste(' --',maintainer,'',format(build$date_stamp,'%a, %d %b %Y %H:%M:%S %z'))
+             ,'',paste(' --',maintainer_c2d,'',format(build$date_stamp,'%a, %d %b %Y %H:%M:%S %z'))
              ,'','','',sep='\n'),file=changelog, append=TRUE)
 }
 
@@ -41,6 +42,11 @@ generate_rules <- function(pkg) {
         cat("extraInstallFlags=\"--no-test-load\"\n", file=pkg$debfile('rules'), append=TRUE)
     }      
     Sys.chmod(pkg$debfile('rules'),'0700')
+}
+
+generate_compat <- function(pkg) {
+  cat(paste(7,sep='\n'),file=pkg$debfile('compat'))
+  Sys.chmod(pkg$debfile('compat'),'0700')
 }
 
 generate_copyright <- function(pkg) {
@@ -65,8 +71,8 @@ generate_copyright <- function(pkg) {
 
     writeLines(strwrap(
         paste('This Debian package of the GNU R package',pkg$name
-             ,'was generated automatically using cran2deb by'
-             ,paste(maintainer,'.',sep='')
+             ,'was generated automatically using cran2deb4ubuntu by'
+             ,paste(maintainer_c2d,'.',sep='')
              ,''
              ,'The original GNU R package is Copyright (C) '
              # TODO: copyright start date, true copyright date
@@ -126,6 +132,8 @@ prepare_new_debian <- function(pkg,extra_deps) {
     generate_rules(pkg)
     generate_copyright(pkg)
     generate_control(pkg)
+    # Added generate_comp for yakkety
+    generate_compat(pkg)
     ## debdir <- file.path(pkg$path,'debian')
     ## system(paste("ls ", debdir, "; ls -l ", debdir, "/patches/*", sep=""))
 

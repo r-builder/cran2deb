@@ -21,8 +21,12 @@ get_dependencies <- function(pkg,extra_deps,verbose=TRUE) {
             depends$bin = c(sysreq$bin,depends$bin)
             depends$build = c(sysreq$build,depends$build)
         } else {
-	    if (verbose) {cat("sysreq:"); print(sysreq)}
+        if (is.null(sysreq)) {
+            notice('Houston, we have a NULL sysreq')
+            }  else {
+	        if (verbose) {cat("sysreq:"); print(sysreq)}
             fail('Cannot interpret system dependency, fix package.\n')
+            }
         }
     }
 
@@ -131,7 +135,7 @@ generate_control <- function(pkg) {
     control[1,'Source'] <- pkg$srcname
     control[1,'Section'] <- 'gnu-r'
     control[1,'Priority'] <- 'optional'
-    control[1,'Maintainer'] <- maintainer
+    control[1,'Maintainer'] <- maintainer_c2d
     control[1,'Build-Depends'] <- paste(pkg$depends$build, collapse=', ')
     control[1,'Standards-Version'] <- '3.9.1'
     if ('URL' %in% colnames(pkg$description)) {

@@ -32,7 +32,7 @@ download_pkg <- function(dir, pkgname) {
     pkg$version <- available[pkgname,'Version']
 
     # see if we have already built this release and uploaded it.
-    debfn <- file.path(pbuilder_results, paste(pkg$srcname, '_', pkg$version, '.orig.tar.gz', sep=''))
+    debfn <- file.path(rbuilders_loc,  paste(substr(pkg$srcname,1,1),'/',pkg$srcname,'/',pkg$srcname,'_',pkg$version,'.orig.tar.gz',sep=""))
     pkg$need_repack = FALSE
     if (file.exists(debfn)) {
         # if so, use the existing archive. this is good for three reasons:
@@ -113,9 +113,12 @@ repack_pkg <- function(pkg) {
         unlink(file.path(basename(pkg$path),'debian'),recursive=TRUE)
     }
     # tar it all back up
-    log_system('tar -czf',shQuote(debarchive),shQuote(basename(pkg$path)))
+    # log_system('tar -czf',shQuote(debarchive),shQuote(basename(pkg$path))) MAR 1/27/17
+    file.rename(pkg$archive, paste(pkg$srcname,'_'
+                                    ,pkg$version,'.orig.tar.gz'
+                                    ,sep='')) # MAR 1/27/17 to match CRAN tar.gz
     setwd(wd)
-    file.remove(pkg$archive)
+    #file.remove(pkg$archive) # MAR 1/28/17
     pkg$archive = debarchive
     pkg$need_repack = FALSE
     return(pkg)
@@ -145,10 +148,16 @@ prepare_pkg <- function(dir, pkgname) {
     if (pkg$need_repack) {
         pkg <- repack_pkg(pkg)
     }
+    notice('Hi Mike') # Fix for change in tar file directory names
+    notice(pkg$path)
+    if (is.na(file.info(pkg$path)[,'isdir'])){
+      pkg$path = list.dirs(file.path(dir))[2]
+    }
+    notice(pkg$path)
     if (!file.info(pkg$path)[,'isdir']) {
         fail(pkg$path,'is not a directory and should be.')
     }
-
+    
     # extract the DESCRIPTION file, which contains much metadata
     pkg$description = read.dcf(file.path(pkg$path,'DESCRIPTION'))
 
