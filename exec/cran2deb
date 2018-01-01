@@ -15,9 +15,9 @@ fi
 shift
 
 precmd=""
-if [ "$(id -un)" != c2d ]; then
-	precmd="sudo -u mrutter -E"
-fi
+#if [ "$(id -un)" != c2d ]; then
+#	precmd="sudo -u mrutter -E"
+#fi
 
 if [ "web" = "$cmd" ]; then 
 	# web uses getopt and would be irritated by the "$root" argument

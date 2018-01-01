@@ -25,7 +25,9 @@ generate_changelog_entry <- function(build, changelog) {
     # TODO: should say 'New upstream release' when necessary
     debversion <- version_new(build$r_version, build$deb_revision, build$deb_epoch)
     print(maintainer_c2d)
-    cat(paste(paste(build$srcname,' (',debversion,') testing; urgency=low',sep='')
+    if ((dist <- Sys.getenv("DIST")) == "")
+    	dist <- "testing"   # fallback
+    cat(paste(paste(build$srcname,' (',debversion,') ', dist, '; urgency=low',sep='')
              ,'' ,paste('  * cran2deb ',build$scm_revision
                        ,' with DB version ',as.integer(build$db_version),'.',sep='')
              ,'',paste(' --',maintainer_c2d,'',format(build$date_stamp,'%a, %d %b %Y %H:%M:%S %z'))
