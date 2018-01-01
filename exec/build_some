@@ -36,3 +36,4 @@ do
         fi
     fi
 done
+mv all_pkgs all_pkgs.old 

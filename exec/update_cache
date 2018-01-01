@@ -13,12 +13,12 @@ available <- NULL
 ctv.available <- NULL
 
 mirrors <- NULL
+mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/3.5')
 mirrors <- c(mirrors,CRAN='http://cran.r-project.org')
 #mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/2.2')
-mirrors <- c(mirrors,BioC='http://www.bioconductor.org/packages/2.7')
 
 verbose<-TRUE
-debug<-FALSE
+debug<-TRUE
 
 for (mirror.name in names(mirrors)) {
 	mirror.url<-mirrors[mirror.name]
@@ -44,8 +44,10 @@ for (mirror.name in names(mirrors)) {
 	}
 	if (verbose) message(paste("Retrieved ",nrow(packages.retrieved)," package descriptions.\n",sep=""))
 	available <- rbind(available, packages.retrieved)
-	message('updating list of available R task views...')
-	ctv.available <- rbind(ctv.available,available.views(repo=mirror.url))
+    if ("CRAN" == mirror.name) {
+	  message('updating list of available R task views...')
+	  ctv.available <- rbind(ctv.available,available.views(repo=mirror.url))
+	}
 }
 
 #available <- rbind(available,available.packages(contrib.url('http://www.bioconductor.org/')))
@@ -60,10 +62,13 @@ if (sum(dupes)>0) {
 
 # TODO: Check if not better a dedicated tool should be called for this
 message('updating list of base R packages...')
-base_pkgs <- readLines(pipe(paste('sudo pbuilder --execute --override-config --configfile'
-                                 ,shQuote(pbuilder_config),'-- /usr/bin/R --vanilla 2>&1 >/dev/null <'
-                                 ,shQuote(file.path(root,'exec/get_base_pkgs'))
-                                 ,'| grep -v ^W:')))
+#base_pkgs <- readLines(pipe(paste('/usr/bin/R --vanilla 2>&1 >/dev/null <',
+#                                  shQuote(file.path(root,'exec/get_base_pkgs')))))
+                                  
+instPkgs <- installed.packages(lib.loc="/usr/lib/R/library")
+instPkgs <- instPkgs[ instPkgs[,"Priority"] == 'base', ] 
+base_pkgs <- rownames(instPkgs)                                
+                                
 
 if (any(grep("^E:",base_pkgs,value=FALSE))) {
 	cat("Cannot continue, the following error occurred:\n")
@@ -78,7 +83,7 @@ if (debug) {
 	print(base_pkgs)
 }
 
-message('updating list of existing Debian packages...')
+message('updating list of existing Ubuntu packages...')
 debian_pkgs <- readLines(pipe('apt-cache rdepends r-base-core | sed -e "/^  r-cran/{s/^[[:space:]]*r/r/;p}" -e d | sort -u'))
 
 if (any(grep("^E:",debian_pkgs,value=FALSE))) {

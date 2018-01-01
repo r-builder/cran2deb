@@ -36,9 +36,9 @@ if [ ! -e /var/cache/cran2deb/cache.rda ] || [ $delta -gt $update_period ]; then
     if [ -e /var/cache/pbuilder/base-cran2deb-$sys.tgz ]; then
         mode=update
     fi
-    echo C: sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
-    echo "Executing sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc"
-    sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
+ #   echo C: sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
+ #   echo "Executing sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc"
+ #   sudo pbuilder $mode --override-config --configfile /etc/cran2deb/sys/$sys/pbuilderrc
     echo "Executing $root/exec/update_cache $root"
     $root/exec/update_cache $root
 fi
