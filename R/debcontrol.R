@@ -137,7 +137,7 @@ generate_control <- function(pkg) {
     control[1,'Priority'] <- 'optional'
     control[1,'Maintainer'] <- maintainer_c2d
     control[1,'Build-Depends'] <- paste(pkg$depends$build, collapse=', ')
-    control[1,'Standards-Version'] <- '3.9.1'
+    control[1,'Standards-Version'] <- '4.1.3'
     if ('URL' %in% colnames(pkg$description)) {
         control[1,'Homepage'] <- pkg$description[1,'URL']
     }
@@ -147,7 +147,7 @@ generate_control <- function(pkg) {
     if (pkg$archdep) {
         control[2,'Architecture'] <- 'any'
     }
-    control[2,'Depends'] <- paste(pkg$depends$bin,collapse=', ',sep='')
+    control[2,'Depends'] <- paste("${misc:Depends},", paste(pkg$depends$bin,collapse=', ',sep=''))
 
     # generate the description
     descr <- 'GNU R package "'
