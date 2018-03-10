@@ -43,12 +43,12 @@ generate_rules <- function(pkg) {
     if (pkg$name %in% c("Rmpi", "npRmpi", "doMPI")) {
         cat("extraInstallFlags=\"--no-test-load\"\n", file=pkg$debfile('rules'), append=TRUE)
     }      
-    Sys.chmod(pkg$debfile('rules'),'0700')
+    Sys.chmod(pkg$debfile('rules'),'0755')
 }
 
 generate_compat <- function(pkg) {
-  cat(paste(7,sep='\n'),file=pkg$debfile('compat'))
-  Sys.chmod(pkg$debfile('compat'),'0700')
+  cat(paste(9,sep='\n'),file=pkg$debfile('compat'))
+  Sys.chmod(pkg$debfile('compat'),'0664')
 }
 
 generate_copyright <- function(pkg) {
