@@ -148,7 +148,7 @@ prepare_pkg <- function(dir, pkgname) {
     if (pkg$need_repack) {
         pkg <- repack_pkg(pkg)
     }
-    notice('Hi Mike') # Fix for change in tar file directory names
+    #notice('Hi Mike') # Fix for change in tar file directory names
     notice(pkg$path)
     if (is.na(file.info(pkg$path)[,'isdir'])){
       pkg$path = list.dirs(file.path(dir))[2]
