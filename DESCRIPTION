@@ -1,6 +1,6 @@
 Package: cran2deb
-Version: 0.0
-Date: 2008-07-14
+Version: 0.1.0.1
+Date: 2018-03-25
 Title: Convert CRAN packages into Debian packages
 Author: Charles Blundell <blundellc@gmail.com>, with assistance from Dirk Eddelbuettel <>
 Maintainer: Charles Blundell <blundellc@gmail.com>

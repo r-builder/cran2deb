@@ -1,4 +1,6 @@
 2018-03-25  Dirk Eddelbuettel  <edd@debian.org>
 
+	* DESCRIPTION (Version): Version 0.1.0.1 as we got to start at some point
+
 	* R/build.R: Add -d flag to debuild call
 
