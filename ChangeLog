@@ -1,0 +1,4 @@
+2018-03-25  Dirk Eddelbuettel  <edd@debian.org>
+
+	* R/build.R: Add -d flag to debuild call
+

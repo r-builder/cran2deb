@@ -160,7 +160,7 @@ build_debian <- function(pkg) {
     
     notice('building Debian source package',pkg$debname,paste('(',pkg$debversion,')',sep=''),'in',getwd(),'...')
 
-    cmd = paste('debuild -us -uc -S')
+    cmd = paste('debuild -us -uc -S -d')
     if (version_revision(pkg$debversion) > 2) {
         cmd = paste(cmd,'-sd')
         notice('build should exclude original source')
