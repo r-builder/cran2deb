@@ -83,7 +83,7 @@ if (debug) {
 	print(base_pkgs)
 }
 
-message('updating list of existing Ubuntu packages...')
+message('updating list of existing packages...')
 debian_pkgs <- readLines(pipe('apt-cache rdepends r-base-core | sed -e "/^  r-cran/{s/^[[:space:]]*r/r/;p}" -e d | sort -u'))
 
 if (any(grep("^E:",debian_pkgs,value=FALSE))) {

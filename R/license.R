@@ -7,8 +7,8 @@ is_acceptable_license <- function(license,verbose=FALSE,debug=FALSE) {
 
     if (length(grep('^file ',license))) {
         # skip file licenses
-	notice("The package has a file license. This needs individual checking and settings in the respective table.")
-        return(FALSE)
+	    notice("The package has a file license. This needs individual checking and settings in the respective table (IGNORING).")
+        return(TRUE)
     }
     license <- license_text_reduce(license)
     if (debug) cat("**** a ****\n")

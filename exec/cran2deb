@@ -8,7 +8,7 @@ if [ "x" = "x$cmd" ]; then
 fi
 
 if [ ! -x "$root/exec/$cmd" ]; then
-    echo unknown command $cmd
+    echo unknown command $root/exec/$cmd
     exit 1
 fi
 
