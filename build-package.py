@@ -157,7 +157,7 @@ def _build_pkg_dsc_and_upload(pkg_name: str):
         subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
         debs = glob.glob(f"{td}/*.deb")
-        assert len(debs) != 0, f"Did not find any debs in: {td}"
+        assert len(debs) > 0, f"Did not find any debs in: {td}"
 
         print("Uploading to debian repo")
         for deb in debs:
