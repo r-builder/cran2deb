@@ -77,6 +77,7 @@ class HttpDebRepo:
                 self._deb_info[row['name']].add(deb_ver)
 
     def has_version(self, pkg_name: str, deb_ver: str):
+        pkg_name = f"r-cran-{pkg_name}"
         deb_ver = _get_deb_version(deb_ver)
         return deb_ver in self._deb_info.get(pkg_name, _empty_dict)
 
