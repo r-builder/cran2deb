@@ -163,7 +163,7 @@ def _build_pkg_dsc_and_upload(pkg_name: str):
         for deb in debs:
             response = requests.post(
                 f"https://deb.fbn.org/add/{_distribution}",
-                files={'deb-file': (os.path.basename(deb), open(debs, "rb"))})
+                files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
             assert response.status_code == 200, f"Error with request {response}"
 
 
