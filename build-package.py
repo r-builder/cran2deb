@@ -89,7 +89,7 @@ class HttpDebRepo:
 
 
 def _get_dependencies(cran_pkg_name: str):
-    print("Finding dependencies")
+    print(f"Finding dependencies of {cran_pkg_name}")
     r_cran_name = f"r-cran-{cran_pkg_name}"
     output = subprocess.check_output(["apt-cache", "depends", r_cran_name]).decode('utf-8')
 
@@ -113,7 +113,10 @@ def _get_dependencies(cran_pkg_name: str):
             continue
 
         if m['pkgname'].startswith("r-cran-"):
-            r_depends.add(m['pkgname'].replace("r-cran-", "", 1))
+            pkgname = m['pkgname'].replace("r-cran-", "", 1)
+            if pkgname == "rcpp":
+                pkgname = "Rcpp"
+            r_depends.add(pkgname)
         else:
             non_r_depends.add(m['pkgname'])
 
@@ -124,7 +127,7 @@ def _install_r_deps(http_repo: HttpDebRepo, deps: Set[str]):
     if not deps:
         return
 
-    # Ensure all the deps are available via ht http deb repo
+    # Ensure all the deps are available via the http deb repo
     for dep in deps:
         _build_pkg(http_repo, dep)
 
