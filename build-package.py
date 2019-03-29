@@ -172,7 +172,9 @@ def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
 
     prefix = "dpkg-checkbuilddeps: error: Unmet build dependencies: "
     assert stderr[0].startswith(prefix)
-    return {PkgName(pkg_name) for pkg_name in stderr[0][len(prefix):].split(" ")}
+    deps = stderr[0][len(prefix):]
+    print(f"found dsc deps: {deps}")
+    return {PkgName(pkg_name) for pkg_name in deps.split(" ")}
 
 
 def _get_install_dependencies(deb_file_path: str) -> Tuple[Set[PkgName], Set[PkgName]]:
