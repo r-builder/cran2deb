@@ -14,18 +14,19 @@ get_dependencies <- function(pkg,extra_deps,verbose=TRUE) {
     # add the command line dependencies
     depends$bin = c(extra_deps$deb,depends$bin)
     depends$build = c(extra_deps$deb,depends$build)
+
     # add the system requirements
     if ('SystemRequirements' %in% colnames(pkg$description)) {
-        sysreq <- sysreqs_as_debian(pkg$description[1,'SystemRequirements'],verbose=verbose)
-	if (!is.null(sysreq) && is.list(sysreq)) {
+        sysreq <- sysreqs_as_debian(pkg$description[1,'SystemRequirements'], verbose=verbose)
+        if (!is.null(sysreq) && is.list(sysreq)) {
             depends$bin = c(sysreq$bin,depends$bin)
             depends$build = c(sysreq$build,depends$build)
         } else {
         if (is.null(sysreq)) {
-            notice('Houston, we have a NULL sysreq')
-            }  else {
-	        if (verbose) {cat("sysreq:"); print(sysreq)}
-            fail('Cannot interpret system dependency, fix package.\n')
+                notice('Houston, we have a NULL sysreq')
+            } else {
+                if (verbose) {cat("sysreq:"); print(sysreq)}
+                fail('Cannot interpret system dependency, fix package.\n')
             }
         }
     }
@@ -73,15 +74,20 @@ sysreqs_as_debian <- function(sysreq_text,verbose=FALSE) {
     # form of this field is unspecified (ugh) but most people seem to stick
     # with this
     aliases <- c()
+
     # drop notes
     sysreq_text = gsub('[Nn][Oo][Tt][Ee]:\\s.*','',sysreq_text)
+
     # conversion from and to commata and lower case
     sysreq_text <- gsub('[[:space:]]and[[:space:]]',' , ',tolower(sysreq_text))
+
     for (sysreq in strsplit(sysreq_text,'[[:space:]]*,[[:space:]]*')[[1]]) {
-	if (verbose) cat("sysreq to investigate: '",sysreq,"'.\n",sep="")
+	    if (verbose) cat("sysreq to investigate: '",sysreq,"'.\n",sep="")
         startreq = sysreq
+
         # constant case (redundant)
         sysreq = tolower(sysreq)
+
         # drop version information/comments for now
         sysreq = gsub('[[][^])]*[]]','',sysreq)
         sysreq = gsub('\\([^)]*\\)','',sysreq)
@@ -89,24 +95,30 @@ sysreqs_as_debian <- function(sysreq_text,verbose=FALSE) {
         sysreq = gsub('version','',sysreq)
         sysreq = gsub('from','',sysreq)
         sysreq = gsub('[<>=]*[[:space:]]*[[:digit:]]+[[:digit:].+:~-]*','',sysreq)
+
         # byebye URLs
         sysreq = gsub('(ht|f)tps?://[[:alnum:]!?*"\'(),%$_@.&+/=-]*','',sysreq)
+
         # squish out space -- this does not work for me (did not want to touch, though), Steffen
         sysreq = chomp(gsub('[[:space:]]+',' ',sysreq))
+
         # no final dot and neither final blanks
         sysreq = gsub('\\.?\\s*$','',sysreq)
+
+        sysreq = gsub('\\.?\\s*$','',sysreq)
+
         if (nchar(sysreq) == 0) {
             notice('part of the SystemRequirement became nothing')
             next
         }
         alias <- db_sysreq_override(sysreq)
-        if (is.null(alias)) {
-            error('do not know what to do with SystemRequirement:',sysreq)
+        if (is.null(alias) || nchar(alias) == 0) {
+            error('do not know what to do with SystemRequirement:', sysreq)
             error('original SystemRequirement:',startreq)
             fail('unmet system requirement')
         }
-        notice(paste("mapped SystemRequirement '",startreq,"' onto '",alias,"' via '",sysreq,"'.",sep=""))
-        aliases = c(aliases,alias)
+        notice(paste("mapped SystemRequirement '", startreq, "' onto '", alias,"' via '", sysreq,"'.", sep=""))
+        aliases = c(aliases, alias)
     }
     return(map_aliases_to_debian(aliases))
 }

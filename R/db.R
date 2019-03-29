@@ -138,9 +138,9 @@ db_bump_epoch <- function(con) {
 
 db_sysreq_override <- function(sysreq_text) {
     con <- db_start()
-    results <- dbGetQuery(con,paste(
-                    'SELECT DISTINCT depend_alias FROM sysreq_override WHERE'
-                            ,db_quote(tolower(sysreq_text)),'LIKE r_pattern'))
+    results <- dbGetQuery(con, paste(
+                    'SELECT DISTINCT depend_alias FROM sysreq_override WHERE',
+                    db_quote(tolower(sysreq_text)), 'LIKE r_pattern'))
     db_stop(con)
     if (length(results) == 0) {
         return(NULL)
