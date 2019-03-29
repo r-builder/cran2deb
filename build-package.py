@@ -182,6 +182,8 @@ class PackageBuilder:
                 if self._http_repo.has_version(pkg_name, version):
                     continue
 
+                print(f"Got {pkg_name} with ver: {version} from {deb}")
+
                 response = requests.post(
                     f"https://deb.fbn.org/add/{_distribution}",
                     files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
