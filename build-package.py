@@ -203,8 +203,8 @@ def _get_install_dependencies(deb_file_path: str) -> Tuple[Set[PkgName], Set[Pkg
     return r_depends, non_r_depends
 
 
-def _local_repo_has_pkg(pkg_name: PkgName, version: str):
-    output = subprocess.check_output(['reprepro', 'list', 'rbuilders', pkg_name.cran_name.lower()], cwd=_local_repo_root).decode('utf-8')
+def _get_local_repo_pkg(pkg_name: PkgName, version: str):
+    output = subprocess.check_output(['reprepro', "-T", "deb", 'list', 'rbuilders', pkg_name.cran_name.lower()], cwd=_local_repo_root).decode('utf-8')
 
     for line in output.splitlines():
         # 'rbuilders|main|source: withr 2.1.2-1cran2'
@@ -252,7 +252,7 @@ class PackageBuilder:
             print(f'Adding {debs} to {_local_repo_root}')
             subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', '*.deb'], cwd=_local_repo_root)
             # to remove: reprepro remove rbuilders [name]
-            # to find: reprepro list rbuilders
+            # to find: reprepro list rbuilders [name]
 
             print("Uploading to remote debian repo")
             for deb in debs:
@@ -292,8 +292,7 @@ class PackageBuilder:
             return
 
         # If our local repo has the deb similarly we assume all the deps made it as well
-        if _local_repo_has_pkg(cran_pkg_name, local_ver):
-            print(f"Local Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
+        if _get_local_repo_pkg(cran_pkg_name, local_ver):
             return
 
         # Build source package
