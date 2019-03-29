@@ -121,7 +121,7 @@ class PackageBuilder:
             assert m, f"Unknown line: {line}, with cran_name: {r_cran_name}"
 
             m = m.groupdict()
-            if m['deptype'] in {"Suggests", "Conflicts"}:
+            if m['deptype'] in {"Suggests", "Conflicts", "Recommends"}:
                 continue
 
             assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
@@ -272,6 +272,7 @@ def main():
     app_args = parser.parse_args()
     app_args.cran_pkg_name = app_args.cran_pkg_name[0]
 
+    # TODO: this does work for deb builder, see if fix in python works
     os.environ['MAKE'] = f"make -j {_num_cpus}"
 
     if not os.path.exists(_dist_path):
