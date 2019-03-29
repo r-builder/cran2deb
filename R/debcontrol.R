@@ -19,8 +19,8 @@ get_dependencies <- function(pkg,extra_deps,verbose=TRUE) {
     if ('SystemRequirements' %in% colnames(pkg$description)) {
         sysreq <- sysreqs_as_debian(pkg$description[1,'SystemRequirements'], verbose=verbose)
         if (!is.null(sysreq) && is.list(sysreq)) {
-            depends$bin = c(sysreq$bin,depends$bin)
-            depends$build = c(sysreq$build,depends$build)
+            depends$bin = c(sysreq$bin, depends$bin)
+            depends$build = c(sysreq$build, depends$build)
         } else {
         if (is.null(sysreq)) {
                 notice('Houston, we have a NULL sysreq')
@@ -70,7 +70,7 @@ get_dependencies <- function(pkg,extra_deps,verbose=TRUE) {
     return(depends)
 }
 
-sysreqs_as_debian <- function(sysreq_text,verbose=FALSE) {
+sysreqs_as_debian <- function(sysreq_text, verbose=FALSE) {
     # form of this field is unspecified (ugh) but most people seem to stick
     # with this
     aliases <- c()

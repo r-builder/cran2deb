@@ -58,3 +58,11 @@ fi
 
 cran2deb repopulate
 cran2deb update
+
+# NOTE: right now in sysreqs_as_debian it strips the version, however this is version specific
+
+# openssl
+cran2deb depend sysreq libssl1.0-dev openssl
+
+# lubridate
+cran2deb depend sysreq tzdata "A system with zoneinfo data%"
