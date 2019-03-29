@@ -55,6 +55,12 @@ _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf
 _num_cpus = multiprocessing.cpu_count()
 
 
+# TODO: we need to ensure we build a newer version than what's available via apt-get
+_forced_dep_versions = {
+    "r-cran-magrittr": "1.5-1cran1"
+}
+
+
 class DebVersion(NamedTuple):
     version: str
     build_num: str
@@ -218,8 +224,18 @@ class PackageBuilder:
         self._build_pkg_dsc_and_upload(cran_pkg_name)
 
 
+def _get_forced_version(pkg_name: str):
+    forced_ver = _forced_dep_versions.get(pkg_name)
+    if not forced_ver:
+        return pkg_name
+
+    return f'{pkg_name}={forced_ver}'
+
+
 def _install_apt_get_pkgs(pkgs: Set[str]):
     print(f"Installing apt-get packages: {pkgs}")
+
+    pkgs = {_get_forced_version(pkg) for pkg in pkgs}
     subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
 
@@ -283,6 +299,7 @@ def main():
     app_args.cran_pkg_name = app_args.cran_pkg_name[0]
 
     os.environ["DEB_BUILD_OPTIONS"] = f'parallel={_num_cpus}'
+    os.environ['MAKEFLAGS'] = f'-j{_num_cpus}'
 
     if not os.path.exists(_dist_path):
         with open(_dist_path, "w") as f:

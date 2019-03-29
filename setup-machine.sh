@@ -13,7 +13,7 @@ apt-get update && \
     libopenblas-dev libpcre3-dev libpng-dev libpq-dev libproj-dev libreadline6-dev libssl-dev libyaml-dev \
     r-cran-littler r-cran-hwriter
 
-export MAKE="make -j $(nproc)"
+export MAKEFLAGS='-j$(nproc)'
 
 # Install R packages not available via apt-get
 cat << EOF > /tmp/r_setup_pkgs.R
