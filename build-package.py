@@ -177,6 +177,7 @@ class PackageBuilder:
             dirs = glob.glob(f"{td}/*/")
             assert len(dirs) == 1, f"Did not find only one dir in: {td} dirs: {dirs}"
 
+            subprocess.check_call(["mk-build-deps", "-i"], cwd=td)
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
             debs = glob.glob(f"{td}/*.deb")
