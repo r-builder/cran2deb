@@ -196,7 +196,7 @@ class PackageBuilder:
         self._install_r_deps(r_deps)
 
         if self._http_repo.has_version(cran_pkg_name, local_ver):
-            print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Exiting...")
+            print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
             return
 
         _install_non_r_deps(non_r_deps)
