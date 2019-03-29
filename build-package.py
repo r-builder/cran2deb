@@ -3,7 +3,7 @@ import argparse
 import os
 import subprocess
 import re
-from typing import Set, Dict, NamedTuple, Optional
+from typing import Set, Dict, NamedTuple, Optional, Tuple
 from types import MappingProxyType
 import tempfile
 import glob
@@ -82,6 +82,51 @@ def _get_info_from_deb(deb_path: str):
     return pkg, version
 
 
+def _get_name_replacements() -> Dict[str, str]:
+    conn = sqlite3.connect('/var/cache/cran2deb/cran2deb.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT package FROM packages;")
+
+    # {cran_name.lower(): cran_name}
+    name_replacements = {row['package'].lower(): row['package'] for row in cur}
+    return name_replacements
+
+
+class PkgName:
+    _r_cran_prefix = 'r-cran-'
+    _name_replacements = _get_name_replacements()
+
+    def __init__(self, pkg_name: str, force_cran: bool = False):
+        if force_cran:
+            self.cran_name = self._strip_r_cran_prefix(pkg_name)
+            self.deb_name = self._ensure_r_cran_prefix(pkg_name)
+        elif pkg_name.startswith(self._r_cran_prefix):
+            self.deb_name = pkg_name
+            self.cran_name = self._strip_r_cran_prefix(pkg_name)
+        else:
+            self.deb_name = pkg_name
+            self.cran_name = None
+
+        if self.cran_name:
+            self.cran_name = self._name_replacements.get(self.cran_name, self.cran_name)
+
+    def __str__(self):
+        return self.deb_name
+
+    def _ensure_r_cran_prefix(self, pkg_name: str):
+        if not pkg_name.startswith(self._r_cran_prefix):
+            pkg_name = f"{self._r_cran_prefix}-{pkg_name}"
+
+        return pkg_name.lower()
+
+    def _strip_r_cran_prefix(self, pkg_name: str):
+        if pkg_name.startswith(self._r_cran_prefix):
+            return pkg_name[len(self._r_cran_prefix):]
+
+        return pkg_name
+
+
 class HttpDebRepo:
     def __init__(self):
         # {package_name: DebInfo}
@@ -99,75 +144,78 @@ class HttpDebRepo:
                 deb_ver = _get_deb_version(version)
                 self._deb_info[row['name']].add(deb_ver)
 
-    def has_version(self, pkg_name: str, deb_ver: str):
+    def has_version(self, pkg_name: PkgName, deb_ver: str):
         if self._deb_info is None:
             self.refresh()
 
         # This should be moved out
-        if not pkg_name.startswith('r-cran-'):
-            pkg_name = f"r-cran-{pkg_name}".lower()
-
         deb_ver = _get_deb_version(deb_ver)
-        return deb_ver in self._deb_info.get(pkg_name, _empty_dict)
+        return deb_ver in self._deb_info.get(pkg_name.deb_name, _empty_dict)
+
+
+def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
+    p = subprocess.run(["dpkg-checkbuilddeps"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=dir_path)
+    stdout = p.stdout.decode('utf-8').splitlines()
+    stderr = p.stderr.decode('utf-8').splitlines()
+
+    if p.returncode == 0:
+        return []
+
+    assert not stdout, f"Encountered stdout: {stdout}"
+    assert len(stderr) == 1, f"Encountered unknown stderr: {stderr}"
+
+    prefix = "dpkg-checkbuilddeps: error: Unmet build dependencies: "
+    assert stderr[0].startswith(prefix)
+    return {PkgName(pkg_name) for pkg_name in stderr[0][len(prefix):].split(" ")}
+
+
+def _get_install_dependencies(cran_pkg_name: PkgName) -> Tuple[Set[PkgName], Set[PkgName]]:
+    print(f"Finding dependencies of {cran_pkg_name}")
+
+    output = subprocess.check_output(["apt-cache", "depends", cran_pkg_name.deb_name]).decode('utf-8')
+
+    r_depends = set()
+    non_r_depends = set()
+    for line in output.splitlines():
+        line = line.strip()
+        if line.startswith('r-cran-') or line.startswith("r-base-"):
+            continue
+
+        m = _dep_re.match(line)
+        assert m, f"Unknown line: {line}, with cran_name: {cran_pkg_name}"
+
+        m = m.groupdict()
+        if m['deptype'] in {"Suggests", "Conflicts", "Recommends", "Replaces"}:
+            continue
+
+        assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
+
+        if m['pkgname'] in {'r-base-core'} or m['pkgname'].startswith('<r-api'):
+            print(f"Skipping dep: {m['pkgname']}")
+            continue
+
+        pkg_name = PkgName(m['pkgname'])
+        if pkg_name.cran_name:
+            r_depends.add(pkg_name)
+        else:
+            non_r_depends.add(pkg_name)
+
+    return r_depends, non_r_depends
 
 
 class PackageBuilder:
     def __init__(self):
         self._http_repo: HttpDebRepo = HttpDebRepo()
 
-        conn = sqlite3.connect('/var/cache/cran2deb/cran2deb.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT package FROM packages;")
-
-        self._name_replacements = {row['package'].lower(): row['package'] for row in cur}
-
-    def _get_dependencies(self, cran_pkg_name: str):
-        print(f"Finding dependencies of {cran_pkg_name}")
-        r_cran_name = f"r-cran-{cran_pkg_name}".lower()
-        output = subprocess.check_output(["apt-cache", "depends", r_cran_name]).decode('utf-8')
-
-        r_depends = set()
-        non_r_depends = set()
-        for line in output.splitlines():
-            line = line.strip()
-            if line.startswith('r-cran-') or line.startswith("r-base-"):
-                continue
-
-            m = _dep_re.match(line)
-            assert m, f"Unknown line: {line}, with cran_name: {r_cran_name}"
-
-            m = m.groupdict()
-            if m['deptype'] in {"Suggests", "Conflicts", "Recommends", "Replaces"}:
-                continue
-
-            assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
-
-            if m['pkgname'] in {'r-base-core'} or m['pkgname'].startswith('<r-api'):
-                print(f"Skipping dep: {m['pkgname']}")
-                continue
-
-            if m['pkgname'].startswith("r-cran-"):
-                pkgname = m['pkgname'].replace("r-cran-", "", 1)
-                pkgname = self._name_replacements.get(pkgname, pkgname)
-                r_depends.add(pkgname)
-            else:
-                non_r_depends.add(m['pkgname'])
-
-        return r_depends, non_r_depends
-
-    def _install_r_deps(self, deps: Set[str]):
-        if not deps:
-            return
-
+    def _install_r_deps(self, deps: Set[PkgName]):
         # Ensure all the deps are available via the http deb repo
         for dep in deps:
             self.build_pkg(dep)
 
         # install via apt-get so deb builds won't fail with missing deps
-        _install_apt_get_pkgs({f'r-cran-{dep.lower()}' for dep in deps})
+        _install_apt_get_pkgs(deps)
 
-    def _build_pkg_dsc_and_upload(self, pkg_name: str):
+    def _build_pkg_dsc_and_upload(self, pkg_name: PkgName):
         print(f"Building deb for {pkg_name}")
         dsc_path = _get_pkg_dsc_path(pkg_name)
 
@@ -177,7 +225,11 @@ class PackageBuilder:
             dirs = glob.glob(f"{td}/*/")
             assert len(dirs) == 1, f"Did not find only one dir in: {td} dirs: {dirs}"
 
-            subprocess.check_call(["mk-build-deps", "-i"], cwd=td)
+            # Install build dependencies
+            r_deps = _get_build_dependencies(dirs[0])
+            self._install_r_deps(r_deps)
+
+            subprocess.check_call(["mk-build-deps", "-i"], cwd=dirs[0])
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
             debs = glob.glob(f"{td}/*.deb")
@@ -188,7 +240,7 @@ class PackageBuilder:
                 # On the first run cran2deb may not have provided the correct version so we need
                 # to check again here
                 pkg_name, version = _get_info_from_deb(deb)
-
+                pkg_name = PkgName(pkg_name)
                 if self._http_repo.has_version(pkg_name, version):
                     continue
 
@@ -202,13 +254,13 @@ class PackageBuilder:
             self._http_repo.refresh()
 
     # NOTE: this can be recursive
-    def build_pkg(self, cran_pkg_name: str):
+    def build_pkg(self, cran_pkg_name: PkgName):
         local_ver = _get_cran2deb_version(cran_pkg_name)
 
         print(f"Ensuring Build of {cran_pkg_name} ver: {local_ver}")
 
-        # Install dependencies
-        r_deps, non_r_deps = self._get_dependencies(cran_pkg_name)
+        # Install dependencies (this is here to ensure all deps are on our repo)
+        r_deps, non_r_deps = _get_install_dependencies(cran_pkg_name)
         self._install_r_deps(r_deps)
 
         if self._http_repo.has_version(cran_pkg_name, local_ver):
@@ -225,31 +277,33 @@ class PackageBuilder:
         self._build_pkg_dsc_and_upload(cran_pkg_name)
 
 
-def _get_forced_version(pkg_name: str):
-    forced_ver = _forced_dep_versions.get(pkg_name)
+def _get_forced_version(pkg_deb_name: str):
+    forced_ver = _forced_dep_versions.get(pkg_deb_name)
     if not forced_ver:
-        return pkg_name
+        return pkg_deb_name
 
-    return f'{pkg_name}={forced_ver}'
+    return f'{pkg_deb_name}={forced_ver}'
 
 
-def _install_apt_get_pkgs(pkgs: Set[str]):
+def _install_apt_get_pkgs(pkgs: Set[PkgName]):
+    if not pkgs:
+        return
+
     print(f"Installing apt-get packages: {pkgs}")
 
-    pkgs = {_get_forced_version(pkg) for pkg in pkgs}
+    pkgs = {_get_forced_version(pkg.deb_name) for pkg in pkgs}
     subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
 
-def _get_pkg_dsc_path(pkg_name: str):
-    pkg_name = pkg_name.lower()
-    glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name[0]}/{pkg_name}/*.dsc"
+def _get_pkg_dsc_path(pkg_name: PkgName):
+    glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name.deb_name[0]}/{pkg_name.deb_name}/*.dsc"
     glob_dscs = glob.glob(glob_str)
     assert len(glob_dscs) == 1, f"Could not find one dsc in: {glob_str}"
 
     return glob_dscs[0]
 
 
-def _get_cran2deb_version(pkg_name: str):
+def _get_cran2deb_version(pkg_name: PkgName):
     """
     On a non-build package output will look like:
 
@@ -268,7 +322,7 @@ def _get_cran2deb_version(pkg_name: str):
     if `debian_revision` == 1, it's actually 2, otherwise it's correct
 
     """
-    output = subprocess.check_output(['r', '-q', '-e', f"suppressMessages(library(cran2deb)); cat(new_build_version('{pkg_name}'))"]).decode('utf-8')
+    output = subprocess.check_output(['r', '-q', '-e', f"suppressMessages(library(cran2deb)); cat(new_build_version('{pkg_name.cran_name}'))"]).decode('utf-8')
 
     rver = None
     for line in output.splitlines():
@@ -297,7 +351,7 @@ def main():
     parser.add_argument('cran_pkg_name', type=str, nargs=1, help='package to build.  ex: ggplot2')
 
     app_args = parser.parse_args()
-    app_args.cran_pkg_name = app_args.cran_pkg_name[0]
+    cran_pkg_name = PkgName(app_args.cran_pkg_name[0], True)
 
     os.environ["DEB_BUILD_OPTIONS"] = f'parallel={_num_cpus}'
     os.environ['MAKEFLAGS'] = f'-j{_num_cpus}'
@@ -308,7 +362,7 @@ def main():
 
     # Get local current/next version
     pkg_builder = PackageBuilder()
-    pkg_builder.build_pkg(app_args.cran_pkg_name)
+    pkg_builder.build_pkg(cran_pkg_name)
 
 
 if __name__ == '__main__':
