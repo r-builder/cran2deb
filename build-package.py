@@ -248,12 +248,6 @@ class PackageBuilder:
             debs = glob.glob(f"{td}/*.deb")
             assert len(debs) > 0, f"Did not find any debs in: {td}"
 
-            # Upload debs to local repo
-            print(f'Adding {debs} to {_local_repo_root}')
-            subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', '*.deb'], cwd=_local_repo_root)
-            # to remove: reprepro remove rbuilders [name]
-            # to find: reprepro list rbuilders [name]
-
             print("Uploading to remote debian repo")
             for deb in debs:
                 # Ensure all the install dependencies get upload to the debian repo
@@ -274,6 +268,12 @@ class PackageBuilder:
                     f"https://deb.fbn.org/add/{_distribution}",
                     files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
                 assert response.status_code == 200, f"Error with request {response}"
+
+                # Upload deb to local repo
+                print(f'Adding {deb} to {_local_repo_root}')
+                subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
+                # to remove: reprepro remove rbuilders [name]
+                # to find: reprepro list rbuilders [name]
 
             self._http_repo.refresh()
 
