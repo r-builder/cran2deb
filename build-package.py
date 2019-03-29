@@ -177,14 +177,13 @@ def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
     return {PkgName(pkg_name) for pkg_name in deps.split(" ")}
 
 
-def _get_install_dependencies(deb_file_path: str) -> Tuple[Set[PkgName], Set[PkgName]]:
+def _get_install_dependencies(deb_file_path: str) -> Set[PkgName]:
     print(f"Finding dependencies of {deb_file_path}")
 
     "dpkg-deb -W --showformat='${Depends}' r-cran-colorspace_1.4-1-1cran1_amd64.deb "
     deps = subprocess.check_output(["dpkg-deb", "-W", "--showformat=${Depends}", deb_file_path]).decode('utf-8').split(', ')
 
-    r_depends = set()
-    non_r_depends = set()
+    pkg_names = set()
     for dep in deps:
         dep = dep.strip()
         if dep.startswith('r-cran-') or dep.startswith("r-base-") or dep.startswith('r-api'):
@@ -197,12 +196,9 @@ def _get_install_dependencies(deb_file_path: str) -> Tuple[Set[PkgName], Set[Pkg
         m = m.groupdict()
 
         pkg_name = PkgName(m['pkgname'])
-        if pkg_name.cran_name:
-            r_depends.add(pkg_name)
-        else:
-            non_r_depends.add(pkg_name)
+        pkg_names.add(pkg_name)
 
-    return r_depends, non_r_depends
+    return pkg_names
 
 
 def _get_local_repo_pkg(pkg_name: PkgName, version: str):
@@ -222,13 +218,18 @@ class PackageBuilder:
     def __init__(self):
         self._http_repo: HttpDebRepo = HttpDebRepo()
 
-    def _install_r_deps(self, deps: Set[PkgName]):
+    def _install_deps(self, deps: Set[PkgName]):
         # Ensure all the deps are available via the http deb repo
         for dep in deps:
+            if not dep.cran_name:
+                continue
+
             self.build_pkg(dep)
 
-        # install via apt-get so deb builds won't fail with missing deps
-        _install_apt_get_pkgs(deps)
+        print(f"Installing apt-get packages: {deps}")
+
+        pkgs = {_get_forced_version(pkg.deb_name) for pkg in deps}
+        subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
     def _build_pkg_dsc_and_upload(self, pkg_name: PkgName):
         print(f"Building deb for {pkg_name}")
@@ -241,8 +242,8 @@ class PackageBuilder:
             assert len(dirs) == 1, f"Did not find only one dir in: {td} dirs: {dirs}"
 
             # Install build dependencies
-            r_deps = _get_build_dependencies(dirs[0])
-            self._install_r_deps(r_deps)
+            deps = _get_build_dependencies(dirs[0])
+            self._install_deps(deps)
 
             subprocess.check_call(["mk-build-deps", "-i", "-r", "-t", "apt-get --no-install-recommends -y"], cwd=dirs[0])
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
@@ -253,9 +254,8 @@ class PackageBuilder:
             print("Uploading to remote debian repo")
             for deb in debs:
                 # Ensure all the install dependencies get upload to the debian repo
-                r_deps, non_r_deps = _get_install_dependencies(deb)
-                self._install_r_deps(r_deps)
-                _install_apt_get_pkgs(non_r_deps)
+                deps = _get_install_dependencies(deb)
+                self._install_deps(deps)
 
                 # On the first run cran2deb may not have provided the correct version so we need
                 # to check again here
@@ -311,16 +311,6 @@ def _get_forced_version(pkg_deb_name: str):
         return pkg_deb_name
 
     return f'{pkg_deb_name}={forced_ver}'
-
-
-def _install_apt_get_pkgs(pkgs: Set[PkgName]):
-    if not pkgs:
-        return
-
-    print(f"Installing apt-get packages: {pkgs}")
-
-    pkgs = {_get_forced_version(pkg.deb_name) for pkg in pkgs}
-    subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
 
 def _get_pkg_dsc_path(pkg_name: PkgName):
