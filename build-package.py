@@ -193,6 +193,9 @@ def _build_pkg_dsc_and_upload(http_repo: HttpDebRepo, pkg_name: str):
 # rver: 0.2.20  debian_revision: 2  debian_epoch: 0
 _rver_line_re = re.compile(r'rver: (?P<rver>[^ ]+)\s+debian_revision: (?P<debian_revision>[^ ]+)\s+ debian_epoch: (?P<debian_epoch>[^ ]+)')
 
+# version_update:  rver: 0.2.20  prev_pkgver: 0.2.20-1cran2  prev_success: TRUE
+_version_update_line_re = re.compile(r'version_update:\s+rver: (?P<rver>[^ ]+)\s+prev_pkgver: (?P<prev_pkgver>[^ ]+)\s+ prev_success: (?P<prev_success>[^ ]+)')
+
 
 def _get_cran2deb_version(pkg_name: str):
     """
@@ -209,11 +212,13 @@ def _get_cran2deb_version(pkg_name: str):
     rver: 0.2.20  debian_revision: 3  debian_epoch: 0
     0.2.20-1cran3
 
-    So we can assume that if `debian_revision` == 1, it's actually 2, otherwise it's correct
+    If `version_update` is available, we must use that, otherwise we can assume that
+    if `debian_revision` == 1, it's actually 2, otherwise it's correct
 
     """
     output = subprocess.check_output(['r', '-q', '-e', f"suppressMessages(library(cran2deb)); cat(new_build_version('{pkg_name}'))"]).decode('utf-8')
 
+    rver = None
     for line in output.splitlines():
         m = _rver_line_re.match(line)
         if m:
@@ -221,7 +226,15 @@ def _get_cran2deb_version(pkg_name: str):
             if m['debian_revision'] == "1":
                 m['debian_revision'] = "2"
 
-            return f"{m['rver']}-1cran{m['debian_revision']}"
+            rver = f"{m['rver']}-1cran{m['debian_revision']}"
+            continue
+
+        m = _version_update_line_re.match(line)
+        if m:
+            return m.group('prev_pkgver')
+
+    if rver:
+        return rver
 
     assert False, f"Unable to determine version from: {output}"
 
