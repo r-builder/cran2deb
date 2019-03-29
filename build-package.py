@@ -77,6 +77,8 @@ class HttpDebRepo:
         self._deb_info: Optional[Dict[str, Set[DebVersion]]] = None
 
     def refresh(self):
+        subprocess.check_call(['apt-get', 'update'])
+
         self._deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
 
         data = requests.get(f"https://deb.fbn.org/list/{_distribution}").json()
