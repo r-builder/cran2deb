@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -xe
+#!/usr/bin/env bash
+set -ex
 
 # TODO: migrate this all the python
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
