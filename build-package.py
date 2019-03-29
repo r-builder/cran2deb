@@ -165,7 +165,7 @@ def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
     stderr = p.stderr.decode('utf-8').splitlines()
 
     if p.returncode == 0:
-        return []
+        return set()
 
     assert not stdout, f"Encountered stdout: {stdout}"
     assert len(stderr) == 1, f"Encountered unknown stderr: {stderr}"
@@ -374,10 +374,9 @@ def _get_cran2deb_version(pkg_name: PkgName):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-origin', type=str, default='deb.fbn.org', help='Debian Repo hostname')
-    parser.add_argument('cran_pkg_name', type=str, nargs=1, help='package to build.  ex: ggplot2')
+    parser.add_argument('cran_pkg_name', type=str, nargs='+', help='package to build.  ex: ggplot2')
 
     app_args = parser.parse_args()
-    cran_pkg_name = PkgName(app_args.cran_pkg_name[0], True)
 
     os.environ["DEB_BUILD_OPTIONS"] = f'parallel={_num_cpus}'
     os.environ['MAKEFLAGS'] = f'-j{_num_cpus}'
@@ -385,9 +384,11 @@ def main():
     with open(_dist_path, "w") as f:
         f.write(_dist_template.format(origin=app_args.origin))
 
-    # Get local current/next version
     pkg_builder = PackageBuilder()
-    pkg_builder.build_pkg(cran_pkg_name)
+
+    for cran_pkg_name in app_args.cran_pkg_name:
+        cran_pkg_name = PkgName(cran_pkg_name, True)
+        pkg_builder.build_pkg(cran_pkg_name)
 
 
 if __name__ == '__main__':
