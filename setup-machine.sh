@@ -9,7 +9,7 @@ apt-get install -y --no-install-recommends \
     pbuilder devscripts fakeroot dh-r reprepro sqlite3 lsb-release build-essential \
     xvfb xfonts-base libcurl4-gnutls-dev libxml2-dev fontconfig imagemagick libcairo2-dev libatlas-base-dev libbz2-dev \
     libexpat1 libfreetype6-dev fbn-libgdal fbn-libgeos libgflags-dev fbn-libhdf5 liblapack-dev liblzma-dev fbn-libnetcdf \
-    libopenblas-dev libpcre3-dev libpng-dev libpq-dev libproj-dev libreadline6-dev libssl-dev libyaml-dev
+    libopenblas-dev libpcre3-dev libpng-dev libpq-dev libproj-dev libreadline6-dev libssl-dev libyaml-dev \
     r-cran-littler r-cran-hwriter
 
 export MAKE="make -j $(nproc)"
