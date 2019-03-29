@@ -303,7 +303,7 @@ def _install_apt_get_pkgs(pkgs: Set[PkgName]):
 
 
 def _get_pkg_dsc_path(pkg_name: PkgName):
-    glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name.cran_name[0]}/{pkg_name.cran_name}/*.dsc"
+    glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name.cran_name[0].lower()}/{pkg_name.cran_name.lower()}/*.dsc"
     glob_dscs = glob.glob(glob_str)
     assert len(glob_dscs) == 1, f"Could not find one dsc in: {glob_str}"
 
