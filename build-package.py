@@ -218,16 +218,18 @@ def _get_cran2deb_version(pkg_name: str):
 # NOTE: this can be recursive
 def _build_pkg(http_repo: HttpDebRepo, cran_pkg_name: str):
     local_ver = _get_cran2deb_version(cran_pkg_name)
+
+    print(f"Ensuring Build of {cran_pkg_name} ver: {local_ver}")
+
+    # Install dependencies
+    r_deps, non_r_deps = _get_dependencies(cran_pkg_name)
+    _install_r_deps(http_repo, r_deps)
+
     if http_repo.has_version(cran_pkg_name, local_ver):
         print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Exiting...")
         return
 
-    print(f"Starting Build of {cran_pkg_name} ver: {local_ver}")
-
-    # Install dependencies
-    r_deps, non_r_deps = _get_dependencies(cran_pkg_name)
     _install_non_r_deps(non_r_deps)
-    _install_r_deps(http_repo, r_deps)
 
     # Build source package
     print("Building source package")
