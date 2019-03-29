@@ -148,18 +148,8 @@ class PackageBuilder:
         for dep in deps:
             self.build_pkg(dep)
 
-        # TODO: we should switch to installing deps via our deb repo
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_file = os.path.join(temp_dir, "install_pkgs.R")
-            quoted_deps = [f'"{dep}"' for dep in deps]
-            contents = _ipak_r_method + f'ipak(c({", ".join(quoted_deps)}))'
-
-            with open(temp_file, "w") as f:
-                f.write(contents)
-
-            print(f"Installing dependencies. Running: Rscript against: {contents}")
-
-            subprocess.check_call(["Rscript", temp_file])
+        # install via apt-get so deb builds won't fail with missing deps
+        _install_apt_get_pkgs(deps)
 
     def _build_pkg_dsc_and_upload(self, pkg_name: str):
         print(f"Building deb for {pkg_name}")
@@ -199,7 +189,7 @@ class PackageBuilder:
             print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
             return
 
-        _install_non_r_deps(non_r_deps)
+        _install_apt_get_pkgs(non_r_deps)
 
         # Build source package
         print("Building source package")
@@ -209,9 +199,9 @@ class PackageBuilder:
         self._build_pkg_dsc_and_upload(cran_pkg_name)
 
 
-def _install_non_r_deps(deps: Set[str]):
-    print(f"Installing apt-get packages: {deps}")
-    subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(deps))
+def _install_apt_get_pkgs(pkgs: Set[str]):
+    print(f"Installing apt-get packages: {pkgs}")
+    subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
 
 def _get_pkg_dsc_path(pkg_name: str):
