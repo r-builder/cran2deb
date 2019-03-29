@@ -38,7 +38,9 @@ ipak <- function(pkg) {
 """
 
 _dist_path = "/etc/cran2deb/archive/rep/conf/distributions"
-_dep_re = re.compile(r"\s*(?P<deptype>[^:]+):\s*(?P<pkgname>.*)")
+
+# libc6 (>= 2.4)
+_dep_re = re.compile(r"(?P<pkgname>[^ ]+)\s*(?:\((?P<ver_restriction>.*)\))?")
 
 # '3.5.7-0~jessie'
 _deb_version_re = re.compile(r'(?P<version>[^-]+)-(?P<build_num>[^~]+)(?:~(?P<distribution>.*))?')
@@ -172,30 +174,24 @@ def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
     return {PkgName(pkg_name) for pkg_name in stderr[0][len(prefix):].split(" ")}
 
 
-def _get_install_dependencies(cran_pkg_name: PkgName) -> Tuple[Set[PkgName], Set[PkgName]]:
-    print(f"Finding dependencies of {cran_pkg_name}")
+def _get_install_dependencies(deb_file_path: str) -> Tuple[Set[PkgName], Set[PkgName]]:
+    print(f"Finding dependencies of {deb_file_path}")
 
-    output = subprocess.check_output(["apt-cache", "depends", cran_pkg_name.deb_name]).decode('utf-8')
+    "dpkg-deb -W --showformat='${Depends}' r-cran-colorspace_1.4-1-1cran1_amd64.deb "
+    deps = subprocess.check_output(["dpkg-deb", "-W", "--showformat=${Depends}", deb_file_path]).decode('utf-8').split(', ')
 
     r_depends = set()
     non_r_depends = set()
-    for line in output.splitlines():
-        line = line.strip()
-        if line.startswith('r-cran-') or line.startswith("r-base-"):
+    for dep in deps:
+        dep = dep.strip()
+        if dep.startswith('r-cran-') or dep.startswith("r-base-") or dep.startswith('r-api'):
+            print(f"Skipping dep: {dep}")
             continue
 
-        m = _dep_re.match(line)
-        assert m, f"Unknown line: {line}, with cran_name: {cran_pkg_name}"
+        m = _dep_re.match(dep)
+        assert m, f"Unknown dependency type: {dep}"
 
         m = m.groupdict()
-        if m['deptype'] in {"Suggests", "Conflicts", "Recommends", "Replaces"}:
-            continue
-
-        assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
-
-        if m['pkgname'] in {'r-base-core'} or m['pkgname'].startswith('<r-api'):
-            print(f"Skipping dep: {m['pkgname']}")
-            continue
 
         pkg_name = PkgName(m['pkgname'])
         if pkg_name.cran_name:
@@ -240,6 +236,11 @@ class PackageBuilder:
 
             print("Uploading to debian repo")
             for deb in debs:
+                # Ensure all the install dependencies get upload to the debian repo
+                r_deps, non_r_deps = _get_install_dependencies(deb)
+                self._install_r_deps(r_deps)
+                _install_apt_get_pkgs(non_r_deps)
+
                 # On the first run cran2deb may not have provided the correct version so we need
                 # to check again here
                 pkg_name, version = _get_info_from_deb(deb)
@@ -247,7 +248,7 @@ class PackageBuilder:
                 if self._http_repo.has_version(pkg_name, version):
                     continue
 
-                print(f"Got {pkg_name} with ver: {version} from {deb}")
+                print(f"Uploading {pkg_name} with ver: {version} from {deb}")
 
                 response = requests.post(
                     f"https://deb.fbn.org/add/{_distribution}",
@@ -262,15 +263,13 @@ class PackageBuilder:
 
         print(f"Ensuring Build of {cran_pkg_name} ver: {local_ver}")
 
-        # Install dependencies (this is here to ensure all deps are on our repo)
-        r_deps, non_r_deps = _get_install_dependencies(cran_pkg_name)
-        self._install_r_deps(r_deps)
-
+        # Unfortunately we can't get the dependencies via apt-cache depends as
+        # that module may not match what we're building.  So we need to actually build
+        # each module and find the dependencies from the deb file
+        # NOTE: if the repo has the module, we're assuming all the dependencies made it as well
         if self._http_repo.has_version(cran_pkg_name, local_ver):
             print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
             return
-
-        _install_apt_get_pkgs(non_r_deps)
 
         # Build source package
         print("Building source package")
