@@ -66,3 +66,11 @@ cran2deb depend sysreq libssl1.0-dev openssl
 
 # lubridate
 cran2deb depend sysreq tzdata "A system with zoneinfo data%"
+
+# feather
+cran2deb depend sysreq ignore "little-endian platform"
+
+# showtext
+#cran2deb depend alias_build libpng12-dev libpng-dev
+#cran2deb depend alias_build libpng12-dev libpng-dev
+#cran2deb depend alias_run libpng12-0 libpng16-16

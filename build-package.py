@@ -60,7 +60,8 @@ _local_repo_root = '/var/www/cran2deb/rep'
 
 # TODO: we need to ensure we build a newer version than what's available via apt-get
 _forced_dep_versions = {
-    "r-cran-magrittr": "1.5-1cran1"
+    "r-cran-magrittr": "1.5-1cran1",
+    "r-cran-sp": "1.3-1-1cran1"
 }
 
 
