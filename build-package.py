@@ -9,6 +9,7 @@ import tempfile
 import glob
 from collections import defaultdict
 import multiprocessing
+import sqlite3
 
 # Third Party
 import requests
@@ -42,6 +43,13 @@ _dep_re = re.compile(r"\s*(?P<deptype>[^:]+):\s*(?P<pkgname>.*)")
 # '3.5.7-0~jessie'
 _deb_version_re = re.compile(r'(?P<version>[^-]+)-(?P<build_num>[^~]+)(?:~(?P<distribution>.*))?')
 
+# rver: 0.2.20  debian_revision: 2  debian_epoch: 0
+_rver_line_re = re.compile(r'rver: (?P<rver>[^ ]+)\s+debian_revision: (?P<debian_revision>[^ ]+)\s+ debian_epoch: (?P<debian_epoch>[^ ]+)')
+
+# version_update:  rver: 0.2.20  prev_pkgver: 0.2.20-1cran2  prev_success: TRUE
+_version_update_line_re = re.compile(r'version_update:\s+rver: (?P<rver>[^ ]+)\s+prev_pkgver: (?P<prev_pkgver>[^ ]+)\s+ prev_success: (?P<prev_success>[^ ]+)')
+
+
 _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf-8').strip()
 
 _num_cpus = multiprocessing.cpu_count()
@@ -50,12 +58,6 @@ _num_cpus = multiprocessing.cpu_count()
 class DebVersion(NamedTuple):
     version: str
     build_num: str
-
-
-_name_replacements = {name.lower(): name for name in {
-    'Rcpp',
-    'pkgKitten'
-}}
 
 
 def _get_deb_version(deb_ver: str) -> DebVersion:
@@ -93,59 +95,117 @@ class HttpDebRepo:
         return deb_ver in self._deb_info.get(pkg_name, _empty_dict)
 
 
-def _get_dependencies(cran_pkg_name: str):
-    print(f"Finding dependencies of {cran_pkg_name}")
-    r_cran_name = f"r-cran-{cran_pkg_name}"
-    output = subprocess.check_output(["apt-cache", "depends", r_cran_name.lower()]).decode('utf-8')
+class PackageBuilder:
+    def __init__(self):
+        self._http_repo: HttpDebRepo = HttpDebRepo()
 
-    r_depends = set()
-    non_r_depends = set()
-    for line in output.splitlines():
-        if line.strip().startswith('r-cran-'):
-            continue
+        conn = sqlite3.connect('/var/cache/cran2deb/cran2deb.db')
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT package FROM packages;")
 
-        m = _dep_re.match(line)
-        assert m, f"Unknown line: {line}, with cran_name: {r_cran_name}"
+        self._name_replacements = {row['package'].lower(): row['package'] for row in cur}
 
-        m = m.groupdict()
-        if m['deptype'] == "Suggests":
-            continue
+    def _get_dependencies(self, cran_pkg_name: str):
+        print(f"Finding dependencies of {cran_pkg_name}")
+        r_cran_name = f"r-cran-{cran_pkg_name}"
+        output = subprocess.check_output(["apt-cache", "depends", r_cran_name.lower()]).decode('utf-8')
 
-        assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
+        r_depends = set()
+        non_r_depends = set()
+        for line in output.splitlines():
+            if line.strip().startswith('r-cran-'):
+                continue
 
-        if m['pkgname'] in {'r-base-core'} or m['pkgname'].startswith('<r-api'):
-            print(f"Skipping dep: {m['pkgname']}")
-            continue
+            m = _dep_re.match(line)
+            assert m, f"Unknown line: {line}, with cran_name: {r_cran_name}"
 
-        if m['pkgname'].startswith("r-cran-"):
-            pkgname = m['pkgname'].replace("r-cran-", "", 1)
-            pkgname = _name_replacements.get(pkgname, pkgname)
-            r_depends.add(pkgname)
-        else:
-            non_r_depends.add(m['pkgname'])
+            m = m.groupdict()
+            if m['deptype'] == "Suggests":
+                continue
 
-    return r_depends, non_r_depends
+            assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
 
+            if m['pkgname'] in {'r-base-core'} or m['pkgname'].startswith('<r-api'):
+                print(f"Skipping dep: {m['pkgname']}")
+                continue
 
-def _install_r_deps(http_repo: HttpDebRepo, deps: Set[str]):
-    if not deps:
-        return
+            if m['pkgname'].startswith("r-cran-"):
+                pkgname = m['pkgname'].replace("r-cran-", "", 1)
+                pkgname = self._name_replacements.get(pkgname, pkgname)
+                r_depends.add(pkgname)
+            else:
+                non_r_depends.add(m['pkgname'])
 
-    # Ensure all the deps are available via the http deb repo
-    for dep in deps:
-        _build_pkg(http_repo, dep)
+        return r_depends, non_r_depends
 
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_file = os.path.join(temp_dir, "install_pkgs.R")
-        quoted_deps = [f'"{dep}"' for dep in deps]
-        contents = _ipak_r_method + f'ipak(c({", ".join(quoted_deps)}))'
+    def _install_r_deps(self, deps: Set[str]):
+        if not deps:
+            return
 
-        with open(temp_file, "w") as f:
-            f.write(contents)
+        # Ensure all the deps are available via the http deb repo
+        for dep in deps:
+            self.build_pkg(dep)
 
-        print(f"Installing dependencies. Running: Rscript against: {contents}")
+        # TODO: we should switch to installing deps via our deb repo
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file = os.path.join(temp_dir, "install_pkgs.R")
+            quoted_deps = [f'"{dep}"' for dep in deps]
+            contents = _ipak_r_method + f'ipak(c({", ".join(quoted_deps)}))'
 
-        subprocess.check_call(["Rscript", temp_file])
+            with open(temp_file, "w") as f:
+                f.write(contents)
+
+            print(f"Installing dependencies. Running: Rscript against: {contents}")
+
+            subprocess.check_call(["Rscript", temp_file])
+
+    def _build_pkg_dsc_and_upload(self, pkg_name: str):
+        print(f"Building deb for {pkg_name}")
+        dsc_path = _get_pkg_dsc_path(pkg_name)
+
+        with tempfile.TemporaryDirectory() as td:
+            subprocess.check_call(["dpkg-source", "-x", dsc_path], cwd=td)
+
+            dirs = glob.glob(f"{td}/*/")
+            assert len(dirs) == 1, f"Did not find only one dir in: {td} dirs: {dirs}"
+
+            subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
+
+            debs = glob.glob(f"{td}/*.deb")
+            assert len(debs) > 0, f"Did not find any debs in: {td}"
+
+            print("Uploading to debian repo")
+            for deb in debs:
+                response = requests.post(
+                    f"https://deb.fbn.org/add/{_distribution}",
+                    files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
+                assert response.status_code == 200, f"Error with request {response}"
+
+            self._http_repo.refresh()
+
+    # NOTE: this can be recursive
+    def build_pkg(self, cran_pkg_name: str):
+        local_ver = _get_cran2deb_version(cran_pkg_name)
+
+        print(f"Ensuring Build of {cran_pkg_name} ver: {local_ver}")
+
+        # Install dependencies
+        r_deps, non_r_deps = self._get_dependencies(cran_pkg_name)
+        self._install_r_deps(r_deps)
+
+        if self._http_repo.has_version(cran_pkg_name, local_ver):
+            print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Exiting...")
+            return
+
+        _install_non_r_deps(non_r_deps)
+
+        # Build source package
+        print("Building source package")
+        subprocess.check_call(["cran2deb", "build", cran_pkg_name])
+
+        # Build deb package
+        self._build_pkg_dsc_and_upload(cran_pkg_name)
 
 
 def _install_non_r_deps(deps: Set[str]):
@@ -160,38 +220,6 @@ def _get_pkg_dsc_path(pkg_name: str):
     assert len(glob_dscs) == 1, f"Could not find one dsc in: {glob_str}"
 
     return glob_dscs[0]
-
-
-def _build_pkg_dsc_and_upload(http_repo: HttpDebRepo, pkg_name: str):
-    print(f"Building deb for {pkg_name}")
-    dsc_path = _get_pkg_dsc_path(pkg_name)
-
-    with tempfile.TemporaryDirectory() as td:
-        subprocess.check_call(["dpkg-source", "-x", dsc_path], cwd=td)
-
-        dirs = glob.glob(f"{td}/*/")
-        assert len(dirs) == 1, f"Did not find only one dir in: {td} dirs: {dirs}"
-
-        subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
-
-        debs = glob.glob(f"{td}/*.deb")
-        assert len(debs) > 0, f"Did not find any debs in: {td}"
-
-        print("Uploading to debian repo")
-        for deb in debs:
-            response = requests.post(
-                f"https://deb.fbn.org/add/{_distribution}",
-                files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
-            assert response.status_code == 200, f"Error with request {response}"
-
-        http_repo.refresh()
-
-
-# rver: 0.2.20  debian_revision: 2  debian_epoch: 0
-_rver_line_re = re.compile(r'rver: (?P<rver>[^ ]+)\s+debian_revision: (?P<debian_revision>[^ ]+)\s+ debian_epoch: (?P<debian_epoch>[^ ]+)')
-
-# version_update:  rver: 0.2.20  prev_pkgver: 0.2.20-1cran2  prev_success: TRUE
-_version_update_line_re = re.compile(r'version_update:\s+rver: (?P<rver>[^ ]+)\s+prev_pkgver: (?P<prev_pkgver>[^ ]+)\s+ prev_success: (?P<prev_success>[^ ]+)')
 
 
 def _get_cran2deb_version(pkg_name: str):
@@ -236,30 +264,6 @@ def _get_cran2deb_version(pkg_name: str):
     assert False, f"Unable to determine version from: {output}"
 
 
-# NOTE: this can be recursive
-def _build_pkg(http_repo: HttpDebRepo, cran_pkg_name: str):
-    local_ver = _get_cran2deb_version(cran_pkg_name)
-
-    print(f"Ensuring Build of {cran_pkg_name} ver: {local_ver}")
-
-    # Install dependencies
-    r_deps, non_r_deps = _get_dependencies(cran_pkg_name)
-    _install_r_deps(http_repo, r_deps)
-
-    if http_repo.has_version(cran_pkg_name, local_ver):
-        print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Exiting...")
-        return
-
-    _install_non_r_deps(non_r_deps)
-
-    # Build source package
-    print("Building source package")
-    subprocess.check_call(["cran2deb", "build", cran_pkg_name])
-
-    # Build deb package
-    _build_pkg_dsc_and_upload(http_repo, cran_pkg_name)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-origin', type=str, default='deb.fbn.org', help='Debian Repo hostname')
@@ -275,8 +279,8 @@ def main():
             f.write(_dist_template.format(origin=app_args.origin))
 
     # Get local current/next version
-    http_repo = HttpDebRepo()
-    _build_pkg(http_repo, app_args.cran_pkg_name)
+    pkg_builder = PackageBuilder()
+    pkg_builder.build_pkg(app_args.cran_pkg_name)
 
 
 if __name__ == '__main__':
