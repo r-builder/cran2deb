@@ -112,9 +112,9 @@ class PkgName:
             self.cran_name = self._name_replacements.get(self.cran_name, self.cran_name)
 
     def __repr__(self):
-        value = f'deb_name={self.deb_name}'
+        value = f'deb_name="{self.deb_name}"'
         if self.cran_name:
-            value = f'{value}, cran_name={self.cran_name}'
+            value = f'{value}, cran_name="{self.cran_name}"'
         return f'PkgName({value})'
 
     def _ensure_r_cran_prefix(self, pkg_name: str):
@@ -299,7 +299,7 @@ def _install_apt_get_pkgs(pkgs: Set[PkgName]):
 
 
 def _get_pkg_dsc_path(pkg_name: PkgName):
-    glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name.deb_name[0]}/{pkg_name.deb_name}/*.dsc"
+    glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name.cran_name[0]}/{pkg_name.cran_name}/*.dsc"
     glob_dscs = glob.glob(glob_str)
     assert len(glob_dscs) == 1, f"Could not find one dsc in: {glob_str}"
 
