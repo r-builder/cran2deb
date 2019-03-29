@@ -97,9 +97,9 @@ class HttpDebRepo:
 
 
 def _get_dependencies(cran_pkg_name: str):
+    cran_pkg_name = _name_replacements.get(cran_pkg_name, cran_pkg_name)
     print(f"Finding dependencies of {cran_pkg_name}")
     r_cran_name = f"r-cran-{cran_pkg_name}"
-    r_cran_name = _name_replacements.get(r_cran_name, r_cran_name)
     output = subprocess.check_output(["apt-cache", "depends", r_cran_name]).decode('utf-8')
 
     r_depends = set()
