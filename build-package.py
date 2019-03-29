@@ -132,6 +132,7 @@ def _install_r_deps(deps: Set[str]):
 
 
 def _install_non_r_deps(deps: Set[str]):
+    print(f"Installing apt-get packages: {deps}")
     subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(deps))
 
 
@@ -151,12 +152,12 @@ def _build_pkg_dsc_and_upload(pkg_name: str):
         subprocess.check_call(["dpkg-source", "-x", dsc_path], cwd=td)
 
         dirs = glob.glob(f"{td}/*/")
-        assert len(dirs) == 1, f"Did not find only one dir in: {td}"
+        assert len(dirs) == 1, f"Did not find only one dir in: {td} dirs: {dirs}"
 
         subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
         debs = glob.glob(f"{td}/*.deb")
-        assert len(debs) == 1, f"Did not find only one deb in: {td}"
+        assert len(debs) == 1, f"Did not find only one deb in: {td} debs: {debs}"
 
         print("Uploading to debian repo")
         response = requests.post(
