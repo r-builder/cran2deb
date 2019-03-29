@@ -228,7 +228,7 @@ class PackageBuilder:
             r_deps = _get_build_dependencies(dirs[0])
             self._install_r_deps(r_deps)
 
-            subprocess.check_call(["mk-build-deps", "-i", "-r", "-t", "apt-get --no-install-recommends", "-y"], cwd=dirs[0])
+            subprocess.check_call(["mk-build-deps", "-i", "-r", "-t", "apt-get --no-install-recommends -y"], cwd=dirs[0])
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
             debs = glob.glob(f"{td}/*.deb")
