@@ -3,10 +3,11 @@ import argparse
 import os
 import subprocess
 import re
-from typing import Set
+from typing import Set, Dict
 import tempfile
 import glob
-
+from collections import defaultdict
+import multiprocessing
 
 # Third Party
 import requests
@@ -34,8 +35,28 @@ ipak <- function(pkg) {
 _dist_path = "/etc/cran2deb/archive/rep/conf/distributions"
 _dep_re = re.compile(r"\s*(?P<deptype>[^:]+):\s*(?P<pkgname>.*)")
 
+# '3.5.7-0~jessie'
+_deb_version_re = re.compile(r'(?P<version>[^-]+)-(?P<build_num>[^~]+)(?:~(?P<distribution>.*))?')
 
 _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf-8').strip()
+
+_num_cpus = multiprocessing.cpu_count()
+
+
+class HttpDebRepo:
+    def __init__(self):
+        # {package_name: DebInfo}
+        self._deb_info: Dict[str, Dict[str, Set[str]]] = defaultdict(lambda: defaultdict(set))
+
+        data = requests.get(f"https://deb.fbn.org/list/{_distribution}").json()
+
+        for row in data:
+            for version in row['versions']:
+                m = _deb_version_re.match(version)
+                assert m, f"unrecognized entry: {row}"
+                m = m.groupdict()
+                assert not m.get('distribution') or m['distribution'] == _distribution, f"entry {row} does not match distribution: {_distribution}"
+                self._deb_info[row['name']][m['version']].add(m['build_num'])
 
 
 def _get_dependencies(cran_pkg_name: str):
@@ -119,6 +140,8 @@ def main():
 
     app_args = parser.parse_args()
     app_args.cran_pkg_name = app_args.cran_pkg_name[0]
+
+    os.environ['MAKE'] = f"make -j {_num_cpus}"
 
     if not os.path.exists(_dist_path):
         with open(_dist_path, "w") as f:
