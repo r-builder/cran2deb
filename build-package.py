@@ -228,7 +228,7 @@ class PackageBuilder:
             r_deps = _get_build_dependencies(dirs[0])
             self._install_r_deps(r_deps)
 
-            subprocess.check_call(["mk-build-deps", "-i"], cwd=dirs[0])
+            subprocess.check_call(["mk-build-deps", "-i", "-r", "-t", "apt-get --no-install-recommends", "-y"], cwd=dirs[0])
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
             debs = glob.glob(f"{td}/*.deb")
@@ -237,6 +237,7 @@ class PackageBuilder:
             # Upload debs to local repo
             print(f'Adding {debs} to /var/www/cran2deb/rep')
             subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', '*.deb'], cwd='/var/www/cran2deb/rep')
+            # to remove: reprepro remove rbuilders [name]
 
             print("Uploading to remote debian repo")
             for deb in debs:
