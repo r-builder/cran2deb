@@ -234,7 +234,11 @@ class PackageBuilder:
             debs = glob.glob(f"{td}/*.deb")
             assert len(debs) > 0, f"Did not find any debs in: {td}"
 
-            print("Uploading to debian repo")
+            # Upload debs to local repo
+            print(f'Adding {debs} to /var/www/cran2deb/rep')
+            subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', '*.deb'], cwd='/var/www/cran2deb/rep')
+
+            print("Uploading to remote debian repo")
             for deb in debs:
                 # Ensure all the install dependencies get upload to the debian repo
                 r_deps, non_r_deps = _get_install_dependencies(deb)
