@@ -22,7 +22,7 @@ _dist_template = """
 Origin: {origin}
 Codename: rbuilders
 Components: main
-Architectures: source
+Architectures: source amd64
 Description: Debian Repository
 """
 
@@ -382,9 +382,8 @@ def main():
     os.environ["DEB_BUILD_OPTIONS"] = f'parallel={_num_cpus}'
     os.environ['MAKEFLAGS'] = f'-j{_num_cpus}'
 
-    if not os.path.exists(_dist_path):
-        with open(_dist_path, "w") as f:
-            f.write(_dist_template.format(origin=app_args.origin))
+    with open(_dist_path, "w") as f:
+        f.write(_dist_template.format(origin=app_args.origin))
 
     # Get local current/next version
     pkg_builder = PackageBuilder()
