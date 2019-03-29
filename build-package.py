@@ -157,13 +157,14 @@ def _build_pkg_dsc_and_upload(pkg_name: str):
         subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
         debs = glob.glob(f"{td}/*.deb")
-        assert len(debs) == 1, f"Did not find only one deb in: {td} debs: {debs}"
+        assert len(debs) != 0, f"Did not find any debs in: {td}"
 
         print("Uploading to debian repo")
-        response = requests.post(
-            f"https://deb.fbn.org/add/{_distribution}",
-            files={'deb-file': (os.path.basename(debs[0]), open(debs[0], "rb"))})
-        assert response.status_code == 200, f"Error with request {response}"
+        for deb in debs:
+            response = requests.post(
+                f"https://deb.fbn.org/add/{_distribution}",
+                files={'deb-file': (os.path.basename(deb), open(debs, "rb"))})
+            assert response.status_code == 200, f"Error with request {response}"
 
 
 # rver: 0.2.20  debian_revision: 2  debian_epoch: 0
