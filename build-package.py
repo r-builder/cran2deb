@@ -87,9 +87,10 @@ def _get_dependencies(cran_pkg_name: str):
     r_cran_name = f"r-cran-{cran_pkg_name}"
     output = subprocess.check_output(["apt-cache", "depends", r_cran_name]).decode('utf-8')
 
-    depends = set()
+    r_depends = set()
+    non_r_depends = set()
     for line in output.splitlines():
-        if line.strip() == r_cran_name:
+        if line.strip().startswith('r-cran-'):
             continue
 
         m = _dep_re.match(line)
@@ -105,11 +106,12 @@ def _get_dependencies(cran_pkg_name: str):
             print(f"Skipping dep: {m['pkgname']}")
             continue
 
-        assert m['pkgname'].startswith("r-cran-")
+        if m['pkgname'].startswith("r-cran-"):
+            r_depends.add(m['pkgname'].replace("r-cran-", "", 1))
+        else:
+            non_r_depends.add(m['pkgname'])
 
-        depends.add(m['pkgname'].replace("r-cran-", "", 1))
-
-    return depends
+    return r_depends, non_r_depends
 
 
 def _install_r_deps(deps: Set[str]):
@@ -127,6 +129,10 @@ def _install_r_deps(deps: Set[str]):
         print(f"Installing dependencies. Running: Rscript against: {contents}")
 
         subprocess.check_call(["Rscript", temp_file])
+
+
+def _install_non_r_deps(deps: Set[str]):
+    subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(deps))
 
 
 def _get_pkg_dsc_path(pkg_name: str):
@@ -219,8 +225,9 @@ def main():
     print(f"Starting Build of {app_args.cran_pkg_name} ver: {local_ver}")
 
     # Install dependencies
-    deps = _get_dependencies(app_args.cran_pkg_name)
-    _install_r_deps(deps)
+    r_deps, non_r_deps = _get_dependencies(app_args.cran_pkg_name)
+    _install_non_r_deps(non_r_deps)
+    _install_r_deps(r_deps)
 
     # Build source package
     print("Building source package")
