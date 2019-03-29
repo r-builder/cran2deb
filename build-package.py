@@ -154,6 +154,7 @@ def _install_non_r_deps(deps: Set[str]):
 
 
 def _get_pkg_dsc_path(pkg_name: str):
+    pkg_name = pkg_name.lower()
     glob_str = f"/etc/cran2deb/archive/rep/pool/main/{pkg_name[0]}/{pkg_name}/*.dsc"
     glob_dscs = glob.glob(glob_str)
     assert len(glob_dscs) == 1, f"Could not find one dsc in: {glob_str}"
