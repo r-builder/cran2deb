@@ -3,7 +3,7 @@ import argparse
 import os
 import subprocess
 import re
-from typing import Set, Dict, NamedTuple
+from typing import Set, Dict, NamedTuple, Optional
 from types import MappingProxyType
 import tempfile
 import glob
@@ -67,6 +67,9 @@ def _get_deb_version(deb_ver: str) -> DebVersion:
 class HttpDebRepo:
     def __init__(self):
         # {package_name: DebInfo}
+        self._deb_info: Optional[Dict[str, Set[DebVersion]]] = None
+
+    def refresh(self):
         self._deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
 
         data = requests.get(f"https://deb.fbn.org/list/{_distribution}").json()
@@ -77,6 +80,9 @@ class HttpDebRepo:
                 self._deb_info[row['name']].add(deb_ver)
 
     def has_version(self, pkg_name: str, deb_ver: str):
+        if self._deb_info is None:
+            self.refresh()
+
         pkg_name = f"r-cran-{pkg_name}"
         deb_ver = _get_deb_version(deb_ver)
         return deb_ver in self._deb_info.get(pkg_name, _empty_dict)
@@ -114,9 +120,13 @@ def _get_dependencies(cran_pkg_name: str):
     return r_depends, non_r_depends
 
 
-def _install_r_deps(deps: Set[str]):
+def _install_r_deps(http_repo: HttpDebRepo, deps: Set[str]):
     if not deps:
         return
+
+    # Ensure all the deps are available via ht http deb repo
+    for dep in deps:
+        _build_pkg(http_repo, dep)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_file = os.path.join(temp_dir, "install_pkgs.R")
@@ -144,7 +154,7 @@ def _get_pkg_dsc_path(pkg_name: str):
     return glob_dscs[0]
 
 
-def _build_pkg_dsc_and_upload(pkg_name: str):
+def _build_pkg_dsc_and_upload(http_repo: HttpDebRepo, pkg_name: str):
     print(f"Building deb for {pkg_name}")
     dsc_path = _get_pkg_dsc_path(pkg_name)
 
@@ -165,6 +175,8 @@ def _build_pkg_dsc_and_upload(pkg_name: str):
                 f"https://deb.fbn.org/add/{_distribution}",
                 files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
             assert response.status_code == 200, f"Error with request {response}"
+
+        http_repo.refresh()
 
 
 # rver: 0.2.20  debian_revision: 2  debian_epoch: 0
@@ -203,6 +215,28 @@ def _get_cran2deb_version(pkg_name: str):
     assert False, f"Unable to determine version from: {output}"
 
 
+# NOTE: this can be recursive
+def _build_pkg(http_repo: HttpDebRepo, cran_pkg_name: str):
+    local_ver = _get_cran2deb_version(cran_pkg_name)
+    if http_repo.has_version(cran_pkg_name, local_ver):
+        print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Exiting...")
+        return
+
+    print(f"Starting Build of {cran_pkg_name} ver: {local_ver}")
+
+    # Install dependencies
+    r_deps, non_r_deps = _get_dependencies(cran_pkg_name)
+    _install_non_r_deps(non_r_deps)
+    _install_r_deps(http_repo, r_deps)
+
+    # Build source package
+    print("Building source package")
+    subprocess.check_call(["cran2deb", "build", cran_pkg_name])
+
+    # Build deb package
+    _build_pkg_dsc_and_upload(http_repo, cran_pkg_name)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-origin', type=str, default='deb.fbn.org', help='Debian Repo hostname')
@@ -219,24 +253,7 @@ def main():
 
     # Get local current/next version
     http_repo = HttpDebRepo()
-    local_ver = _get_cran2deb_version(app_args.cran_pkg_name)
-    if http_repo.has_version(app_args.cran_pkg_name, local_ver):
-        print(f"HTTP Debian Repo already has version: {local_ver}.  Exiting...")
-        sys.exit(0)
-
-    print(f"Starting Build of {app_args.cran_pkg_name} ver: {local_ver}")
-
-    # Install dependencies
-    r_deps, non_r_deps = _get_dependencies(app_args.cran_pkg_name)
-    _install_non_r_deps(non_r_deps)
-    _install_r_deps(r_deps)
-
-    # Build source package
-    print("Building source package")
-    subprocess.check_call(["cran2deb", "build", app_args.cran_pkg_name])
-
-    # Build deb package
-    _build_pkg_dsc_and_upload(app_args.cran_pkg_name)
+    _build_pkg(http_repo, app_args.cran_pkg_name)
 
 
 if __name__ == '__main__':
