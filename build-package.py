@@ -108,8 +108,8 @@ class PackageBuilder:
 
     def _get_dependencies(self, cran_pkg_name: str):
         print(f"Finding dependencies of {cran_pkg_name}")
-        r_cran_name = f"r-cran-{cran_pkg_name}"
-        output = subprocess.check_output(["apt-cache", "depends", r_cran_name.lower()]).decode('utf-8')
+        r_cran_name = f"r-cran-{cran_pkg_name}".lower()
+        output = subprocess.check_output(["apt-cache", "depends", r_cran_name]).decode('utf-8')
 
         r_depends = set()
         non_r_depends = set()
@@ -121,7 +121,7 @@ class PackageBuilder:
             assert m, f"Unknown line: {line}, with cran_name: {r_cran_name}"
 
             m = m.groupdict()
-            if m['deptype'] == "Suggests":
+            if m['deptype'] in {"Suggests", "Conflicts"}:
                 continue
 
             assert m['deptype'] == "Depends", f"Unknown deptype for line: {line}"
