@@ -114,7 +114,8 @@ class PackageBuilder:
         r_depends = set()
         non_r_depends = set()
         for line in output.splitlines():
-            if line.strip().startswith('r-cran-'):
+            line = line.strip()
+            if line.startswith('r-cran-') or line.startswith("r-base-"):
                 continue
 
             m = _dep_re.match(line)
@@ -272,7 +273,6 @@ def main():
     app_args = parser.parse_args()
     app_args.cran_pkg_name = app_args.cran_pkg_name[0]
 
-    # TODO: this does work for deb builder, see if fix in python works
     os.environ["DEB_BUILD_OPTIONS"] = f'parallel={_num_cpus}'
 
     if not os.path.exists(_dist_path):
