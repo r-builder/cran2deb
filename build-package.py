@@ -112,10 +112,10 @@ class PkgName:
             self.cran_name = self._name_replacements.get(self.cran_name, self.cran_name)
 
     def __repr__(self):
-        value = f'deb_name: {self.deb_name}'
+        value = f'deb_name={self.deb_name}'
         if self.cran_name:
-            value = f'{value} cran_name: {self.cran_name}'
-        return value
+            value = f'{value}, cran_name={self.cran_name}'
+        return f'PkgName({value})'
 
     def _ensure_r_cran_prefix(self, pkg_name: str):
         if not pkg_name.startswith(self._r_cran_prefix):
@@ -274,7 +274,7 @@ class PackageBuilder:
 
         # Build source package
         print("Building source package")
-        subprocess.check_call(["cran2deb", "build", cran_pkg_name])
+        subprocess.check_call(["cran2deb", "build", cran_pkg_name.cran_name])
 
         # Build deb package
         self._build_pkg_dsc_and_upload(cran_pkg_name)
