@@ -112,7 +112,7 @@ sysreqs_as_debian <- function(sysreq_text,verbose=FALSE) {
             next
         }
         alias <- db_sysreq_override(sysreq)
-        if (is.null(alias) || nchar(alias) == 0) {
+        if (is.null(alias) || alias == "") {
             error('do not know what to do with SystemRequirement:', sysreq)
             error('original SystemRequirement:',startreq)
             fail('unmet system requirement')
