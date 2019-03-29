@@ -159,7 +159,7 @@ class PackageBuilder:
             self.build_pkg(dep)
 
         # install via apt-get so deb builds won't fail with missing deps
-        _install_apt_get_pkgs(deps)
+        _install_apt_get_pkgs({f'r-cran-{dep.lower()}' for dep in deps})
 
     def _build_pkg_dsc_and_upload(self, pkg_name: str):
         print(f"Building deb for {pkg_name}")
