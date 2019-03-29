@@ -71,6 +71,11 @@ def _get_deb_version(deb_ver: str) -> DebVersion:
     return DebVersion(m['version'], m['build_num'])
 
 
+def _get_info_from_deb(deb_path: str):
+    pkg, version = subprocess.check_output(["dpkg-deb", "-W", "--showformat=${Package}\n${Version}", deb_path]).decode('utf8').splitlines()
+    return pkg, version
+
+
 class HttpDebRepo:
     def __init__(self):
         # {package_name: DebInfo}
@@ -170,6 +175,13 @@ class PackageBuilder:
 
             print("Uploading to debian repo")
             for deb in debs:
+                # On the first run cran2deb may not have provided the correct version so we need
+                # to check again here
+                pkg_name, version = _get_info_from_deb(deb)
+
+                if self._http_repo.has_version(pkg_name, version):
+                    continue
+
                 response = requests.post(
                     f"https://deb.fbn.org/add/{_distribution}",
                     files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
