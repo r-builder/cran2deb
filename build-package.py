@@ -3,14 +3,19 @@ import argparse
 import os
 import subprocess
 import re
-from typing import Set, Dict
+from typing import Set, Dict, NamedTuple
+from types import MappingProxyType
 import tempfile
 import glob
 from collections import defaultdict
 import multiprocessing
+import sys
 
 # Third Party
 import requests
+
+
+_empty_dict = MappingProxyType({})
 
 
 _dist_template = """
@@ -43,20 +48,37 @@ _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf
 _num_cpus = multiprocessing.cpu_count()
 
 
+class DebVersion(NamedTuple):
+    version: str
+    build_num: str
+
+
+def _get_deb_version(deb_ver: str) -> DebVersion:
+    m = _deb_version_re.match(deb_ver)
+    assert m, f"unrecognized deb version format: {deb_ver}"
+    m = m.groupdict()
+
+    distribution = m.get('distribution')
+    assert not _distribution or not distribution or _distribution == distribution, f"distribution of {deb_ver} does not match {_distribution}"
+
+    return DebVersion(m['version'], m['build_num'])
+
+
 class HttpDebRepo:
     def __init__(self):
         # {package_name: DebInfo}
-        self._deb_info: Dict[str, Dict[str, Set[str]]] = defaultdict(lambda: defaultdict(set))
+        self._deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
 
         data = requests.get(f"https://deb.fbn.org/list/{_distribution}").json()
 
         for row in data:
             for version in row['versions']:
-                m = _deb_version_re.match(version)
-                assert m, f"unrecognized entry: {row}"
-                m = m.groupdict()
-                assert not m.get('distribution') or m['distribution'] == _distribution, f"entry {row} does not match distribution: {_distribution}"
-                self._deb_info[row['name']][m['version']].add(m['build_num'])
+                deb_ver = _get_deb_version(version)
+                self._deb_info[row['name']].add(deb_ver)
+
+    def has_version(self, pkg_name: str, deb_ver: str):
+        deb_ver = _get_deb_version(deb_ver)
+        return deb_ver in self._deb_info.get(pkg_name, _empty_dict)
 
 
 def _get_dependencies(cran_pkg_name: str):
@@ -90,6 +112,9 @@ def _get_dependencies(cran_pkg_name: str):
 
 
 def _install_r_deps(deps: Set[str]):
+    if not deps:
+        return
+
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_file = os.path.join(temp_dir, "install_pkgs.R")
         quoted_deps = [f'"{dep}"' for dep in deps]
@@ -98,7 +123,7 @@ def _install_r_deps(deps: Set[str]):
         with open(temp_file, "w") as f:
             f.write(contents)
 
-        print(f"running: Rscript against: {contents}")
+        print(f"Installing dependencies. Running: Rscript against: {contents}")
 
         subprocess.check_call(["Rscript", temp_file])
 
@@ -111,7 +136,7 @@ def _get_pkg_dsc_path(pkg_name: str):
     return glob_dscs[0]
 
 
-def _build_pkg_dsc(pkg_name: str):
+def _build_pkg_dsc_and_upload(pkg_name: str):
     print(f"Building deb for {pkg_name}")
     dsc_path = _get_pkg_dsc_path(pkg_name)
 
@@ -133,6 +158,42 @@ def _build_pkg_dsc(pkg_name: str):
         assert response.status_code == 200, f"Error with request {response}"
 
 
+# rver: 0.2.20  debian_revision: 2  debian_epoch: 0
+_rver_line_re = re.compile(r'rver: (?P<rver>[^ ]+)\s+debian_revision: (?P<debian_revision>[^ ]+)\s+ debian_epoch: (?P<debian_epoch>[^ ]+)')
+
+
+def _get_cran2deb_version(pkg_name: str):
+    """
+    On a non-build package output will look like:
+
+    new_build_version:   pkgname: gtable
+    rver: 0.3.0  debian_revision: 1  debian_epoch: 0
+    0.3.0-1cran1
+
+    On built package output will look like:
+    new_build_version:   pkgname: rjson
+    rver: 0.2.20  debian_revision: 2  debian_epoch: 0
+    version_update:  rver: 0.2.20  prev_pkgver: 0.2.20-1cran2  prev_success: TRUE
+    rver: 0.2.20  debian_revision: 3  debian_epoch: 0
+    0.2.20-1cran3
+
+    So we can assume that if `debian_revision` == 1, it's actually 2, otherwise it's correct
+
+    """
+    output = subprocess.check_output(['r', '-q', '-e', f"suppressMessages(library(cran2deb)); cat(new_build_version('{pkg_name}'))"]).decode('utf-8')
+
+    for line in output.splitlines():
+        m = _rver_line_re.match(line)
+        if m:
+            m = m.groupdict()
+            if m['debian_revision'] == "1":
+                m['debian_revision'] = "2"
+
+            return f"{m['rver']}-1cran{m['debian_revision']}"
+
+    assert False, f"Unable to determine version from: {output}"
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-origin', type=str, default='deb.fbn.org', help='Debian Repo hostname')
@@ -147,6 +208,15 @@ def main():
         with open(_dist_path, "w") as f:
             f.write(_dist_template.format(origin=app_args.origin))
 
+    # Get local current/next version
+    http_repo = HttpDebRepo()
+    local_ver = _get_cran2deb_version(app_args.cran_pkg_name)
+    if http_repo.has_version(app_args.cran_pkg_name, local_ver):
+        print(f"HTTP Debian Repo already has version: {local_ver}.  Exiting...")
+        sys.exit(0)
+
+    print(f"Starting Build of {app_args.cran_pkg_name} ver: {local_ver}")
+
     # Install dependencies
     deps = _get_dependencies(app_args.cran_pkg_name)
     _install_r_deps(deps)
@@ -156,7 +226,7 @@ def main():
     subprocess.check_call(["cran2deb", "build", app_args.cran_pkg_name])
 
     # Build deb package
-    _build_pkg_dsc(app_args.cran_pkg_name)
+    _build_pkg_dsc_and_upload(app_args.cran_pkg_name)
 
 
 if __name__ == '__main__':

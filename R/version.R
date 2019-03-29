@@ -27,7 +27,7 @@ version_new <- function(rver, debian_revision=1, debian_epoch=db_get_base_epoch(
 
     # always add the '-1' Debian release; nothing is lost and rarely will R
     # packages be Debian packages without modification.
-    return(paste(pkgver,'-',version_suffix_step,version_suffix,debian_revision,sep=''))
+    return(paste(pkgver,'-', version_suffix_step, version_suffix, debian_revision, sep=''))
 #    return(paste(pkgver,'-',2,version_suffix,debian_revision,sep=''))
 }
 
