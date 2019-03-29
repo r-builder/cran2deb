@@ -9,7 +9,6 @@ import tempfile
 import glob
 from collections import defaultdict
 import multiprocessing
-import sys
 
 # Third Party
 import requests
@@ -53,12 +52,10 @@ class DebVersion(NamedTuple):
     build_num: str
 
 
-_name_replacements = {
-    'rcpp': 'Rcpp'
-}
-
-for n, v in dict(_name_replacements).items():
-    _name_replacements[v] = n
+_name_replacements = {name.lower(): name for name in {
+    'Rcpp',
+    'pkgKitten'
+}}
 
 
 def _get_deb_version(deb_ver: str) -> DebVersion:
@@ -97,10 +94,9 @@ class HttpDebRepo:
 
 
 def _get_dependencies(cran_pkg_name: str):
-    cran_pkg_name = _name_replacements.get(cran_pkg_name, cran_pkg_name)
     print(f"Finding dependencies of {cran_pkg_name}")
     r_cran_name = f"r-cran-{cran_pkg_name}"
-    output = subprocess.check_output(["apt-cache", "depends", r_cran_name]).decode('utf-8')
+    output = subprocess.check_output(["apt-cache", "depends", r_cran_name.lower()]).decode('utf-8')
 
     r_depends = set()
     non_r_depends = set()
