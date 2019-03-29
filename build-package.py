@@ -56,6 +56,7 @@ _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf
 
 _num_cpus = multiprocessing.cpu_count()
 
+_local_repo_root = '/var/www/cran2deb/rep'
 
 # TODO: we need to ensure we build a newer version than what's available via apt-get
 _forced_dep_versions = {
@@ -202,6 +203,19 @@ def _get_install_dependencies(deb_file_path: str) -> Tuple[Set[PkgName], Set[Pkg
     return r_depends, non_r_depends
 
 
+def _local_repo_has_pkg(pkg_name: PkgName, version: str):
+    output = subprocess.check_output(['reprepro', 'list', 'rbuilders', pkg_name.cran_name.lower()], cwd=_local_repo_root).decode('utf-8')
+
+    for line in output.splitlines():
+        # 'rbuilders|main|source: withr 2.1.2-1cran2'
+        _, module_ver = line.split(": ", 1)
+        module_name, vers_str = module_ver.split(" ", 1)
+        if module_name == pkg_name.cran_name.lower() and vers_str == version:
+            return True
+
+        return False
+
+
 class PackageBuilder:
     def __init__(self):
         self._http_repo: HttpDebRepo = HttpDebRepo()
@@ -235,9 +249,10 @@ class PackageBuilder:
             assert len(debs) > 0, f"Did not find any debs in: {td}"
 
             # Upload debs to local repo
-            print(f'Adding {debs} to /var/www/cran2deb/rep')
-            subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', '*.deb'], cwd='/var/www/cran2deb/rep')
+            print(f'Adding {debs} to {_local_repo_root}')
+            subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', '*.deb'], cwd=_local_repo_root)
             # to remove: reprepro remove rbuilders [name]
+            # to find: reprepro list rbuilders
 
             print("Uploading to remote debian repo")
             for deb in debs:
@@ -274,6 +289,11 @@ class PackageBuilder:
         # NOTE: if the repo has the module, we're assuming all the dependencies made it as well
         if self._http_repo.has_version(cran_pkg_name, local_ver):
             print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
+            return
+
+        # If our local repo has the deb similarly we assume all the deps made it as well
+        if _local_repo_has_pkg(cran_pkg_name, local_ver):
+            print(f"Local Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
             return
 
         # Build source package
