@@ -64,6 +64,9 @@ cran2deb update
 # openssl
 cran2deb depend sysreq libssl1.0-dev openssl
 
+# curl
+cran2deb depend sysreq libcurl4-gnutls-dev "libcurl: %"
+
 # lubridate
 cran2deb depend sysreq tzdata "A system with zoneinfo data%"
 
