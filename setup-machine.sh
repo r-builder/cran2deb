@@ -86,8 +86,7 @@ if [[ ${R_VERSION} == 3.4* ]]; then
     # latest mvtnorm is 3.5+
     sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO packages (package,latest_r_version) VALUES ('mvtnorm', '1.0-8');"
 
-    scm_revision=$(sqlite3 -noheader <. /var/cache/cran2deb/cran2deb.db " SELECT scm_revision FROM builds LIMIT 1")
-    scm_revision=$(echo ${scm_revision} | xargs)
+    scm_revision=$(r -q -e 'suppressPackageStartupMessages(library(cran2deb));cat(scm_revision)')
 
     sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO builds
     (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES

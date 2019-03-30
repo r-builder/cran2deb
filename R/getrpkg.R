@@ -63,10 +63,18 @@ download_pkg <- function(dir, pkgname) {
         } else {
             # use this instead of download.packages as it is more resilient to
             # dodgy network connections (hello BT 'OpenWorld', bad ISP)
-            url <- paste(available[pkgname,'Repository'], fn, sep='/')
+            if(is.na(available[pkgname,'NeedsCompilation'])) {
+                # TODO: this needs to be done in a better way
+                url <- paste(available[pkgname, 'Repository'], 'Archive', pkg$name, fn, sep='/')
+            }
+            else {
+                url <- paste(available[pkgname, 'Repository'], fn, sep='/')
+            }
+
             # don't log the output -- we don't care!
-            ret <- system(paste('curl','-o',shQuote(archive),
-                          paste('-m',curl.maxtime,'--retry',curl.retries,sep=' '),
+            notice('Downloading archive ', url)
+            ret <- system(paste('curl', '--fail', '-o', shQuote(archive),
+                          paste('-m', curl.maxtime, '--retry', curl.retries, sep=' '),
                           shQuote(url)))
             if (ret != 0) {
                 fail('failed to download',url)
