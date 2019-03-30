@@ -61,6 +61,18 @@ cran2deb update
 
 # TODO: These are specific to stretch, should encapsulate these into a table
 
+# TODO: we need to ensure we build a newer version than what's available via apt-get
+# NOTE: clients will need this as well
+cat << EOF > /etc/apt/preferences
+Package: r-cran-magrittr
+Pin: version 1.5-1cran1
+Pin-Priority: 1001
+
+Package: r-cran-sp
+Pin: version 1.3-1-1cran1
+Pin-Priority: 1001
+EOF
+
 # openssl
 # NOTE: right now in sysreqs_as_debian it strips the version, however this is version specific
 cran2deb depend sysreq libssl1.0-dev openssl

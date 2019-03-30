@@ -58,12 +58,6 @@ _num_cpus = multiprocessing.cpu_count()
 
 _local_repo_root = '/var/www/cran2deb/rep'
 
-# TODO: we need to ensure we build a newer version than what's available via apt-get
-_forced_dep_versions = {
-    "r-cran-magrittr": "1.5-1cran1",
-    "r-cran-sp": "1.3-1-1cran1"
-}
-
 
 class DebVersion(NamedTuple):
     version: str
@@ -229,7 +223,7 @@ class PackageBuilder:
 
         print(f"Installing apt-get packages: {deps}")
 
-        pkgs = {_get_forced_version(pkg.deb_name) for pkg in deps}
+        pkgs = {pkg.deb_name for pkg in deps}
         subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
     def _build_pkg_dsc_and_upload(self, pkg_name: PkgName):
@@ -304,14 +298,6 @@ class PackageBuilder:
 
         # Build deb package
         self._build_pkg_dsc_and_upload(cran_pkg_name)
-
-
-def _get_forced_version(pkg_deb_name: str):
-    forced_ver = _forced_dep_versions.get(pkg_deb_name)
-    if not forced_ver:
-        return pkg_deb_name
-
-    return f'{pkg_deb_name}={forced_ver}'
 
 
 def _get_pkg_dsc_path(pkg_name: PkgName):
