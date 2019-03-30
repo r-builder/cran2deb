@@ -5,11 +5,13 @@ set -ex
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Install apt-get requirements
+# NOTE: these cannot use fbn-gdal et all because they require the system libs
+# TODO: remove deps not required by cran2deb, and re-build modules from script correctly adding the required deps to said cran modules
 apt-get update && \
     apt-get install -y --no-install-recommends \
     pbuilder devscripts fakeroot dh-r reprepro sqlite3 lsb-release build-essential \
     xvfb xfonts-base libcurl4-gnutls-dev libxml2-dev fontconfig imagemagick libcairo2-dev libatlas-base-dev libbz2-dev \
-    libexpat1 libfreetype6-dev fbn-libgdal fbn-libgeos libgflags-dev fbn-libhdf5 liblapack-dev liblzma-dev fbn-libnetcdf \
+    libexpat1 libfreetype6-dev libgflags-dev liblapack-dev liblzma-dev \
     libopenblas-dev libpcre3-dev libpng-dev libpq-dev libproj-dev libreadline6-dev libssl-dev libyaml-dev \
     r-cran-littler r-cran-hwriter equivs
 
@@ -77,12 +79,40 @@ Pin: version 1.8-3-1cran1
 Pin-Priority: 1001
 EOF
 
+
+wipe_alias () {
+    depend_alias=$1
+    debian_pkg=$2
+    alias=$3
+
+    sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM sysreq_override WHERE depend_alias LIKE '$1';"
+    sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM debian_dependency WHERE debian_pkg LIKE '$2' OR alias LIKE '$3';"
+}
+
+list_alias() {
+    depend_alias=$1
+    debian_pkg=$2
+    alias=$3
+
+    sqlite3 /var/cache/cran2deb/cran2deb.db "SELECT * FROM sysreq_override WHERE depend_alias LIKE '$1';"
+    sqlite3 /var/cache/cran2deb/cran2deb.db "SELECT * FROM debian_dependency WHERE debian_pkg LIKE '$2' OR alias LIKE '$3';"
+}
+
+reset_module() {
+    reprepro -b /var/www/cran2deb/rep remove rbuilders $1
+    reprepro -b /var/www/cran2deb/rep remove rbuilders $1-dbgsym
+    curl "https://deb.fbn.org/remove/stretch/r-cran-$1"
+    curl "https://deb.fbn.org/remove/stretch/r-cran-$1-dbgsym"
+    cran2deb build_force $1
+}
+
+# NOTE: these defaults come from populate_depend_aliases + populate_sysreq
+
 # openssl
 # NOTE: right now in sysreqs_as_debian it strips the version, however this is version specific
-cran2deb depend sysreq libssl1.0-dev openssl
-
-# curl
-cran2deb depend sysreq libcurl4-gnutls-dev "libcurl: %"
+cran2deb depend sysreq libssl1.0.2 openssl
+cran2deb depend alias_build libssl1.0.2 libssl1.0-dev
+cran2deb depend alias_run libssl1.0.2 libssl1.0.2
 
 # lubridate
 cran2deb depend sysreq tzdata "A system with zoneinfo data%"
@@ -91,22 +121,35 @@ cran2deb depend sysreq tzdata "A system with zoneinfo data%"
 cran2deb depend sysreq ignore "little-endian platform"
 
 # sysfonts / showtext
-sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM debian_dependency WHERE debian_pkg LIKE 'libpng%' OR alias LIKE 'libpng%';"
-cran2deb depend alias_build libpng libpng-dev
-cran2deb depend alias_run libpng libpng16-16
+wipe_alias "libpng%" "libpng%" "libpng%"
 cran2deb depend sysreq libpng16-16 libpng
+cran2deb depend alias_build libpng16-16 libpng-dev
+cran2deb depend alias_run libpng16-16 libpng16-16
 
-# rcurl
-cran2deb depend sysreq libcurl4-gnutls-dev libcurl
+# RCurl
+cran2deb depend sysreq libcurl3-gnutls libcurl
+cran2deb depend alias_build libcurl3-gnutls libcurl4-gnutls-dev
+cran2deb depend alias_run libcurl3-gnutls libcurl3-gnutls
+
+# curl
+cran2deb depend sysreq libcurl3-gnutls "libcurl: %"
 
 # stringi
-cran2deb depend sysreq libicu-dev "icu4c %"
+cran2deb depend sysreq libicu57 "icu4c %"
+cran2deb depend alias_build libicu57 libicu-dev
+cran2deb depend alias_run libicu57 libicu57
+
 
 # rgdal
-sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM debian_dependency WHERE debian_pkg LIKE 'libgdal%' OR alias LIKE 'libgdal%';"
-cran2deb depend alias_build libgdal libgdal-dev
-cran2deb depend alias_run libgdal libgdal20
-
+wipe_alias "libgdal%" "libgdal%" "libgdal%"
+wipe_alias "proj" "proj" "proj"
+cran2deb depend sysreq libgdal20 "%gdal%"
+cran2deb depend alias_build libgdal20 libgdal-dev
+cran2deb depend alias_build libgdal20 gdal-bin
+cran2deb depend alias_run libgdal20 libgdal20
+cran2deb depend sysreq libproj12 "proj%"
+cran2deb depend alias_build libproj12 libproj-dev
+cran2deb depend alias_run libproj12 libproj12
 
 # Fixups for old package versions
 if [[ ${R_VERSION} == 3.4* ]]; then
