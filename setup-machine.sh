@@ -166,6 +166,19 @@ cran2deb depend alias_run libnetcdf11 libhdf5-100
 cran2deb depend alias_build libnetcdf11 libudunits2-dev
 cran2deb depend alias_run libnetcdf11 libudunits2-0
 
+# pander
+cran2deb depend sysreq pandoc "pandoc %"
+cran2deb depend alias_build pandoc pandoc
+cran2deb depend alias_run pandoc pandoc
+
+# knitr
+cran2deb depend sysreq pandoc "Package vignettes based on R Markdown %"
+cran2deb depend alias_build pandoc rst2pdf
+cran2deb depend alias_run pandoc rst2pdf
+
+# raster
+cran2deb depend sysreq ignore "c++11"
+
 # Fixups for old package versions
 if [[ ${R_VERSION} == 3.4* ]]; then
     # latest mvtnorm is 3.5+

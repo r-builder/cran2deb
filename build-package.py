@@ -93,13 +93,15 @@ def _get_name_replacements() -> Dict[str, str]:
 
 class PkgName:
     _r_cran_prefix = 'r-cran-'
+    _r_bioc_prefix = 'r-bioc-'
+
     _name_replacements = _get_name_replacements()
 
     def __init__(self, pkg_name: str, force_cran: bool = False):
         if force_cran:
             self.cran_name = self._strip_r_cran_prefix(pkg_name)
             self.deb_name = self._ensure_r_cran_prefix(pkg_name)
-        elif pkg_name.startswith(self._r_cran_prefix):
+        elif pkg_name.startswith(self._r_cran_prefix) or pkg_name.startswith(self._r_bioc_prefix):
             self.deb_name = pkg_name
             self.cran_name = self._strip_r_cran_prefix(pkg_name)
         else:
@@ -116,7 +118,7 @@ class PkgName:
         return f'PkgName({value})'
 
     def _ensure_r_cran_prefix(self, pkg_name: str):
-        if not pkg_name.startswith(self._r_cran_prefix):
+        if not pkg_name.startswith(self._r_cran_prefix) and not pkg_name.startswith(self._r_bioc_prefix):
             pkg_name = f"{self._r_cran_prefix}{pkg_name}"
 
         return pkg_name.lower()
@@ -124,6 +126,9 @@ class PkgName:
     def _strip_r_cran_prefix(self, pkg_name: str):
         if pkg_name.startswith(self._r_cran_prefix):
             return pkg_name[len(self._r_cran_prefix):]
+
+        if pkg_name.startswith(self._r_bioc_prefix):
+            return pkg_name[len(self._r_bioc_prefix):]
 
         return pkg_name
 
@@ -174,14 +179,12 @@ def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
 
 def _get_install_dependencies(deb_file_path: str) -> Set[PkgName]:
     print(f"Finding dependencies of {deb_file_path}")
-
-    "dpkg-deb -W --showformat='${Depends}' r-cran-colorspace_1.4-1-1cran1_amd64.deb "
     deps = subprocess.check_output(["dpkg-deb", "-W", "--showformat=${Depends}", deb_file_path]).decode('utf-8').split(', ')
 
     pkg_names = set()
     for dep in deps:
         dep = dep.strip()
-        if dep.startswith('r-cran-') or dep.startswith("r-base-") or dep.startswith('r-api'):
+        if dep.startswith('r-cran-') or dep.startswith("r-base-") or dep.startswith('r-api') or dep.startswith('r-bioc-'):
             print(f"Skipping dep: {dep}")
             continue
 
