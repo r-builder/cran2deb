@@ -81,6 +81,9 @@ cran2deb depend alias_run libpng12-0 libpng16-16
 # rcurl
 cran2deb depend sysreq libcurl4-gnutls-dev libcurl
 
+# stringi
+cran2deb depend sysreq libicu-dev "icu4c %"
+
 # Fixups for old package versions
 if [[ ${R_VERSION} == 3.4* ]]; then
     # latest mvtnorm is 3.5+

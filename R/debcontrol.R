@@ -82,34 +82,42 @@ sysreqs_as_debian <- function(sysreq_text, verbose=FALSE) {
     sysreq_text <- gsub('[[:space:]]and[[:space:]]',' , ',tolower(sysreq_text))
 
     for (sysreq in strsplit(sysreq_text,'[[:space:]]*,[[:space:]]*')[[1]]) {
-	    if (verbose) cat("sysreq to investigate: '",sysreq,"'.\n",sep="")
+	    if (verbose) cat("sysreq to investigate: '", sysreq,"'.\n", sep="")
         startreq = sysreq
 
         # constant case (redundant)
         sysreq = tolower(sysreq)
 
-        # drop version information/comments for now
-        sysreq = gsub('[[][^])]*[]]','',sysreq)
-        sysreq = gsub('\\([^)]*\\)','',sysreq)
-        sysreq = gsub('[[][^])]*[]]','',sysreq)
-        sysreq = gsub('version','',sysreq)
-        sysreq = gsub('from','',sysreq)
-        sysreq = gsub('[<>=]*[[:space:]]*[[:digit:]]+[[:digit:].+:~-]*','',sysreq)
-
-        # byebye URLs
-        sysreq = gsub('(ht|f)tps?://[[:alnum:]!?*"\'(),%$_@.&+/=-]*','',sysreq)
-
-        # squish out space -- this does not work for me (did not want to touch, though), Steffen
-        sysreq = chomp(gsub('[[:space:]]+',' ',sysreq))
-
-        # no final dot and neither final blanks
-        sysreq = gsub('\\.?\\s*$','',sysreq)
-
-        if (nchar(sysreq) == 0) {
-            notice('part of the SystemRequirement became nothing')
-            next
-        }
+        # first try pre-sub'd string, as below breaks ICU4C
         alias <- db_sysreq_override(sysreq)
+
+        if (is.null(alias) || !length(alias)) {
+            notice('do not know what to do with SystemRequirement:', sysreq, "attempting substitutions")
+
+            # drop version information/comments for now
+            sysreq = gsub('[[][^])]*[]]','',sysreq)
+            sysreq = gsub('\\([^)]*\\)','',sysreq)
+            sysreq = gsub('[[][^])]*[]]','',sysreq)
+            sysreq = gsub('version','',sysreq)
+            sysreq = gsub('from','',sysreq)
+            sysreq = gsub('[<>=]*[[:space:]]*[[:digit:]]+[[:digit:].+:~-]*','',sysreq)
+
+            # byebye URLs
+            sysreq = gsub('(ht|f)tps?://[[:alnum:]!?*"\'(),%$_@.&+/=-]*','',sysreq)
+
+            # squish out space -- this does not work for me (did not want to touch, though), Steffen
+            sysreq = chomp(gsub('[[:space:]]+',' ',sysreq))
+
+            # no final dot and neither final blanks
+            sysreq = gsub('\\.?\\s*$','',sysreq)
+
+            if (nchar(sysreq) == 0) {
+                notice('part of the SystemRequirement became nothing')
+                next
+            }
+            alias <- db_sysreq_override(sysreq)
+        }
+
         if (is.null(alias) || !length(alias)) {
             error('do not know what to do with SystemRequirement:', sysreq)
             error('original SystemRequirement:',startreq)
