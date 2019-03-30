@@ -99,6 +99,8 @@ new_build_version <- function(pkgname, verbose=FALSE) {
     }
     else if (!is.null(db_ver)) {
         latest_r_ver <- version_upstream(db_ver)
+        available[pkgname, 'Version'] <- latest_r_ver
+        available[pkgname, 'Repository'] <- "http://cran.r-project.org/src/contrib"
     }
     else {
         fail('tried to discover new version of',pkgname,'but it does not appear to be available')

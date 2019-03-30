@@ -22,14 +22,14 @@ download_pkg <- function(dir, pkgname) {
     pkg <- pairlist()
     pkg$date_stamp = Sys.time()
     pkg$name = pkgname
-    pkg$repoURL = available[pkgname,'Repository']
+    pkg$version <- available[pkgname, 'Version']
+    pkg$repoURL = available[pkgname, 'Repository']
     pkg$repo = repourl_as_debian(pkg$repoURL)
     if (!length(grep('^[A-Za-z0-9][A-Za-z0-9+.-]+$',pkg$name))) {
         fail('Cannot convert package name into a Debian name',pkg$name)
     }
     pkg$srcname = pkgname_as_debian(pkg$name, binary=F)
     pkg$debname = pkgname_as_debian(pkg$name, repo=pkg$repo)
-    pkg$version <- available[pkgname,'Version']
 
     # see if we have already built this release and uploaded it.
     debfn <- file.path(rbuilders_loc,  paste(substr(pkg$srcname,1,1),'/',pkg$srcname,'/',pkg$srcname,'_',pkg$version,'.orig.tar.gz',sep=""))
