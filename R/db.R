@@ -389,10 +389,10 @@ db_latest_build <- function(pkgname,verbose=FALSE,debug=FALSE) {
     }
     build <- dbGetQuery(con, paste('SELECT * FROM builds'
                        ,'NATURAL JOIN (SELECT package,max(id) AS max_id FROM builds'
-                       ,              'WHERE system =',db_quote(which_system)
+                       ,              'WHERE system =', db_quote(which_system)
                        ,              'GROUP BY package) AS last'
                        ,'WHERE id = max_id'
-                       ,'AND builds.package =',db_quote(pkgname)))
+                       ,'AND builds.package =', db_quote(pkgname)))
     if (debug) {
 	cat("       dbGetQuery was executed:\n")
 	cat("       print(build):\n")

@@ -12,7 +12,7 @@ repourl_as_debian <- function(url) {
     fail('unknown repository',url)
 }
 
-pkgname_as_debian <- function(name,repopref=NULL,version=NULL,binary=T,build=F) {
+pkgname_as_debian <- function(name, repopref=NULL, version=NULL, binary=T, build=F) {
     # generate the debian package name corresponding to the R package name
     if (name %in% base_pkgs) {
         name = 'R'

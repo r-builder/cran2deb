@@ -92,12 +92,15 @@ new_build_version <- function(pkgname, verbose=FALSE) {
     # the current R version, the user can manually add an entry to the packages to force it
     # example: INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES ('mvtnorm', '1.0-8');
     # So we default the the db_version unless the latest version is available
-    latest_r_ver <- db_ver
+    latest_r_ver <- NULL
 
     if(latest_available) {
         latest_r_ver <- available[pkgname,'Version']
     }
-    else if (is.null(db_ver)) {
+    else if (!is.null(db_ver)) {
+        latest_r_ver <- version_upstream(db_ver)
+    }
+    else {
         fail('tried to discover new version of',pkgname,'but it does not appear to be available')
     }
 

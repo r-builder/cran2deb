@@ -55,9 +55,10 @@ fi
 cran2deb repopulate
 cran2deb update
 
-# NOTE: right now in sysreqs_as_debian it strips the version, however this is version specific
+# TODO: These are specific to stretch, should encapsulate these into a table
 
 # openssl
+# NOTE: right now in sysreqs_as_debian it strips the version, however this is version specific
 cran2deb depend sysreq libssl1.0-dev openssl
 
 # curl
@@ -76,8 +77,16 @@ cran2deb depend alias_run libpng12-0 libpng16-16
 # rcurl
 cran2deb depend sysreq libcurl4-gnutls-dev libcurl
 
+# Fixups for old package versions
 R_VERSION=$(dpkg-query --showformat='${Version}' --show r-base-core)
 if [[ ${R_VERSION} == 3.4* ]]; then
     # latest mvtnorm is 3.5+
     sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO packages (package,latest_r_version) VALUES ('mvtnorm', '1.0-8');"
+
+    scm_revision=$(sqlite3 -noheader <. /var/cache/cran2deb/cran2deb.db " SELECT scm_revision FROM builds LIMIT 1")
+    scm_revision=$(echo ${scm_revision} | xargs)
+
+    sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO builds
+    (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES
+    ('mvtnorm', '${SYS}', '1.0-8', 0, 1, 1, 0, date('now'), strftime('%H:%M:%S.%f', 'now'), '${scm_revision}', '')"
 fi
