@@ -101,7 +101,7 @@ new_build_version <- function(pkgname, verbose=FALSE) {
         latest_r_ver <- version_upstream(db_ver)
 
         # TODO: fixme
-        available <- rbind(available, mvtnorm=c(Package="mvtnorm", Version=latest_r_ver, Repository="http://cran.r-project.org/src/contrib", Priority=NA, Depends=NA,
+        available <<- rbind(available, mvtnorm=c(Package="mvtnorm", Version=latest_r_ver, Repository="http://cran.r-project.org/src/contrib", Priority=NA, Depends=NA,
         Imports=NA, LinkingTo=NA, Suggests=NA, Enhances=NA, License=NA, License_is_FOSS=NA, License_restricts_use=NA,
         OS_type=NA, Archs=NA, MD5sum=NA, NeedsCompilation=NA, File=NA))
     }
