@@ -10,6 +10,7 @@ import glob
 from collections import defaultdict
 import multiprocessing
 import sqlite3
+import distro
 
 # Third Party
 import requests
@@ -57,6 +58,7 @@ _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf
 _num_cpus = multiprocessing.cpu_count()
 
 _local_repo_root = '/var/www/cran2deb/rep'
+_local_sqlite_path = '/var/cache/cran2deb/cran2deb.db'
 
 
 class DebVersion(NamedTuple):
@@ -81,7 +83,7 @@ def _get_info_from_deb(deb_path: str):
 
 
 def _get_name_replacements() -> Dict[str, str]:
-    conn = sqlite3.connect('/var/cache/cran2deb/cran2deb.db')
+    conn = sqlite3.connect(_local_sqlite_path)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute("SELECT package FROM packages;")
@@ -133,30 +135,98 @@ class PkgName:
         return pkg_name
 
 
-class HttpDebRepo:
+def _reset_module(pkg_name: PkgName):
+    print(f"Forcing rebuild of {pkg_name}")
+
+    subprocess.check_call(["reprepro", "-b", _local_repo_root, "remove", "rbuilders", pkg_name.cran_name.lower(), f"{pkg_name.deb_name.lower()}-dbgsym"])
+
+    response = requests.get(f"https://deb.fbn.org/remove/{_distribution}/{pkg_name.deb_name}")
+    assert response.status_code == 200, f"Error removing {pkg_name} from http repo with response code: {response.status_code}"
+
+    response = requests.get(f"https://deb.fbn.org/remove/{_distribution}/{pkg_name.deb_name}-dbgsym")
+    assert response.status_code == 200, f"Error removing {pkg_name}-dbgsym from http repo with response code: {response.status_code}"
+
+    subprocess.check_call(["apt-get", "remove", pkg_name.deb_name])
+    subprocess.check_call(["cran2deb", "build_force", pkg_name.cran_name])
+
+
+def _ensure_old_versions():
+    _old_packages = {
+        "mvtnorm": '1.0-8',
+        'multcomp': '1.4-8',
+    }
+
+    conn = sqlite3.connect(_local_sqlite_path)
+    conn.row_factory = sqlite3.Row
+
+    scm_revision = subprocess.check_output(['r', '-q', '-e', 'suppressPackageStartupMessages(library(cran2deb));cat(scm_revision)']).decode('utf-8')
+
+    info = distro.lsb_release_info()
+    system = f"{info['distributor_id'].lower()}-{info['codename']}"
+
+    cur = conn.cursor()
+    for name, ver in _old_packages.items():
+        cur.execute("SELECT * FROM builds WHERE package=?", [name])
+        rows = [row for row in cur]
+
+        if rows and rows[0]['r_version'] == ver:
+            continue
+
+        if rows:
+            _reset_module(PkgName(name, True))
+            cur.execute("""UPDATE builds SET r_version=?, success=0, log='' WHERE package=?""", [ver, name])
+        else:
+            cur.execute("""INSERT OR REPLACE INTO builds
+                (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES
+                (?, ?, ?, 0, 1, 1, 0, date('now'), strftime('%H:%M:%S.%f', 'now'), ?, '')""", [name, system, ver, scm_revision])
+
+
+class DebRepos:
     def __init__(self):
         # {package_name: DebInfo}
-        self._deb_info: Optional[Dict[str, Set[DebVersion]]] = None
+        self._http_deb_info: Optional[Dict[str, Set[DebVersion]]] = None
+        self._local_deb_info: Optional[Dict[str, Set[DebVersion]]] = None
 
-    def refresh(self):
+    def _http_refresh(self):
         subprocess.check_call(['apt-get', 'update'])
 
-        self._deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
+        self._http_deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
 
         data = requests.get(f"https://deb.fbn.org/list/{_distribution}").json()
 
         for row in data:
             for version in row['versions']:
                 deb_ver = _get_deb_version(version)
-                self._deb_info[row['name']].add(deb_ver)
+                self._http_deb_info[row['name']].add(deb_ver)
 
-    def has_version(self, pkg_name: PkgName, deb_ver: str):
-        if self._deb_info is None:
+    def _local_refresh(self):
+        output = subprocess.check_output(['reprepro', "-T", "deb", 'list', 'rbuilders'], cwd=_local_repo_root).decode('utf-8')
+
+        self._local_deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
+
+        for line in output.splitlines():
+            # 'rbuilders|main|source: withr 2.1.2-1cran2'
+            _, module_ver = line.split(": ", 1)
+            module_name, vers_str = module_ver.split(" ", 1)
+
+            deb_ver = _get_deb_version(vers_str)
+            self._local_deb_info[module_name].add(deb_ver)
+
+    def local_has_version(self, pkg_name: PkgName, deb_ver: str):
+        deb_ver = _get_deb_version(deb_ver)
+        return deb_ver in self._local_deb_info.get(pkg_name.deb_name, _empty_dict)
+
+    def refresh(self):
+        self._http_refresh()
+        self._local_refresh()
+
+    def http_has_version(self, pkg_name: PkgName, deb_ver: str):
+        if self._http_deb_info is None:
             self.refresh()
 
         # This should be moved out
         deb_ver = _get_deb_version(deb_ver)
-        return deb_ver in self._deb_info.get(pkg_name.deb_name, _empty_dict)
+        return deb_ver in self._http_deb_info.get(pkg_name.deb_name, _empty_dict)
 
 
 def _get_build_dependencies(dir_path: str) -> Set[PkgName]:
@@ -199,22 +269,9 @@ def _get_install_dependencies(deb_file_path: str) -> Set[PkgName]:
     return pkg_names
 
 
-def _get_local_repo_pkg(pkg_name: PkgName, version: str):
-    output = subprocess.check_output(['reprepro', "-T", "deb", 'list', 'rbuilders', pkg_name.deb_name], cwd=_local_repo_root).decode('utf-8')
-
-    for line in output.splitlines():
-        # 'rbuilders|main|source: withr 2.1.2-1cran2'
-        _, module_ver = line.split(": ", 1)
-        module_name, vers_str = module_ver.split(" ", 1)
-        if module_name == pkg_name.deb_name and vers_str == version:
-            return True
-
-        return False
-
-
 class PackageBuilder:
     def __init__(self):
-        self._http_repo: HttpDebRepo = HttpDebRepo()
+        self._deb_repos: DebRepos = DebRepos()
 
     def _install_deps(self, deps: Set[PkgName]):
         # Ensure all the deps are available via the http deb repo
@@ -260,7 +317,7 @@ class PackageBuilder:
                 # to check again here
                 pkg_name, version = _get_info_from_deb(deb)
                 pkg_name = PkgName(pkg_name)
-                if self._http_repo.has_version(pkg_name, version):
+                if self._deb_repos.http_has_version(pkg_name, version):
                     continue
 
                 print(f"Uploading {pkg_name} with ver: {version} from {deb}")
@@ -272,15 +329,12 @@ class PackageBuilder:
 
                 need_refresh = True
                 # Upload deb to local repo
-                if not _get_local_repo_pkg(pkg_name, version):
+                if not self._deb_repos.local_has_version(pkg_name, version):
                     print(f'Adding {deb} to {_local_repo_root}')
                     subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
 
-                # to remove: reprepro -b /var/www/cran2deb/rep remove rbuilders [name]  (then need cran2deb build_force [name]
-                # to find: reprepro -b /var/www/cran2deb/rep list rbuilders [name]
-
             if need_refresh:
-                self._http_repo.refresh()
+                self._deb_repos.refresh()
 
     # NOTE: this can be recursive
     def build_pkg(self, cran_pkg_name: PkgName):
@@ -292,12 +346,12 @@ class PackageBuilder:
         # that module may not match what we're building.  So we need to actually build
         # each module and find the dependencies from the deb file
         # NOTE: if the repo has the module, we're assuming all the dependencies made it as well
-        if self._http_repo.has_version(cran_pkg_name, local_ver):
+        if self._deb_repos.http_has_version(cran_pkg_name, local_ver):
             print(f"HTTP Debian Repo already has version: {local_ver} of {cran_pkg_name}.  Skipping")
             return
 
         # If our local repo has the deb similarly we assume all the deps made it as well
-        if _get_local_repo_pkg(cran_pkg_name, local_ver):
+        if self._deb_repos.local_has_version(cran_pkg_name, local_ver):
             return
 
         # Build source package
@@ -370,6 +424,8 @@ def main():
 
     with open(_dist_path, "w") as f:
         f.write(_dist_template.format(origin=app_args.origin))
+
+    _ensure_old_versions()
 
     pkg_builder = PackageBuilder()
 

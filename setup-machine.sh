@@ -98,14 +98,6 @@ list_alias() {
     sqlite3 /var/cache/cran2deb/cran2deb.db "SELECT * FROM debian_dependency WHERE debian_pkg LIKE '$2' OR alias LIKE '$3';"
 }
 
-reset_module() {
-    reprepro -b /var/www/cran2deb/rep remove rbuilders $1
-    reprepro -b /var/www/cran2deb/rep remove rbuilders $1-dbgsym
-    curl "https://deb.fbn.org/remove/stretch/r-cran-$1"
-    curl "https://deb.fbn.org/remove/stretch/r-cran-$1-dbgsym"
-    cran2deb build_force $1
-    ./build-package.py $1
-}
 
 # NOTE: these defaults come from populate_depend_aliases + populate_sysreq
 
@@ -178,6 +170,15 @@ cran2deb depend alias_run pandoc rst2pdf
 
 # raster
 cran2deb depend sysreq ignore "c++11"
+
+# jpeg
+wipe_alias "%jpeg%" "%jpeg%" "%jpeg%"
+cran2deb depend sysreq libjpeg "libjpeg%"
+cran2deb depend alias_build libjpeg libjpeg62-turbo-dev
+cran2deb depend alias_run libjpeg libjpeg62
+
+
+python3 -m pip install distro
 
 # Fixups for old package versions
 if [[ ${R_VERSION} == 3.4* ]]; then
