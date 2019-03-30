@@ -71,6 +71,10 @@ Pin-Priority: 1001
 Package: r-cran-sp
 Pin: version 1.3-1-1cran1
 Pin-Priority: 1001
+
+Package: r-cran-xtable
+Pin: version 1.8-3-1cran1
+Pin-Priority: 1001
 EOF
 
 # openssl
