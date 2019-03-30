@@ -31,7 +31,7 @@ EOF
 Rscript /tmp/r_setup_pkgs.R
 
 # Install R cran2deb package and add bin symlink
-R CMD INSTALL .
+R CMD INSTALL "${this_dir}"
 
 ln -s /root/cran2deb/exec/cran2deb /usr/bin/
 
