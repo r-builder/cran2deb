@@ -86,7 +86,10 @@ cran2deb depend sysreq tzdata "A system with zoneinfo data%"
 # feather
 cran2deb depend sysreq ignore "little-endian platform"
 
-# sysfonts
+# sysfonts / showtext
+# TODO: this is a problem because in data/populate_depend_aliases it sets these to the old versions
+#       can we force these or remove the other versions via the command line?  Perhaps add a new one
+#       if it doesn't exit
 cran2deb depend alias_build libpng libpng-dev
 cran2deb depend alias_run libpng libpng16-16
 cran2deb depend sysreq libpng16-16 libpng
