@@ -31,17 +31,13 @@ EOF
 Rscript /tmp/r_setup_pkgs.R
 
 # Install R cran2deb package and add bin symlink
-pushd "${this_dir}/.."
-R CMD INSTALL cran2deb
+R CMD INSTALL .
 
 ln -s /root/cran2deb/exec/cran2deb /usr/bin/
 
 export ROOT=$(cran2deb root)
 export ARCH=$(dpkg --print-architecture)
 export SYS="debian-${ARCH}"
-
-# back to original folder
-popd
 
 if [[ ! -d "/etc/cran2deb" ]]; then
     mkdir /etc/cran2deb/
