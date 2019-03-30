@@ -87,8 +87,9 @@ cran2deb depend sysreq tzdata "A system with zoneinfo data%"
 cran2deb depend sysreq ignore "little-endian platform"
 
 # sysfonts
-cran2deb depend alias_build libpng12-dev libpng-dev
-cran2deb depend alias_run libpng12-0 libpng16-16
+cran2deb depend alias_build libpng libpng-dev
+cran2deb depend alias_run libpng libpng16-16
+cran2deb depend sysreq libpng16-16 libpng
 
 # rcurl
 cran2deb depend sysreq libcurl4-gnutls-dev libcurl
