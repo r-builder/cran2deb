@@ -13,7 +13,8 @@ apt-get update && \
     libopenblas-dev libpcre3-dev libpng-dev libpq-dev libproj-dev libreadline6-dev libssl-dev libyaml-dev \
     r-cran-littler r-cran-hwriter
 
-export MAKEFLAGS='-j$(nproc)'
+# NOTE: if you enable this it can hang your docker container
+#export MAKEFLAGS='-j$(nproc)'
 
 # Install R packages not available via apt-get
 cat << EOF > /tmp/r_setup_pkgs.R
@@ -33,11 +34,14 @@ Rscript /tmp/r_setup_pkgs.R
 # Install R cran2deb package and add bin symlink
 R CMD INSTALL "${this_dir}"
 
-ln -s /root/cran2deb/exec/cran2deb /usr/bin/
+if [[ ! -e "/usr/bin/cran2deb" ]]; then
+    ln -s /root/cran2deb/exec/cran2deb /usr/bin/
+fi
 
 export ROOT=$(cran2deb root)
 export ARCH=$(dpkg --print-architecture)
 export SYS="debian-${ARCH}"
+export R_VERSION=$(dpkg-query --showformat='${Version}' --show r-base-core)
 
 if [[ ! -d "/etc/cran2deb" ]]; then
     mkdir /etc/cran2deb/
@@ -71,14 +75,13 @@ cran2deb depend sysreq tzdata "A system with zoneinfo data%"
 cran2deb depend sysreq ignore "little-endian platform"
 
 # sysfonts
-cran2deb depends alias_build libpng12-dev libpng-dev
+cran2deb depend alias_build libpng12-dev libpng-dev
 cran2deb depend alias_run libpng12-0 libpng16-16
 
 # rcurl
 cran2deb depend sysreq libcurl4-gnutls-dev libcurl
 
 # Fixups for old package versions
-R_VERSION=$(dpkg-query --showformat='${Version}' --show r-base-core)
 if [[ ${R_VERSION} == 3.4* ]]; then
     # latest mvtnorm is 3.5+
     sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO packages (package,latest_r_version) VALUES ('mvtnorm', '1.0-8');"
