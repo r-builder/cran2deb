@@ -77,3 +77,11 @@ cran2deb depend sysreq ignore "little-endian platform"
 cran2deb depends alias_build libpng12-dev libpng-dev
 cran2deb depend alias_run libpng12-0 libpng16-16
 
+# rcurl
+cran2deb depend sysreq libcurl4-gnutls-dev libcurl
+
+R_VERSION=$(dpkg-query --showformat='${Version}' --show r-base-core)
+if [[ ${R_VERSION} == 3.4* ]]; then
+    # latest mvtnorm is 3.5+
+    sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO packages (package,latest_r_version) VALUES ('mvtnorm', '1.0-8');"
+fi

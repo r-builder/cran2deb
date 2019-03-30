@@ -1,9 +1,10 @@
 .onLoad <- function(libname, pkgname) {
-    global <- function(name,value) assign(name,value,envir=.GlobalEnv)
+    global <- function(name,value) assign(name, value, envir=.GlobalEnv)
     global("which_system", Sys.getenv('CRAN2DEB_SYS','debian-amd64'))
     if (!length(grep('^[a-z]+-[a-z0-9]+$',which_system))) {
         stop('Invalid system specification: must be of the form name-arch')
     }
+
     global("host_arch_c2d", gsub('^[a-z]+-','',which_system))
     global("maintainer_c2d", 'cran2deb4ubuntu <cran2deb4ubuntu@gmail.com>')
     global("root", system.file(package='cran2deb'))
@@ -29,7 +30,7 @@
 
     cache <- file.path(cache_root,'cache.rda')
     if (file.exists(cache)) {
-        load(cache,envir=.GlobalEnv)
+        load(cache, envir=.GlobalEnv)
     }
-    message(paste('I: cran2deb',scm_revision,'building for',which_system,'at',Sys.time()))
+    message(paste('I: cran2deb', scm_revision, 'building for', which_system, 'at', Sys.time()))
 }

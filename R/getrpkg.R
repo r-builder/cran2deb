@@ -27,8 +27,8 @@ download_pkg <- function(dir, pkgname) {
     if (!length(grep('^[A-Za-z0-9][A-Za-z0-9+.-]+$',pkg$name))) {
         fail('Cannot convert package name into a Debian name',pkg$name)
     }
-    pkg$srcname = pkgname_as_debian(pkg$name,binary=F)
-    pkg$debname = pkgname_as_debian(pkg$name,repo=pkg$repo)
+    pkg$srcname = pkgname_as_debian(pkg$name, binary=F)
+    pkg$debname = pkgname_as_debian(pkg$name, repo=pkg$repo)
     pkg$version <- available[pkgname,'Version']
 
     # see if we have already built this release and uploaded it.

@@ -275,8 +275,8 @@ class PackageBuilder:
                 # Upload deb to local repo
                 print(f'Adding {deb} to {_local_repo_root}')
                 subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
-                # to remove: reprepro remove rbuilders [name]
-                # to find: reprepro list rbuilders [name]
+                # to remove: reprepro -b /var/www/cran2deb/rep remove rbuilders [name]  (then need cran2deb build_force [name]
+                # to find: reprepro -b /var/www/cran2deb/rep list rbuilders [name]
 
             self._http_repo.refresh()
 

@@ -79,18 +79,34 @@ version_update <- function(rver, prev_pkgver, prev_success, verbose=TRUE) {
 
 new_build_version <- function(pkgname, verbose=FALSE) {
     cat("new_build_version: "," pkgname:",pkgname,"\n")
-    if (!(pkgname %in% rownames(available))) {
+
+    db_ver <- db_latest_build_version(pkgname)
+    if (verbose) {cat("db_ver: '", db_ver,"'\n", sep="")}
+
+    db_succ <- db_latest_build_status(pkgname)[[1]]
+    if (verbose) {cat("db_succ: '", db_succ,"'\n", sep="")}
+
+    latest_available = pkgname %in% rownames(available)
+
+    # Since available.packages will not pick up old packages with older R version dependencies to match
+    # the current R version, the user can manually add an entry to the packages to force it
+    # example: INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES ('mvtnorm', '1.0-8');
+    # So we default the the db_version unless the latest version is available
+    latest_r_ver <- db_ver
+
+    if(latest_available) {
+        latest_r_ver <- available[pkgname,'Version']
+    }
+    else if (is.null(db_ver)) {
         fail('tried to discover new version of',pkgname,'but it does not appear to be available')
     }
-    db_ver <- db_latest_build_version(pkgname)
-    if (verbose) {cat("db_ver: '",db_ver,"'\n",sep="")}
-    db_succ <- db_latest_build_status(pkgname)[[1]]
-    if (verbose) {cat("db_succ: '",db_succ,"'\n",sep="")}
-    latest_r_ver <- available[pkgname,'Version']
-    if (verbose) {cat("latest_r_ver: '",latest_r_ver,"'\n",sep="")}
+
+    if (verbose) {cat("latest_r_ver: '", latest_r_ver,"'\n", sep="")}
+
     if (!is.null(db_ver)) {
         return(version_update(latest_r_ver, db_ver, db_succ))
     }
+
     return(version_new(latest_r_ver))
 }
 
