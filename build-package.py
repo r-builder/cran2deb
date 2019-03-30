@@ -197,13 +197,13 @@ def _get_install_dependencies(deb_file_path: str) -> Set[PkgName]:
 
 
 def _get_local_repo_pkg(pkg_name: PkgName, version: str):
-    output = subprocess.check_output(['reprepro', "-T", "deb", 'list', 'rbuilders', pkg_name.cran_name.lower()], cwd=_local_repo_root).decode('utf-8')
+    output = subprocess.check_output(['reprepro', "-T", "deb", 'list', 'rbuilders', pkg_name.deb_name], cwd=_local_repo_root).decode('utf-8')
 
     for line in output.splitlines():
         # 'rbuilders|main|source: withr 2.1.2-1cran2'
         _, module_ver = line.split(": ", 1)
         module_name, vers_str = module_ver.split(" ", 1)
-        if module_name == pkg_name.cran_name.lower() and vers_str == version:
+        if module_name == pkg_name.deb_name and vers_str == version:
             return True
 
         return False
@@ -267,8 +267,10 @@ class PackageBuilder:
                 assert response.status_code == 200, f"Error with request {response}"
 
                 # Upload deb to local repo
-                print(f'Adding {deb} to {_local_repo_root}')
-                subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
+                if not _get_local_repo_pkg(pkg_name, version):
+                    print(f'Adding {deb} to {_local_repo_root}')
+                    subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
+
                 # to remove: reprepro -b /var/www/cran2deb/rep remove rbuilders [name]  (then need cran2deb build_force [name]
                 # to find: reprepro -b /var/www/cran2deb/rep list rbuilders [name]
 
