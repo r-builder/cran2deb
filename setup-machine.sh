@@ -139,6 +139,10 @@ cran2deb depend sysreq libicu57 "icu4c %"
 cran2deb depend alias_build libicu57 libicu-dev
 cran2deb depend alias_run libicu57 libicu57
 
+# rgeos
+cran2deb depend sysreq libgeos-3.5.1 "geos %"
+cran2deb depend alias_build libgeos-3.5.1 libgeos-dev
+cran2deb depend alias_run libgeos-3.5.1 libgeos-3.5.1
 
 # rgdal
 wipe_alias "libgdal%" "libgdal%" "libgdal%"
