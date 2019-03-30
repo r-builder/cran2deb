@@ -247,6 +247,7 @@ class PackageBuilder:
             assert len(debs) > 0, f"Did not find any debs in: {td}"
 
             print("Uploading to remote debian repo")
+            need_refresh = False
             for deb in debs:
                 # Ensure all the install dependencies get upload to the debian repo
                 deps = _get_install_dependencies(deb)
@@ -266,6 +267,7 @@ class PackageBuilder:
                     files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
                 assert response.status_code == 200, f"Error with request {response}"
 
+                need_refresh = True
                 # Upload deb to local repo
                 if not _get_local_repo_pkg(pkg_name, version):
                     print(f'Adding {deb} to {_local_repo_root}')
@@ -274,7 +276,8 @@ class PackageBuilder:
                 # to remove: reprepro -b /var/www/cran2deb/rep remove rbuilders [name]  (then need cran2deb build_force [name]
                 # to find: reprepro -b /var/www/cran2deb/rep list rbuilders [name]
 
-            self._http_repo.refresh()
+            if need_refresh:
+                self._http_repo.refresh()
 
     # NOTE: this can be recursive
     def build_pkg(self, cran_pkg_name: PkgName):

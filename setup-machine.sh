@@ -104,6 +104,7 @@ reset_module() {
     curl "https://deb.fbn.org/remove/stretch/r-cran-$1"
     curl "https://deb.fbn.org/remove/stretch/r-cran-$1-dbgsym"
     cran2deb build_force $1
+    ./build-package.py $1
 }
 
 # NOTE: these defaults come from populate_depend_aliases + populate_sysreq
@@ -154,6 +155,16 @@ cran2deb depend alias_run libgdal20 libgdal20
 cran2deb depend sysreq libproj12 "proj%"
 cran2deb depend alias_build libproj12 libproj-dev
 cran2deb depend alias_run libproj12 libproj12
+
+# RNetCDF
+wipe_alias "%netcdf%" "%netcdf%" "%netcdf%"
+cran2deb depend sysreq libnetcdf11 "netcdf%"
+cran2deb depend alias_build libnetcdf11 libnetcdf-dev
+cran2deb depend alias_run libnetcdf11 libnetcdf11
+cran2deb depend alias_build libnetcdf11 libhdf5-dev
+cran2deb depend alias_run libnetcdf11 libhdf5-100
+cran2deb depend alias_build libnetcdf11 libudunits2-dev
+cran2deb depend alias_run libnetcdf11 libudunits2-0
 
 # Fixups for old package versions
 if [[ ${R_VERSION} == 3.4* ]]; then
