@@ -91,9 +91,7 @@ cran2deb depend sysreq tzdata "A system with zoneinfo data%"
 cran2deb depend sysreq ignore "little-endian platform"
 
 # sysfonts / showtext
-# TODO: this is a problem because in data/populate_depend_aliases it sets these to the old versions
-#       can we force these or remove the other versions via the command line?  Perhaps add a new one
-#       if it doesn't exit
+sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM debian_dependency WHERE debian_pkg LIKE 'libpng%' OR alias LIKE 'libpng%';"
 cran2deb depend alias_build libpng libpng-dev
 cran2deb depend alias_run libpng libpng16-16
 cran2deb depend sysreq libpng16-16 libpng
@@ -103,6 +101,12 @@ cran2deb depend sysreq libcurl4-gnutls-dev libcurl
 
 # stringi
 cran2deb depend sysreq libicu-dev "icu4c %"
+
+# rgdal
+sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM debian_dependency WHERE debian_pkg LIKE 'libgdal%' OR alias LIKE 'libgdal%';"
+cran2deb depend alias_build libgdal libgdal-dev
+cran2deb depend alias_run libgdal libgdal20
+
 
 # Fixups for old package versions
 if [[ ${R_VERSION} == 3.4* ]]; then
