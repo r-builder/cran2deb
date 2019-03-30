@@ -105,8 +105,6 @@ sysreqs_as_debian <- function(sysreq_text, verbose=FALSE) {
         # no final dot and neither final blanks
         sysreq = gsub('\\.?\\s*$','',sysreq)
 
-        sysreq = gsub('\\.?\\s*$','',sysreq)
-
         if (nchar(sysreq) == 0) {
             notice('part of the SystemRequirement became nothing')
             next
