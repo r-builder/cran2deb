@@ -78,7 +78,7 @@ version_update <- function(rver, prev_pkgver, prev_success, verbose=TRUE) {
 }
 
 new_build_version <- function(pkgname, verbose=FALSE) {
-    cat("new_build_version: "," pkgname:",pkgname,"\n")
+    cat("new_build_version: pkgname:", pkgname,"\n")
 
     db_ver <- db_latest_build_version(pkgname)
     if (verbose) {cat("db_ver: '", db_ver,"'\n", sep="")}
@@ -99,8 +99,11 @@ new_build_version <- function(pkgname, verbose=FALSE) {
     }
     else if (!is.null(db_ver)) {
         latest_r_ver <- version_upstream(db_ver)
-        available[pkgname, 'Version'] <- latest_r_ver
-        available[pkgname, 'Repository'] <- "http://cran.r-project.org/src/contrib"
+
+        # TODO: fixme
+        available <- rbind(available, mvtnorm=c(Package="mvtnorm", Version=latest_r_ver, Repository="http://cran.r-project.org/src/contrib", Priority=NA, Depends=NA,
+        Imports=NA, LinkingTo=NA, Suggests=NA, Enhances=NA, License=NA, License_is_FOSS=NA, License_restricts_use=NA,
+        OS_type=NA, Archs=NA, MD5sum=NA, NeedsCompilation=NA, File=NA))
     }
     else {
         fail('tried to discover new version of',pkgname,'but it does not appear to be available')
