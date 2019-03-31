@@ -78,6 +78,14 @@ Pin-Priority: 1001
 Package: r-cran-latticeextra
 Pin: version 0.6-28-1cran1
 Pin-Priority: 1001
+
+Package: r-cran-date
+Pin: version 1.2-38-1cran1
+Pin-Priority: 1001
+
+Package: r-cran-maptools
+Pin: version 0.9-5-1cran1
+Pin-Priority: 1001
 EOF
 
 
