@@ -50,11 +50,11 @@ for (mirror.name in names(mirrors)) {
 	}
 }
 
-#available <- rbind(available,available.packages(contrib.url('http://www.bioconductor.org/')))
+#available <- rbind(available, available.packages(contrib.url('http://www.bioconductor.org/')))
 
 dupes <- duplicated(rownames(available), fromLast=T)
 if (sum(dupes)>0) {
-	if (verbose) cat("Found ",sum(dupes)," packages with the same name in different distributions. Those are now removed.\n",sep="")
+	if (verbose) cat("Found ", sum(dupes), " packages with the same name in different distributions. Those are now removed.\n",sep="")
 	available <- available[!dupes,,drop=F]
 } else {
 	if (length(mirrors)>1) cat("All packages have different names.")

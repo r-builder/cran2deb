@@ -179,15 +179,3 @@ cran2deb depend alias_run libjpeg libjpeg62
 
 
 python3 -m pip install distro
-
-# Fixups for old package versions
-if [[ ${R_VERSION} == 3.4* ]]; then
-    # latest mvtnorm is 3.5+
-    sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO packages (package,latest_r_version) VALUES ('mvtnorm', '1.0-8');"
-
-    scm_revision=$(r -q -e 'suppressPackageStartupMessages(library(cran2deb));cat(scm_revision)')
-
-    sqlite3 /var/cache/cran2deb/cran2deb.db "INSERT OR REPLACE INTO builds
-    (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES
-    ('mvtnorm', '${SYS}', '1.0-8', 0, 1, 1, 0, date('now'), strftime('%H:%M:%S.%f', 'now'), '${scm_revision}', '')"
-fi

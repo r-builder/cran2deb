@@ -152,25 +152,39 @@ def _reset_module(pkg_name: PkgName):
 
 def _ensure_old_versions():
     _old_packages = {
-        "mvtnorm": '1.0-8',
-        'multcomp': '1.4-8',
+        "mvtnorm": '1.0-8',  # latest mvtnorm is 3.5+
+        'multcomp': '1.4-8',  # Latest version requires latest mvtnorm which requires newer R version
     }
 
+    # Since available.packages will not pick up old packages with older R version dependencies to match
+    # the current R version, the user can manually add an entry to the packages to force it
+    # example: INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES ('mvtnorm', '1.0-8');
+    # So we default the the db_version unless the latest version is available
+
+    # This will fixes issues where a newer version of the package depends on a newer version of R
     conn = sqlite3.connect(_local_sqlite_path)
     conn.row_factory = sqlite3.Row
 
     scm_revision = subprocess.check_output(['r', '-q', '-e', 'suppressPackageStartupMessages(library(cran2deb));cat(scm_revision)']).decode('utf-8')
+    r_version = subprocess.check_output(["dpkg-query", "--showformat='${Version}'", "--show", "r-base-core"]).decode('utf-8')
+
+    if not r_version.startswith("3.4"):
+        return
 
     info = distro.lsb_release_info()
     system = f"{info['distributor_id'].lower()}-{info['codename']}"
 
     cur = conn.cursor()
     for name, ver in _old_packages.items():
+        cur.execute("INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES (?, ?);", [name, ver]);
+
         cur.execute("SELECT * FROM builds WHERE package=?", [name])
         rows = [row for row in cur]
 
         if rows and rows[0]['r_version'] == ver:
             continue
+
+        subprocess.check_call(['cran2deb', 'force_version', name, ver])
 
         if rows:
             _reset_module(PkgName(name, True))

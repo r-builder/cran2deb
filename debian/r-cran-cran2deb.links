@@ -13,6 +13,7 @@
 #/usr/lib/R/site-library/cran2deb/exec/db_release  /usr/bin/db_release
 #/usr/lib/R/site-library/cran2deb/exec/depclosure  /usr/bin/depclosure
 #/usr/lib/R/site-library/cran2deb/exec/depend  /usr/bin/depend
+#/usr/lib/R/site-library/cran2deb/exec/force_version  /usr/bin/force_version
 #/usr/lib/R/site-library/cran2deb/exec/diagnose  /usr/bin/diagnose
 #/usr/lib/R/site-library/cran2deb/exec/diagnose_ctv  /usr/bin/diagnose_ctv
 #/usr/lib/R/site-library/cran2deb/exec/get_base_pkgs  /usr/bin/get_base_pkgs

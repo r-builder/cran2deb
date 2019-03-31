@@ -86,30 +86,11 @@ new_build_version <- function(pkgname, verbose=FALSE) {
     db_succ <- db_latest_build_status(pkgname)[[1]]
     if (verbose) {cat("db_succ: '", db_succ,"'\n", sep="")}
 
-    latest_available = pkgname %in% rownames(available)
-
-    # Since available.packages will not pick up old packages with older R version dependencies to match
-    # the current R version, the user can manually add an entry to the packages to force it
-    # example: INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES ('mvtnorm', '1.0-8');
-    # So we default the the db_version unless the latest version is available
-    latest_r_ver <- NULL
-
-    if(latest_available) {
-        latest_r_ver <- available[pkgname,'Version']
-    }
-    else if (!is.null(db_ver)) {
-        latest_r_ver <- version_upstream(db_ver)
-
-        # TODO: this is wrong, it's not using matching the column names, instead relying on order
-        available <<- rbind(available, mvtnorm=c(Package=pkgname, Version=latest_r_ver, Priority=NA, Depends=NA,
-            Imports=NA, LinkingTo=NA, Suggests=NA, Enhances=NA, License=NA, License_is_FOSS=NA,
-            License_restricts_use=NA, OS_type=NA, Archs=NA, MD5sum=NA, NeedsCompilation=NA, File=NA,
-            Repository="http://cran.r-project.org/src/contrib"))
-    }
-    else {
-        fail('tried to discover new version of',pkgname,'but it does not appear to be available')
+    if (!(pkgname %in% rownames(available))) {
+        fail('tried to discover new version of', pkgname,'but it does not appear to be available')
     }
 
+    latest_r_ver <- available[pkgname,'Version']
     if (verbose) {cat("latest_r_ver: '", latest_r_ver,"'\n", sep="")}
 
     if (!is.null(db_ver)) {

@@ -1,0 +1,29 @@
+#!/usr/bin/r -t
+## DOC: cran2deb force_version package version
+## DOC:     Forces version of a specific package
+## DOC:
+suppressPackageStartupMessages(library(cran2deb))
+
+if (length(argv) != 3) {
+    pkgname = argv[2]
+    version <- version_upstream(argv[3], TRUE)
+
+    newrow <- cbind(Package=pkgname, Version=version, Repository="http://cran.r-project.org/src/contrib")
+
+    # re-order columns to match table
+    newrow <- newrow[match(colnames(available), colnames(newrow))]
+
+    if(pkgname %in% rownames(available)) {
+        available[pkgname,] <- newrow
+    }
+    else {
+        available <<- rbind(available, newrow)
+        rownames(available)[nrow(available)] <<- pkgname
+    }
+
+    cat(available[pkgname,])
+
+    save(debian_pkgs, base_pkgs, available, ctv.available, file=file.path(cache_root, 'cache.rda'), eval.promises=T)
+} else {
+   cat("usage: force_version pkg_name version\n")
+}
