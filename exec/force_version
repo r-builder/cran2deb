@@ -4,9 +4,9 @@
 ## DOC:
 suppressPackageStartupMessages(library(cran2deb))
 
-if (length(argv) != 3) {
+if (length(argv) == 3) {
     pkgname = argv[2]
-    version <- version_upstream(argv[3], TRUE)
+    version <- argv[3]
 
     newrow <- cbind(Package=pkgname, Version=version, Repository="http://cran.r-project.org/src/contrib")
 
@@ -17,8 +17,8 @@ if (length(argv) != 3) {
         available[pkgname,] <- newrow
     }
     else {
-        available <<- rbind(available, newrow)
-        rownames(available)[nrow(available)] <<- pkgname
+        available <- rbind(available, newrow)
+        rownames(available)[nrow(available)] <- pkgname
     }
 
     cat(available[pkgname,])

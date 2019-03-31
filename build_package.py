@@ -154,6 +154,7 @@ def _ensure_old_versions():
     _old_packages = {
         "mvtnorm": '1.0-8',  # latest mvtnorm is 3.5+
         'multcomp': '1.4-8',  # Latest version requires latest mvtnorm which requires newer R version
+        'caret': '6.0-81',
     }
 
     # Since available.packages will not pick up old packages with older R version dependencies to match
@@ -166,11 +167,12 @@ def _ensure_old_versions():
     conn.row_factory = sqlite3.Row
 
     scm_revision = subprocess.check_output(['r', '-q', '-e', 'suppressPackageStartupMessages(library(cran2deb));cat(scm_revision)']).decode('utf-8')
-    r_version = subprocess.check_output(["dpkg-query", "--showformat='${Version}'", "--show", "r-base-core"]).decode('utf-8')
+    r_version = subprocess.check_output(["dpkg-query", "--showformat=${Version}", "--show", "r-base-core"]).decode('utf-8')
 
     if not r_version.startswith("3.4"):
         return
 
+    print("Checking for old versions")
     info = distro.lsb_release_info()
     system = f"{info['distributor_id'].lower()}-{info['codename']}"
 
@@ -180,6 +182,7 @@ def _ensure_old_versions():
 
         cur.execute("SELECT * FROM builds WHERE package=?", [name])
         rows = [row for row in cur]
+        conn.commit()
 
         if rows and rows[0]['r_version'] == ver:
             continue
@@ -193,6 +196,8 @@ def _ensure_old_versions():
             cur.execute("""INSERT OR REPLACE INTO builds
                 (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES
                 (?, ?, ?, 0, 1, 1, 0, date('now'), strftime('%H:%M:%S.%f', 'now'), ?, '')""", [name, system, ver, scm_revision])
+
+        conn.commit()
 
 
 class DebRepos:

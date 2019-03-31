@@ -5,15 +5,11 @@ set -ex
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Install apt-get requirements
-# NOTE: these cannot use fbn-gdal et all because they require the system libs
-# TODO: remove deps not required by cran2deb, and re-build modules from script correctly adding the required deps to said cran modules
 apt-get update && \
     apt-get install -y --no-install-recommends \
-    pbuilder devscripts fakeroot dh-r reprepro sqlite3 lsb-release build-essential \
-    xvfb xfonts-base libcurl4-gnutls-dev libxml2-dev fontconfig imagemagick libcairo2-dev libatlas-base-dev libbz2-dev \
-    libexpat1 libfreetype6-dev libgflags-dev liblapack-dev liblzma-dev \
-    libopenblas-dev libpcre3-dev libpng-dev libpq-dev libproj-dev libreadline6-dev libssl-dev libyaml-dev \
-    r-cran-littler r-cran-hwriter equivs
+    pbuilder devscripts fakeroot dh-r reprepro sqlite3 lsb-release build-essential equivs \
+    libcurl4-gnutls-dev libxml2-dev libssl-dev \
+    r-cran-littler r-cran-hwriter
 
 # NOTE: if you enable this it can hang your docker container
 #export MAKEFLAGS='-j$(nproc)'
@@ -32,6 +28,7 @@ ipak(c("ctv", "RSQLite", "DBI", "digest", "getopt"))
 EOF
 
 Rscript /tmp/r_setup_pkgs.R
+rm /tmp/r_setup_pkgs.R
 
 # Install R cran2deb package and add bin symlink
 R CMD INSTALL "${this_dir}"
