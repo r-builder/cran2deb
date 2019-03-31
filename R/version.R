@@ -79,16 +79,15 @@ version_update <- function(rver, prev_pkgver, prev_success, verbose=TRUE) {
 
 new_build_version <- function(pkgname, verbose=FALSE) {
     cat("new_build_version: pkgname:", pkgname,"\n")
+    if (!(pkgname %in% rownames(available))) {
+        fail('tried to discover new version of',pkgname,'but it does not appear to be available')
+    }
 
     db_ver <- db_latest_build_version(pkgname)
     if (verbose) {cat("db_ver: '", db_ver,"'\n", sep="")}
 
     db_succ <- db_latest_build_status(pkgname)[[1]]
     if (verbose) {cat("db_succ: '", db_succ,"'\n", sep="")}
-
-    if (!(pkgname %in% rownames(available))) {
-        fail('tried to discover new version of', pkgname,'but it does not appear to be available')
-    }
 
     latest_r_ver <- available[pkgname,'Version']
     if (verbose) {cat("latest_r_ver: '", latest_r_ver,"'\n", sep="")}
