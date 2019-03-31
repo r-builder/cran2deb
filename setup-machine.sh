@@ -74,6 +74,10 @@ Pin-Priority: 1001
 Package: r-cran-xtable
 Pin: version 1.8-3-1cran1
 Pin-Priority: 1001
+
+Package: r-cran-latticeextra
+Pin: version 0.6-28-1cran1
+Pin-Priority: 1001
 EOF
 
 

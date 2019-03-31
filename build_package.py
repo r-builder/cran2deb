@@ -408,6 +408,7 @@ def _get_cran2deb_version(pkg_name: PkgName):
     if `debian_revision` == 1, it's actually 2, otherwise it's correct
 
     """
+    # TODO: this is slow, find a way to do this faster
     output = subprocess.check_output(['r', '-q', '-e', f"suppressMessages(library(cran2deb)); cat(new_build_version('{pkg_name.cran_name}'))"]).decode('utf-8')
 
     rver = None
