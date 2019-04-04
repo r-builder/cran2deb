@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 ## DOC: cran2deb repopulate
 ## DOC:     repopulate the cran2deb database and configurations from a new cran2deb release
 ## DOC:
 
-set -ex
+set -e
 
 dir=/etc/cran2deb
 if [[ ! -d "$dir" ]]; then
@@ -34,7 +34,7 @@ done) | "$root/exec/license" "$root"
     cat "$root/data/$fn"
 done) | "$root/exec/depend" "$root"
 
-if [[ $(lsb_release -i -s) = "Debian" && $(lsb_release -c -s) = "stretch" ]]; then
+if [[ "$(lsb_release -i -s)" = "Debian" && "$(lsb_release -c -s)" = "stretch" ]]; then
     (for fn in populate_debian_stretch_deps quit; do
         cat "$root/data/$fn"
     done) | "$root/exec/depend" "$root"

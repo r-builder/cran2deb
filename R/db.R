@@ -191,12 +191,12 @@ db_add_depends <- function(depend_alias,debian_pkg,build=F) {
 db_wipe_depends <- function(depend_alias, debian_pkg, alias) {
     con <- db_start()
 
-    dbGetQuery(con,'DELETE FROM sysreq_override WHERE depend_alias LIKE ' ,
-                    db_quote(tolower(depend_alias)))
+    dbGetQuery(con, paste('DELETE FROM sysreq_override WHERE depend_alias LIKE ' ,
+                    db_quote(tolower(depend_alias))))
 
-    dbGetQuery(con,'DELETE FROM debian_dependency WHERE debian_pkg LIKE ',
+    dbGetQuery(con, paste('DELETE FROM debian_dependency WHERE debian_pkg LIKE ',
                     db_quote(tolower(debian_pkg)), ' OR alias LIKE ',
-                    db_quote(tolower(alias)))
+                    db_quote(tolower(alias))))
     db_stop(con)
 }
 
@@ -366,8 +366,8 @@ db_builds <- function(pkgname) {
     con <- db_start()
     build <- dbGetQuery(con, paste('SELECT * FROM builds'
                        ,'WHERE success = 1'
-                       ,'AND system =',db_quote(which_system)
-                       ,'AND package =',db_quote(pkgname)))
+                       ,'AND system =', db_quote(which_system)
+                       ,'AND package =', db_quote(pkgname)))
     db_stop(con)
     if (length(build) == 0) {
         return(NULL)
