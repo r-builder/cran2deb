@@ -357,7 +357,7 @@ class PackageBuilder:
                 # Upload deb to local repo
                 if not self._deb_repos.local_has_version(pkg_name, version):
                     print(f'Adding {deb} to {_local_repo_root}')
-                    subprocess.check_call(['reprepro', '-b', _local_repo_root, '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb])
+                    subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
 
             if need_refresh:
                 self._deb_repos.refresh()
