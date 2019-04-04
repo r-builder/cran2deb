@@ -100,8 +100,11 @@ class PkgName:
     _name_replacements = _get_name_replacements()
 
     def __init__(self, pkg_name: str, force_cran: bool = False):
-        pkg_name, self.version = pkg_name.split("=", 1)
-        assert not set(self.version) & {'>', '<', '='}
+        self.version = None
+
+        if '=' in pkg_name:
+            pkg_name, self.version = pkg_name.split("=", 1)
+            assert not set(self.version) & {'>', '<', '='}
 
         if force_cran:
             self.cran_name = self._strip_r_cran_prefix(pkg_name)
