@@ -145,7 +145,7 @@ class PkgName:
 def _reset_module(pkg_name: PkgName):
     print(f"Forcing rebuild of {pkg_name}")
 
-    subprocess.check_call(["reprepro", "-b", _local_repo_root, "remove", "rbuilders", pkg_name.cran_name.lower(), f"{pkg_name.deb_name.lower()}-dbgsym"])
+    subprocess.check_call(["reprepro", "-b", _local_repo_root, "remove", "rbuilders", pkg_name.cran_name.lower(), pkg_name.deb_name.lower(), f"{pkg_name.deb_name.lower()}-dbgsym"])
 
     response = requests.get(f"https://deb.fbn.org/remove/{_distribution}/{pkg_name.deb_name}")
     assert response.status_code == 200, f"Error removing {pkg_name} from http repo with response code: {response.status_code}"
@@ -181,8 +181,6 @@ def _ensure_old_versions(old_packages: Dict[str, str]):
 
     cur = conn.cursor()
     for name, ver in old_packages.items():
-        cur.execute("INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES (?, ?);", [name, ver])
-
         cur.execute("SELECT * FROM builds WHERE package=?", [name])
         rows = [row for row in cur]
         conn.commit()
@@ -190,15 +188,18 @@ def _ensure_old_versions(old_packages: Dict[str, str]):
         if rows and rows[0]['r_version'] == ver:
             continue
 
+        # Drop old versions
+        cur.execute("""DELETE FROM packages WHERE package=?; DELETE FROM builds WHERE package=?;""", [name, name])
+        cur.execute("""INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES (?, ?);""", [name, ver])
+
         subprocess.check_call(['cran2deb', 'force_version', name, ver])
 
         if rows:
             _reset_module(PkgName(name, True))
-            cur.execute("""UPDATE builds SET r_version=?, success=0, log='' WHERE package=?""", [ver, name])
-        else:
-            cur.execute("""INSERT OR REPLACE INTO builds
-                (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES
-                (?, ?, ?, 0, 1, 1, 0, date('now'), strftime('%H:%M:%S.%f', 'now'), ?, '')""", [name, system, ver, scm_revision])
+
+        cur.execute("""INSERT OR REPLACE INTO builds
+            (package, system, r_version, deb_epoch, deb_revision, db_version, success, date_stamp, time_stamp, scm_revision, log) VALUES
+            (?, ?, ?, 0, 1, 1, 0, date('now'), strftime('%H:%M:%S.%f', 'now'), ?, '')""", [name, system, ver, scm_revision])
 
         conn.commit()
 
