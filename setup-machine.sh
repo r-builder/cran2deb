@@ -107,6 +107,10 @@ list_alias() {
     sqlite3 /var/cache/cran2deb/cran2deb.db "SELECT * FROM debian_dependency WHERE debian_pkg LIKE '$2' OR alias LIKE '$3';"
 }
 
+reset_pkg() {
+    reprepro -b /var/www/cran2deb/rep remove rbuilders $1
+    cran2deb build_force $1
+}
 
 # NOTE: these defaults come from populate_depend_aliases + populate_sysreq
 
@@ -180,9 +184,10 @@ cran2deb depend alias_run pandoc rst2pdf
 # raster
 cran2deb depend sysreq ignore "c++11"
 
-# jpeg
+# jpeg + tiff
 wipe_alias "%jpeg%" "%jpeg%" "%jpeg%"
 cran2deb depend sysreq libjpeg "libjpeg%"
+cran2deb depend sysreq libjpeg "jpeg libraries"
 cran2deb depend alias_build libjpeg libjpeg62-turbo-dev
 cran2deb depend alias_run libjpeg libjpeg62
 
@@ -194,5 +199,11 @@ cran2deb depend sysreq libglpk "glpk"
 cran2deb depend alias_build libglpk libglpk-dev
 cran2deb depend alias_run libglpk libglpk40
 
+# tiff
+wipe_alias "%libtiff%" "%libtiff%" "%libtiff%"
+cran2deb depend sysreq libtiff "tiff"
+cran2deb depend sysreq libtiff "libtiff"
+cran2deb depend alias_build libtiff libtiff5-dev
+cran2deb depend alias_run libtiff libtiff5
 
 python3 -m pip install distro

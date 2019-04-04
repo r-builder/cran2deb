@@ -293,6 +293,9 @@ class PackageBuilder:
         self._deb_repos: DebRepos = DebRepos()
 
     def _install_deps(self, deps: Set[PkgName]):
+        if not deps:
+            return
+
         # Ensure all the deps are available via the http deb repo
         for dep in deps:
             if not dep.cran_name:
