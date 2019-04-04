@@ -186,5 +186,13 @@ cran2deb depend sysreq libjpeg "libjpeg%"
 cran2deb depend alias_build libjpeg libjpeg62-turbo-dev
 cran2deb depend alias_run libjpeg libjpeg62
 
+# igraph
+cran2deb depend sysreq libgmp "gmp"
+cran2deb depend alias_build libgmp libgmp-dev
+cran2deb depend alias_run libgmp libgmp10
+cran2deb depend sysreq libglpk "glpk"
+cran2deb depend alias_build libglpk libglpk-dev
+cran2deb depend alias_run libglpk libglpk40
+
 
 python3 -m pip install distro
