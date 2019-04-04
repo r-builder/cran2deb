@@ -191,6 +191,9 @@ db_add_depends <- function(depend_alias,debian_pkg,build=F) {
 db_wipe_depends <- function(depend_alias, debian_pkg, alias) {
     con <- db_start()
 
+    # notice( paste('DELETE FROM sysreq_override WHERE depend_alias LIKE ' ,
+    #                 db_quote(tolower(depend_alias))))
+
     dbGetQuery(con, paste('DELETE FROM sysreq_override WHERE depend_alias LIKE ' ,
                     db_quote(tolower(depend_alias))))
 
