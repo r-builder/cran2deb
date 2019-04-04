@@ -5,6 +5,7 @@ set -ex
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Install apt-get requirements
+# !!!NOTE!!! You should use the version which supports multiple versions: https://github.com/profitbricks/reprepro
 apt-get update && \
     apt-get install -y --no-install-recommends \
     pbuilder devscripts fakeroot dh-r reprepro sqlite3 lsb-release build-essential equivs \
@@ -102,6 +103,7 @@ reset_cran2deb() {
     # Will reset
     rm -rf /var/www/cran2deb/rep/db/ /var/www/cran2deb/rep/lists /var/www/cran2deb/rep/pool /var/www/cran2deb/rep/dists/
     sqlite3 /var/cache/cran2deb/cran2deb.db "DROP TABLE builds; DROP TABLE packages;"
+    sqlite3 /var/cache/cran2deb/cran2deb.db "DELETE FROM sysreq_override; DELETE FROM debian_dependency; DELETE FROM license_override;"
     cran2deb repopulate
 }
 
