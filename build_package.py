@@ -189,7 +189,9 @@ def _ensure_old_versions(old_packages: Dict[str, str]):
             continue
 
         # Drop old versions
-        cur.execute("""DELETE FROM packages WHERE package=?; DELETE FROM builds WHERE package=?;""", [name, name])
+        cur.execute("""DELETE FROM packages WHERE package=?; """, [name])
+        cur.execute("""DELETE FROM builds WHERE package=?; """, [name])
+
         cur.execute("""INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES (?, ?);""", [name, ver])
 
         subprocess.check_call(['cran2deb', 'force_version', name, ver])
