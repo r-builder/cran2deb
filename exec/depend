@@ -44,7 +44,7 @@ exec_cmd <- function(argc, argv) {
             return()
         }
         sysreq = paste(argv[3:argc],collapse=' ')
-        db_add_sysreq_override(sysreq,argv[2])
+        db_add_sysreq_override(sysreq, argv[2])
     } else if (cmd == 'force') {
         if (argc < 3) {
             usage()
@@ -75,6 +75,16 @@ exec_cmd <- function(argc, argv) {
             usage()
             return()
         }
+    } else if (cmd == 'wipe_alias') {
+        if (argc < 4) {
+            usage()
+            return()
+        }
+
+        depend_alias = argv[2]
+        debian_pkg = argv[3]
+        alias = argv[4]
+        db_wipe_depends(depend_alias, debian_pkg, alias)
     } else if (cmd == 'quit') {
         exit()
     } else if (cmd == '#') {

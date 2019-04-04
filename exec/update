@@ -6,7 +6,7 @@
 ## DOC:     force a full update of the cran2deb cache and database
 ## DOC:
 
-set -e
+set -ex
 
 umask 002
 root=$1

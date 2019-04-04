@@ -25,6 +25,7 @@ Codename: rbuilders
 Components: main
 Architectures: source amd64
 Description: Debian Repository
+Limit: 0
 """
 
 _ipak_r_method = """
@@ -162,6 +163,8 @@ def _ensure_old_versions(old_packages: Dict[str, str]):
     # example: INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES ('mvtnorm', '1.0-8');
     # So we default the the db_version unless the latest version is available
 
+    # NOTE: to reset the DB after these changes you must run: `cran2deb repopulate`
+
     # This will fixes issues where a newer version of the package depends on a newer version of R
     conn = sqlite3.connect(_local_sqlite_path)
     conn.row_factory = sqlite3.Row
@@ -219,7 +222,7 @@ class DebRepos:
                 self._http_deb_info[row['name']].add(deb_ver)
 
     def _local_refresh(self):
-        output = subprocess.check_output(['reprepro', "-T", "deb", 'list', 'rbuilders'], cwd=_local_repo_root).decode('utf-8')
+        output = subprocess.check_output(['reprepro', '-b', _local_repo_root, "-T", "deb", 'list', 'rbuilders']).decode('utf-8')
 
         self._local_deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
 
@@ -353,7 +356,7 @@ class PackageBuilder:
                 # Upload deb to local repo
                 if not self._deb_repos.local_has_version(pkg_name, version):
                     print(f'Adding {deb} to {_local_repo_root}')
-                    subprocess.check_call(['reprepro', '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb], cwd=_local_repo_root)
+                    subprocess.check_call(['reprepro', '-b', _local_repo_root, '--ignore=wrongdistribution', '--ignore=missingfile', '-b', '.', 'includedeb', 'rbuilders', deb])
 
             if need_refresh:
                 self._deb_repos.refresh()

@@ -4,10 +4,10 @@
 ## DOC:     repopulate the cran2deb database and configurations from a new cran2deb release
 ## DOC:
 
-set -e
+set -ex
 
 dir=/etc/cran2deb
-if [ ! -d "$dir" ]; then
+if [[ ! -d "$dir" ]]; then
        echo "Dir $dir not existing."
        exit -1
 fi
@@ -34,3 +34,8 @@ done) | "$root/exec/license" "$root"
     cat "$root/data/$fn"
 done) | "$root/exec/depend" "$root"
 
+if [[ $(lsb_release -i -s) = "Debian" && $(lsb_release -c -s) = "stretch" ]]; then
+    (for fn in populate_debian_stretch_deps quit; do
+        cat "$root/data/$fn"
+    done) | "$root/exec/depend" "$root"
+fi
