@@ -100,6 +100,9 @@ class PkgName:
     _name_replacements = _get_name_replacements()
 
     def __init__(self, pkg_name: str, force_cran: bool = False):
+        pkg_name, self.version = pkg_name.split("=", 1)
+        assert not set(self.version) & {'>', '<', '='}
+
         if force_cran:
             self.cran_name = self._strip_r_cran_prefix(pkg_name)
             self.deb_name = self._ensure_r_cran_prefix(pkg_name)
@@ -150,13 +153,7 @@ def _reset_module(pkg_name: PkgName):
     subprocess.check_call(["cran2deb", "build_force", pkg_name.cran_name])
 
 
-def _ensure_old_versions():
-    _old_packages = {
-        "mvtnorm": '1.0-8',  # latest mvtnorm is 3.5+
-        'multcomp': '1.4-8',  # Latest version requires latest mvtnorm which requires newer R version
-        'caret': '6.0-81',
-    }
-
+def _ensure_old_versions(old_packages: Dict[str, str]):
     # Since available.packages will not pick up old packages with older R version dependencies to match
     # the current R version, the user can manually add an entry to the packages to force it
     # example: INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES ('mvtnorm', '1.0-8');
@@ -177,8 +174,8 @@ def _ensure_old_versions():
     system = f"{info['distributor_id'].lower()}-{info['codename']}"
 
     cur = conn.cursor()
-    for name, ver in _old_packages.items():
-        cur.execute("INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES (?, ?);", [name, ver]);
+    for name, ver in old_packages.items():
+        cur.execute("INSERT OR REPLACE INTO packages (package, latest_r_version) VALUES (?, ?);", [name, ver])
 
         cur.execute("SELECT * FROM builds WHERE package=?", [name])
         rows = [row for row in cur]
@@ -438,7 +435,7 @@ def _get_cran2deb_version(pkg_name: PkgName):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-origin', type=str, default='deb.fbn.org', help='Debian Repo hostname')
-    parser.add_argument('cran_pkg_name', type=str, nargs='+', help='package to build.  ex: ggplot2')
+    parser.add_argument('cran_pkg_name', type=str, nargs='+', help='package to build.  ex: ggplot2.  To force specific version: ggplot2=1.2.3')
 
     app_args = parser.parse_args()
 
@@ -448,12 +445,22 @@ def main():
     with open(_dist_path, "w") as f:
         f.write(_dist_template.format(origin=app_args.origin))
 
-    _ensure_old_versions()
+    old_packages = {
+        "mvtnorm": '1.0-8',  # latest mvtnorm is 3.5+
+        'multcomp': '1.4-8',  # Latest version requires latest mvtnorm which requires newer R version
+        'caret': '6.0-81',
+    }
+
+    _ensure_old_versions(old_packages)
 
     pkg_builder = PackageBuilder()
 
     for cran_pkg_name in app_args.cran_pkg_name:
         cran_pkg_name = PkgName(cran_pkg_name, True)
+
+        if cran_pkg_name.version:
+            _ensure_old_versions({cran_pkg_name.cran_name: cran_pkg_name.version})
+
         pkg_builder.build_pkg(cran_pkg_name)
 
 
