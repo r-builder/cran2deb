@@ -12,10 +12,12 @@ apt-get update && \
     libcurl4-gnutls-dev libxml2-dev libssl-dev \
     r-cran-littler r-cran-hwriter
 
-# TODO: fix this to do one at a time, otherwise first missing module will trigger the whole cmt to fail
 # Attempt to install packages
-# r-cran-ctv r-cran-rsqlite
-apt-get install -y --no-install-recommends  r-cran-dbi r-cran-digest r-cran-getopt || 1
+# TODO: combine this list and below list
+required_modules=("r-cran-ctv" "r-cran-rsqlite", "r-cran-dbi", "r-cran-digest", "r-cran-getopt")
+for module in ${required_modules[*]}; do
+     apt-get install -y --no-install-recommends $module || 1
+done
 
 # NOTE: if you enable this it can hang your docker container
 #export MAKEFLAGS='-j$(nproc)'
