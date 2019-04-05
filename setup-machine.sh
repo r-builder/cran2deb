@@ -15,7 +15,7 @@ apt-get update && \
 # Attempt to install packages
 # TODO: combine this list and below list
 set +e
-required_modules=("r-cran-ctv", "r-cran-rsqlite", "r-cran-dbi", "r-cran-digest", "r-cran-getopt")
+required_modules=("r-cran-ctv" "r-cran-rsqlite" "r-cran-dbi" "r-cran-digest" "r-cran-getopt")
 for module in ${required_modules[*]}; do
      apt-get install -y --no-install-recommends $module
 done
