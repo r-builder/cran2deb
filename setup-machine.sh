@@ -14,12 +14,12 @@ apt-get update && \
 
 # Attempt to install packages
 # TODO: combine this list and below list
-set +x
+set +e
 required_modules=("r-cran-ctv" "r-cran-rsqlite", "r-cran-dbi", "r-cran-digest", "r-cran-getopt")
 for module in ${required_modules[*]}; do
      apt-get install -y --no-install-recommends $module
 done
-set -x
+set -e
 
 # NOTE: if you enable this it can hang your docker container
 #export MAKEFLAGS='-j$(nproc)'
