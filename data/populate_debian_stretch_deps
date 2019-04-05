@@ -67,3 +67,5 @@ alias_run zlib1g zlib1g
 sysreq libssh2-1 library . libssh to enable the ssh transport
 alias_build libssh2-1 libssh2-1-dev
 alias_run libssh2-1 libssh2-1
+sysreq xclip xclip or xsel for accessing the x clipboard
+alias_run xclip xclip
