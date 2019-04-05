@@ -12,10 +12,16 @@ apt-get update && \
     libcurl4-gnutls-dev libxml2-dev libssl-dev \
     r-cran-littler r-cran-hwriter
 
+# TODO: fix this to do one at a time, otherwise first missing module will trigger the whole cmt to fail
+# Attempt to install packages
+# r-cran-ctv r-cran-rsqlite
+apt-get install -y --no-install-recommends  r-cran-dbi r-cran-digest r-cran-getopt || 1
+
 # NOTE: if you enable this it can hang your docker container
 #export MAKEFLAGS='-j$(nproc)'
+export MAKEFLAGS='-j2'
 
-# Install R packages not available via apt-get
+# Install R packages requirements
 cat << EOF > /tmp/r_setup_pkgs.R
 ipak <- function(pkg) {
     new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -34,11 +40,11 @@ rm /tmp/r_setup_pkgs.R
 # Install R cran2deb package and add bin symlink
 R CMD INSTALL "${this_dir}"
 
-chmod u+x /usr/bin/cran2deb
-
 if [[ ! -e "/usr/bin/cran2deb" ]]; then
     ln -s /root/cran2deb/exec/cran2deb /usr/bin/
 fi
+
+chmod u+x /usr/bin/cran2deb
 
 export ROOT=$(cran2deb root)
 export ARCH=$(dpkg --print-architecture)
