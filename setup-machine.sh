@@ -34,6 +34,8 @@ rm /tmp/r_setup_pkgs.R
 # Install R cran2deb package and add bin symlink
 R CMD INSTALL "${this_dir}"
 
+chmod u+x /usr/bin/cran2deb
+
 if [[ ! -e "/usr/bin/cran2deb" ]]; then
     ln -s /root/cran2deb/exec/cran2deb /usr/bin/
 fi
