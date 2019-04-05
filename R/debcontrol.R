@@ -92,7 +92,7 @@ sysreqs_as_debian <- function(sysreq_text, verbose=FALSE) {
         alias <- db_sysreq_override(sysreq)
 
         if (is.null(alias) || !length(alias)) {
-            notice('do not know what to do with SystemRequirement:', sysreq, "attempting substitutions")
+            notice("do not know what to do with SystemRequirement:'", sysreq, "'attempting substitutions")
 
             # drop version information/comments for now
             sysreq = gsub('[[][^])]*[]]','',sysreq)
@@ -119,7 +119,7 @@ sysreqs_as_debian <- function(sysreq_text, verbose=FALSE) {
         }
 
         if (is.null(alias) || !length(alias)) {
-            error('do not know what to do with SystemRequirement:', sysreq)
+            error("do not know what to do with SystemRequirement:'", sysreq, "'")
             error('original SystemRequirement:',startreq)
             fail('unmet system requirement')
         }

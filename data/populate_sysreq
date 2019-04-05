@@ -107,3 +107,6 @@ sysreq ignore libgslldbl
 sysreq ignore libgsldev 
 sysreq ignore svmlight 
 sysreq gsl gsl 
+sysreq ignore By default
+sysreq ignore library. however
+sysreq ignore if a system installation is not available
