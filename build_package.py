@@ -329,6 +329,21 @@ class PackageBuilder:
             self._install_deps(deps)
 
             subprocess.check_call(["mk-build-deps", "-i", "-r", "-t", "apt-get --no-install-recommends -y"], cwd=dirs[0])
+
+            if pkg_name.cran_name.lower() == "rgeos":
+                print("Applying custom FBN patches to rgeos")
+                # for some reason dpkg-build does not find geos-config in /usr/local/bin
+                if not os.path.exists("/usr/bin/geos-config"):
+                    # TODO: add cleanup
+                    os.symlink("/usr/local/bin/geos-config", "/usr/bin/geos-config")
+
+                # And for some reason it cannot determine the package of libgeos_c.so.1 belongs to fbn-libgeos
+                # TODO: figure out why and impl better fix
+                debian_shlibs_path = os.path.join(dirs[0], "debian", "shlibs.local")
+                if not os.path.exists(debian_shlibs_path):
+                    with open(debian_shlibs_path, "w") as f:
+                        f.write("libgeos_c 1 fbn-libgeos")
+
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
             debs = glob.glob(f"{td}/*.deb")
