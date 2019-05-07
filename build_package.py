@@ -353,6 +353,10 @@ class PackageBuilder:
                     # TODO: add cleanup
                     os.symlink("/usr/local/bin/gdal-config", "/usr/bin/gdal-config")
 
+                if not os.path.exists(debian_shlibs_path):
+                    with open(debian_shlibs_path, "w") as f:
+                        f.write("libgdal 20 fbn-libgdal")
+
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
             debs = glob.glob(f"{td}/*.deb")
