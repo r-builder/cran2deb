@@ -29,7 +29,9 @@ alias_run libproj12 libproj12
 wipe_alias %netcdf% %netcdf% %netcdf%
 sysreq libnetcdf netcdf%
 alias_build libnetcdf fbn-libnetcdf
+alias_build libnetcdf libudunits2-dev
 alias_run libnetcdf fbn-libnetcdf
+alias_run libnetcdf libudunits2-0
 sysreq pandoc pandoc %
 alias_build pandoc pandoc
 alias_run pandoc pandoc
