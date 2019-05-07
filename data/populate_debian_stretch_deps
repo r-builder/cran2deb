@@ -15,26 +15,21 @@ sysreq libcurl3-gnutls libcurl: %
 sysreq libicu57 icu4c %
 alias_build libicu57 libicu-dev
 alias_run libicu57 libicu57
-sysreq libgeos-3.5.1 geos %
-alias_build libgeos-3.5.1 libgeos-dev
-alias_run libgeos-3.5.1 libgeos-3.5.1
+sysreq libgeos geos %
+alias_build libgeos fbn-libgeos
+alias_run libgeos fbn-libgeos
 wipe_alias libgdal% libgdal% libgdal%
 wipe_alias proj proj proj
-sysreq libgdal20 %gdal%
-alias_build libgdal20 libgdal-dev
-alias_build libgdal20 gdal-bin
-alias_run libgdal20 libgdal20
+sysreq libgdal %gdal%
+alias_build libgdal fbn-libgdal
+alias_run libgdal fbn-libgdal
 sysreq libproj12 proj%
 alias_build libproj12 libproj-dev
 alias_run libproj12 libproj12
 wipe_alias %netcdf% %netcdf% %netcdf%
-sysreq libnetcdf11 netcdf%
-alias_build libnetcdf11 libnetcdf-dev
-alias_run libnetcdf11 libnetcdf11
-alias_build libnetcdf11 libhdf5-dev
-alias_run libnetcdf11 libhdf5-100
-alias_build libnetcdf11 libudunits2-dev
-alias_run libnetcdf11 libudunits2-0
+sysreq libnetcdf netcdf%
+alias_build libnetcdf fbn-libnetcdf
+alias_run libnetcdf fbn-libnetcdf
 sysreq pandoc pandoc %
 alias_build pandoc pandoc
 alias_run pandoc pandoc
