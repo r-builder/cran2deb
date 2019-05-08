@@ -76,29 +76,11 @@ cran2deb update
 # TODO: we need to ensure we build a newer version than what's available via apt-get
 # NOTE: clients will need this as well
 cat << EOF > /etc/apt/preferences
-Package: r-cran-magrittr
-Pin: version 1.5-1cran1
-Pin-Priority: 1001
+# These are to override the newer than cran versions that debian contains
+# See https://github.com/farmersbusinessnetwork/wiki/wiki/FBN-CRAN--Debian-Images for details
 
-Package: r-cran-sp
-Pin: version 1.3-1-1cran1
-Pin-Priority: 1001
-
-Package: r-cran-xtable
-Pin: version 1.8-3-1cran1
-Pin-Priority: 1001
-
-Package: r-cran-latticeextra
-Pin: version 0.6-28-1cran1
-Pin-Priority: 1001
-
-Package: r-cran-date
-Pin: version 1.2-38-1cran1
-Pin-Priority: 1001
-
-Package: r-cran-maptools
-Pin: version 0.9-5-1cran1
-Pin-Priority: 1001
+Package: *
+Pin: origin deb.fbn.org
 EOF
 
 
