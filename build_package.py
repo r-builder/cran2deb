@@ -332,7 +332,7 @@ class PackageBuilder:
 
             debian_shlibs_path = os.path.join(dirs[0], "debian", "shlibs.local")
 
-            if pkg_name.cran_name.lower() == "rgeos":
+            if pkg_name.cran_name.lower() in {"rgeos", "sf"}:
                 print("Applying custom FBN patches to rgeos")
                 # for some reason dpkg-build does not find geos-config in /usr/local/bin
                 if not os.path.exists("/usr/bin/geos-config"):
@@ -341,21 +341,20 @@ class PackageBuilder:
 
                 # And for some reason it cannot determine the package of libgeos_c.so.1 belongs to fbn-libgeos
                 # TODO: figure out why and impl better fix
-                if not os.path.exists(debian_shlibs_path):
-                    with open(debian_shlibs_path, "w") as f:
-                        f.write("libgeos_c 1 fbn-libgeos")
-            elif pkg_name.cran_name.lower() == "rnetcdf":
-                if not os.path.exists(debian_shlibs_path):
-                    with open(debian_shlibs_path, "w") as f:
-                        f.write("libnetcdf 13 fbn-libnetcdf")
-            elif pkg_name.cran_name.lower() in {"rgdal", "sf"}:
+                with open(debian_shlibs_path, "a") as f:
+                    f.write("libgeos_c 1 fbn-libgeos" + os.linesep)
+
+            if pkg_name.cran_name.lower() == "rnetcdf":
+                with open(debian_shlibs_path, "a") as f:
+                    f.write("libnetcdf 13 fbn-libnetcdf" + os.linesep)
+
+            if pkg_name.cran_name.lower() in {"rgdal", "sf"}:
                 if not os.path.exists("/usr/bin/gdal-config"):
                     # TODO: add cleanup
                     os.symlink("/usr/local/bin/gdal-config", "/usr/bin/gdal-config")
 
-                if not os.path.exists(debian_shlibs_path):
-                    with open(debian_shlibs_path, "w") as f:
-                        f.write("libgdal 20 fbn-libgdal")
+                with open(debian_shlibs_path, "a") as f:
+                    f.write("libgdal 20 fbn-libgdal" + os.linesep)
 
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 
