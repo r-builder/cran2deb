@@ -70,7 +70,7 @@ alias_build odbc unixodbc-dev
 alias_build mysql libmysqlclient-dev 
 alias_build mpi libopenmpi-dev 
 alias_build pvm pvm-dev 
-alias_build hdf5 libhdf5-serial-dev 
+alias_build hdf5 fbn-libhdf5
 alias_build sprng libsprng2-dev 
 alias_build libtiff libtiff4-dev 
 alias_build fftw libfftw3-dev 
