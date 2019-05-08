@@ -77,8 +77,6 @@ cran2deb update
 # NOTE: clients will need this as well
 cat << EOF > /etc/apt/preferences
 # These are to override the newer than cran versions that debian contains
-# See https://github.com/farmersbusinessnetwork/wiki/wiki/FBN-CRAN--Debian-Images for details
-
 Package: *
 Pin: origin deb.fbn.org
 EOF
