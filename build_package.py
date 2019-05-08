@@ -487,7 +487,7 @@ def main():
         "mvtnorm": '1.0-8',  # latest mvtnorm is 3.5+
         'multcomp': '1.4-8',  # Latest version requires latest mvtnorm which requires newer R version
         'caret': '6.0-81',
-        'units': '1.3.1'
+        'udunits': '1.3.1'
     }
 
     _ensure_old_versions(old_packages)
