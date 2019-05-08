@@ -348,7 +348,7 @@ class PackageBuilder:
                 if not os.path.exists(debian_shlibs_path):
                     with open(debian_shlibs_path, "w") as f:
                         f.write("libnetcdf 13 fbn-libnetcdf")
-            elif pkg_name.cran_name.lower() == "rgdal":
+            elif pkg_name.cran_name.lower() in {"rgdal", "sf"}:
                 if not os.path.exists("/usr/bin/gdal-config"):
                     # TODO: add cleanup
                     os.symlink("/usr/local/bin/gdal-config", "/usr/bin/gdal-config")
