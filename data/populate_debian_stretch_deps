@@ -67,3 +67,5 @@ alias_run libssh2-1 libssh2-1
 sysreq ignore xclip or xsel for accessing the x clipboard
 sysreq ignore subversion for install_svn
 sysreq ignore git for install_git
+sysreq ignore if a system installation is not available
+sysreq ignore builds
