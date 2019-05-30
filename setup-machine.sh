@@ -45,10 +45,10 @@ rm /tmp/r_setup_pkgs.R
 R CMD INSTALL "${this_dir}"
 
 if [[ ! -e "/usr/bin/cran2deb" ]]; then
-    ln -s /root/cran2deb/exec/cran2deb /usr/bin/
+    ln -s /cran2deb/exec/cran2deb /usr/bin/
 fi
 
-chmod u+x /usr/bin/cran2deb || true
+chmod u+x /usr/bin/cran2deb
 
 export ROOT=$(cran2deb root)
 export ARCH=$(dpkg --print-architecture)
