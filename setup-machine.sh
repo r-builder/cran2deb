@@ -48,7 +48,7 @@ if [[ ! -e "/usr/bin/cran2deb" ]]; then
     ln -s /root/cran2deb/exec/cran2deb /usr/bin/
 fi
 
-chmod u+x /usr/bin/cran2deb
+chmod u+x /usr/bin/cran2deb || true
 
 export ROOT=$(cran2deb root)
 export ARCH=$(dpkg --print-architecture)
@@ -79,8 +79,9 @@ cat << EOF > /etc/apt/preferences
 # These are to override the newer than cran versions that debian contains
 Package: *
 Pin: origin deb.fbn.org
-EOF
 
+EOF
+# Important to have newline at end of file <sigh>
 
 list_alias() {
     depend_alias=$1
