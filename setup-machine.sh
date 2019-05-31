@@ -79,7 +79,7 @@ cat << EOF > /etc/apt/preferences
 # These are to override the newer than cran versions that debian contains
 Package: *
 Pin: origin deb.fbn.org
-
+Pin-Priority: 700
 EOF
 # Important to have newline at end of file <sigh>
 
