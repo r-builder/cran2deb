@@ -1,0 +1,75 @@
+wipe_alias udunits% udunits% udunits%
+sysreq udunits udunits%
+alias_build udunits libudunits2-dev
+alias_run udunits libudunits2-0
+sysreq libssl1.1 openssl
+sysreq libssl1.1 library. openssl headers
+alias_build libssl1.1 libssl-dev
+alias_run libssl1.1 libssl1.1
+sysreq tzdata A system with zoneinfo data%
+sysreq ignore little-endian platform
+wipe_alias libpng% libpng% libpng%
+sysreq libpng16-16 libpng
+alias_build libpng16-16 libpng-dev
+alias_run libpng16-16 libpng16-16
+sysreq libcurl4-gnutls libcurl
+alias_build libcurl4-gnutls libcurl4-gnutls-dev
+alias_run libcurl4-gnutls libcurl4-gnutls
+sysreq libcurl4-gnutls libcurl: %
+sysreq libicu63 icu4c %
+alias_build libicu63 libicu-dev
+alias_run libicu63 libicu63
+sysreq libgeos geos %
+alias_build libgeos fbn-libgeos
+alias_run libgeos fbn-libgeos
+wipe_alias libgdal% libgdal% libgdal%
+wipe_alias proj proj proj
+sysreq libgdal %gdal%
+alias_build libgdal fbn-libgdal
+alias_run libgdal fbn-libgdal
+sysreq libproj proj%
+alias_build libproj fbn-libproj
+alias_run libproj fbn-libproj
+wipe_alias %netcdf% %netcdf% %netcdf%
+sysreq libnetcdf netcdf%
+alias_build libnetcdf fbn-libnetcdf
+alias_build libnetcdf libudunits2-dev
+alias_run libnetcdf fbn-libnetcdf
+alias_run libnetcdf libudunits2-0
+sysreq pandoc pandoc %
+alias_build pandoc pandoc
+alias_run pandoc pandoc
+sysreq pandoc Package vignettes based on R Markdown %
+alias_build pandoc rst2pdf
+alias_run pandoc rst2pdf
+sysreq ignore c++11
+wipe_alias %jpeg% %jpeg% %jpeg%
+sysreq libjpeg libjpeg%
+sysreq libjpeg jpeg libraries
+alias_build libjpeg libjpeg62-turbo-dev
+alias_run libjpeg libjpeg62
+sysreq libgmp gmp
+alias_build libgmp libgmp-dev
+alias_run libgmp libgmp10
+sysreq libglpk glpk
+alias_build libglpk libglpk-dev
+alias_run libglpk libglpk40
+wipe_alias %libtiff% %libtiff% %libtiff%
+sysreq libtiff tiff
+sysreq libtiff libtiff
+alias_build libtiff libtiff5-dev
+alias_run libtiff libtiff5
+sysreq libgit2 gitr uses a system installation of the libgit headers
+alias_build libgit2 libgit2-dev
+alias_run libgit2 libgit2-27
+sysreq zlib1g uses a bundled of the libgit source. zlib headers
+alias_build zlib1g zlib1g-dev
+alias_run zlib1g zlib1g
+sysreq libssh2-1 library . libssh to enable the ssh transport
+alias_build libssh2-1 libssh2-1-dev
+alias_run libssh2-1 libssh2-1
+sysreq ignore xclip or xsel for accessing the x clipboard
+sysreq ignore subversion for install_svn
+sysreq ignore git for install_git
+sysreq ignore if a system installation is not available
+sysreq ignore builds

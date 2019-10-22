@@ -9,7 +9,7 @@ set -e
 dir=/etc/cran2deb
 if [[ ! -d "$dir" ]]; then
        echo "Dir $dir not existing."
-       exit -1
+       exit 1
 fi
 
 umask 002
@@ -34,8 +34,10 @@ done) | "$root/exec/license" "$root"
     cat "$root/data/$fn"
 done) | "$root/exec/depend" "$root"
 
-if [[ "$(lsb_release -i -s)" = "Debian" && "$(lsb_release -c -s)" = "stretch" ]]; then
-    (for fn in populate_debian_stretch_deps quit; do
+distribution=$(lsb_release -c -s)
+
+if [[ "$(lsb_release -i -s)" = "Debian" ]]; then
+    (for fn in "populate_debian_${distribution}_deps" quit; do
         cat "$root/data/$fn"
     done) | "$root/exec/depend" "$root"
 fi
