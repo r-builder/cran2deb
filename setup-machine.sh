@@ -10,7 +10,7 @@ apt-get update && \
     apt-get install -y --no-install-recommends \
     pbuilder devscripts fakeroot dh-r reprepro sqlite3 lsb-release build-essential equivs \
     libcurl4-gnutls-dev libxml2-dev libssl-dev \
-    r-cran-littler r-cran-hwriter
+    r-cran-littler r-cran-hwriter cdbs
 
 # Attempt to install packages
 # TODO: combine this list and below list
@@ -45,7 +45,11 @@ rm /tmp/r_setup_pkgs.R
 R CMD INSTALL "${this_dir}"
 
 if [[ ! -e "/usr/bin/cran2deb" ]]; then
-    ln -s /root/cran2deb/exec/cran2deb /usr/bin/
+    if [[ -f "/root/cran2deb/exec/cran2deb" ]]; then
+      ln -s "/root/cran2deb/exec/cran2deb" /usr/bin/
+    elif [[ -f "/usr/local/lib/R/site-library/cran2deb/exec/cran2deb" ]]; then
+      ln -s "/usr/local/lib/R/site-library/cran2deb/exec/cran2deb" /usr/bin/
+    fi
 fi
 
 chmod u+x /usr/bin/cran2deb
@@ -71,18 +75,6 @@ fi
 cran2deb repopulate
 cran2deb update
 
-# TODO: These are specific to stretch, should encapsulate these into a table
-
-# TODO: we need to ensure we build a newer version than what's available via apt-get
-# NOTE: clients will need this as well
-cat << EOF > /etc/apt/preferences
-# These are to override the newer than cran versions that debian contains
-Package: *
-Pin: origin deb.fbn.org
-Pin-Priority: 700
-EOF
-# Important to have newline at end of file <sigh>
-
 list_alias() {
     depend_alias=$1
     debian_pkg=$2
@@ -90,6 +82,10 @@ list_alias() {
 
     sqlite3 /var/cache/cran2deb/cran2deb.db "SELECT * FROM sysreq_override WHERE depend_alias LIKE '$1' OR r_pattern LIKE '$1';"
     sqlite3 /var/cache/cran2deb/cran2deb.db "SELECT * FROM debian_dependency WHERE debian_pkg LIKE '$2' OR alias LIKE '$3';"
+}
+
+remove_local_deb() {
+  reprepro -b /var/www/cran2deb/rep remove rbuilders "$1"
 }
 
 reset_cran2deb() {

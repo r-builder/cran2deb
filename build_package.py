@@ -25,7 +25,6 @@ Codename: rbuilders
 Components: main
 Architectures: source amd64
 Description: Debian Repository
-Limit: 0
 """
 
 _ipak_r_method = """
@@ -53,8 +52,9 @@ _rver_line_re = re.compile(r'rver: (?P<rver>[^ ]+)\s+debian_revision: (?P<debian
 # version_update:  rver: 0.2.20  prev_pkgver: 0.2.20-1cran2  prev_success: TRUE
 _version_update_line_re = re.compile(r'version_update:\s+rver: (?P<rver>[^ ]+)\s+prev_pkgver: (?P<prev_pkgver>[^ ]+)\s+ prev_success: (?P<prev_success>[^ ]+)')
 
-
-_distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf-8').strip()
+_r_version = subprocess.check_output(["dpkg-query", "--showformat=${Version}", "--show", "r-base-core"]).decode('utf-8')
+_distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf-8').strip()  # ex: stretch
+_deb_repo_codename = f'{_distribution}-cran{_r_version[:3].replace(".", "")}'
 
 _num_cpus = multiprocessing.cpu_count()
 
@@ -147,10 +147,10 @@ def _reset_module(pkg_name: PkgName):
 
     subprocess.check_call(["reprepro", "-b", _local_repo_root, "remove", "rbuilders", pkg_name.cran_name.lower(), pkg_name.deb_name.lower(), f"{pkg_name.deb_name.lower()}-dbgsym"])
 
-    response = requests.get(f"https://deb.fbn.org/remove/{_distribution}/{pkg_name.deb_name}")
+    response = requests.get(f"https://deb.fbn.org/remove/{_deb_repo_codename}/{pkg_name.deb_name}")
     assert response.status_code == 200, f"Error removing {pkg_name} from http repo with response code: {response.status_code}"
 
-    response = requests.get(f"https://deb.fbn.org/remove/{_distribution}/{pkg_name.deb_name}-dbgsym")
+    response = requests.get(f"https://deb.fbn.org/remove/{_deb_repo_codename}/{pkg_name.deb_name}-dbgsym")
     assert response.status_code == 200, f"Error removing {pkg_name}-dbgsym from http repo with response code: {response.status_code}"
 
     subprocess.check_call(["apt-get", "remove", pkg_name.deb_name])
@@ -170,9 +170,8 @@ def _ensure_old_versions(old_packages: Dict[str, str]):
     conn.row_factory = sqlite3.Row
 
     scm_revision = subprocess.check_output(['r', '-q', '-e', 'suppressPackageStartupMessages(library(cran2deb));cat(scm_revision)']).decode('utf-8')
-    r_version = subprocess.check_output(["dpkg-query", "--showformat=${Version}", "--show", "r-base-core"]).decode('utf-8')
-
-    if not r_version.startswith("3.4"):
+    if not _r_version.startswith("3.4") and not _r_version.startswith("3.5"):
+        print(f'Unsupported R version: {_r_version}')
         return
 
     print("Checking for old versions")
@@ -375,10 +374,10 @@ class PackageBuilder:
                 if self._deb_repos.http_has_version(pkg_name, version):
                     continue
 
-                print(f"Uploading {pkg_name} with ver: {version} from {deb}")
+                print(f"Uploading {pkg_name} with ver: {version} from {deb} to: {_deb_repo_codename}")
 
                 response = requests.post(
-                    f"https://deb.fbn.org/add/{_distribution}",
+                    f"https://deb.fbn.org/add/{_deb_repo_codename}",
                     files={'deb-file': (os.path.basename(deb), open(deb, "rb"))})
                 assert response.status_code == 200, f"Error with request {response}"
 
