@@ -52,6 +52,8 @@ _rver_line_re = re.compile(r'rver: (?P<rver>[^ ]+)\s+debian_revision: (?P<debian
 # version_update:  rver: 0.2.20  prev_pkgver: 0.2.20-1cran2  prev_success: TRUE
 _version_update_line_re = re.compile(r'version_update:\s+rver: (?P<rver>[^ ]+)\s+prev_pkgver: (?P<prev_pkgver>[^ ]+)\s+ prev_success: (?P<prev_success>[^ ]+)')
 
+_changelog_first_line = re.compile(r'(?P<pkgname>[^ ]+) \((?P<version>[^)]+)\) (?P<eol>.*)')
+
 _r_version = subprocess.check_output(["dpkg-query", "--showformat=${Version}", "--show", "r-base-core"]).decode('utf-8')
 _distribution = subprocess.check_output(["lsb_release", "-c", "-s"]).decode('utf-8').strip()  # ex: stretch
 _deb_repo_codename = f'{_distribution}-cran{_r_version[:3].replace(".", "")}'
@@ -313,6 +315,18 @@ class PackageBuilder:
         pkgs = {pkg.deb_name for pkg in deps}
         subprocess.check_call(['apt-get', 'install', '--no-install-recommends', '-y'] + list(pkgs))
 
+    def _ensure_distribution_in_changelog(self, changelog_path: str):
+        with open(changelog_path, 'r') as f:
+            data = f.read().splitlines()
+
+        m = _changelog_first_line.match(data[0]).groupdict()
+        if f"~{_distribution}" not in data[0]:
+            data[0] = f'{m["pkgname"]} ({m["version"]}~{_distribution}) {m["eol"]}'
+
+        data = os.linesep.join(data)
+        with open(changelog_path, 'w') as f:
+            f.write(data)
+
     def _build_pkg_dsc_and_upload(self, pkg_name: PkgName):
         print(f"Building deb for {pkg_name}")
         dsc_path = _get_pkg_dsc_path(pkg_name)
@@ -354,6 +368,8 @@ class PackageBuilder:
 
                 with open(debian_shlibs_path, "a") as f:
                     f.write("libgdal 20 fbn-libgdal" + os.linesep)
+
+            self._ensure_distribution_in_changelog(os.path.join(dirs[0], "debian", "changelog"))
 
             subprocess.check_call(["debuild", "-us", "-uc"], cwd=dirs[0])
 

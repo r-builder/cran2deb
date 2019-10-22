@@ -58,6 +58,7 @@ export ROOT=$(cran2deb root)
 export ARCH=$(dpkg --print-architecture)
 export SYS="debian-${ARCH}"
 export R_VERSION=$(dpkg-query --showformat='${Version}' --show r-base-core)
+export DIST=$(lsb_release -c -s)
 
 if [[ ! -d "/etc/cran2deb" ]]; then
     mkdir /etc/cran2deb/
