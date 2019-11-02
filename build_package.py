@@ -218,7 +218,7 @@ class DebRepos:
 
         self._http_deb_info: Dict[str, Set[DebVersion]] = defaultdict(set)
 
-        data = requests.get(f"https://deb.fbn.org/list/{_distribution}").json()
+        data = requests.get(f"https://deb.fbn.org/list/{_deb_repo_codename}").json()
 
         for row in data:
             for version in row['versions']:
