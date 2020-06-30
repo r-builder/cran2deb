@@ -110,4 +110,5 @@ sysreq gsl gsl
 sysreq ignore By default
 sysreq ignore library. however
 sysreq ignore if a system installation is not available
-sysreq ignore with s either proj
+sysreq ignore with versions%either (a) proj < 6
+sysreq ignore use the configure%argument %--with-proj_api=%
