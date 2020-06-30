@@ -73,3 +73,6 @@ sysreq ignore subversion for install_svn
 sysreq ignore git for install_git
 sysreq ignore if a system installation is not available
 sysreq ignore builds
+wipe_alias %java% %java% %java%
+alias_build java openjdk-11-jdk
+alias_run java openjdk-11-jre
