@@ -12,10 +12,10 @@ wipe_alias libpng% libpng% libpng%
 sysreq libpng16-16 libpng
 alias_build libpng16-16 libpng-dev
 alias_run libpng16-16 libpng16-16
-sysreq libcurl4-gnutls libcurl
-alias_build libcurl4-gnutls libcurl4-gnutls-dev
-alias_run libcurl4-gnutls libcurl4-gnutls
-sysreq libcurl4-gnutls libcurl: %
+sysreq libcurl4 libcurl
+alias_build libcurl4 libcurl4-openssl-dev
+alias_run libcurl4 libcurl4
+sysreq libcurl4 libcurl: %
 sysreq libicu63 icu4c %
 alias_build libicu63 libicu-dev
 alias_run libicu63 libicu63
