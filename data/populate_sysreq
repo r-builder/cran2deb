@@ -1,112 +1,113 @@
-sysreq ignore gcc 
-sysreq ignore gnu make 
-sysreq ignore % if present 
-sysreq ignore none 
-sysreq libcurl curl 
-sysreq ggobi ggobi 
-sysreq libatk atk 
-sysreq libcairo cairo 
-sysreq libdieharder dieharder% 
-sysreq libfontconfig fontconfig 
-sysreq libfreetype freetype 
-sysreq libfreetype %freetype 
-sysreq libgd libgd 
-sysreq libgdal %gdal% 
-sysreq opengl opengl 
-sysreq glade %glade 
-sysreq glib glib 
-sysreq glu glu library 
-sysreq gmp gmp 
-sysreq libgraphviz graphviz 
-sysreq gsl gnu gsl% 
-sysreq gsl gnu scientific library 
-sysreq libgtk gtk% 
-sysreq libjpeg libjpeg% 
-sysreq libmagick imagemagick 
-sysreq libpango pango 
-sysreq libpng libpng 
-sysreq quantlib quantlib% 
-sysreq libxml libxml% 
-sysreq msttcorefonts msttcorefonts 
-sysreq pari-gp pari/gp 
-sysreq proj proj% 
-sysreq zlib zlib 
-sysreq java java 
-sysreq odbc %odbc% 
-sysreq ignore drivers. see readme. 
-sysreq ignore r must be compiled with --enable-r-shlib if the server is to be built 
-sysreq yacas yacas% 
-sysreq libtiff %libtiff% 
-sysreq ignore zlibdll 
-sysreq ignore jpegdll% 
-sysreq fftw fftw% 
-sysreq python python 
-sysreq ghostscript ghostscript 
-sysreq gsl libgsl 
-sysreq ignore rgl packages for rendering 
-sysreq grass grass 
-sysreq ignore internal files xba.cqv 
-sysreq ignore xba.regions 
-sysreq ignore lammpi or mpich 
-sysreq blas blas 
-sysreq blacs blacs 
-sysreq scalapack scalapack 
-sysreq wordnet wndb-tar.gz% 
-sysreq boost boost% 
-sysreq jags jags 
-sysreq ignore winbugs 
-sysreq ignore posix-compliant os 
-sysreq curl curl% 
-sysreq netcdf netcdf% 
-sysreq udunits udunits% 
-sysreq rgrs xclip 
-sysreq flac flac 
-sysreq perl perl 
-sysreq ignore encode 
-sysreq ignore parse::recdescent 
-sysreq ignore getopt::long 
-sysreq ignore file::basename 
-sysreq ignore spreadsheet::writeexcel 
-sysreq ignore file::glob 
-sysreq writexls-perl text::csv_xs 
-sysreq ignore ant 
-sysreq ignore linux/64bit 
-sysreq ignore linux/bit 
-sysreq tk tcl/tk 
-sysreq tktable tktable 
-sysreq tktable tktable% 
-sysreq ignore optional) 
-sysreq bwidget bwidget 
-sysreq ignore drivers. 
-sysreq graphviz dot graphviz 
-sysreq ignore berkeleydb 
-sysreq mpfr %mpfr% 
-sysreq ignore http://mpfr.org/% 
-sysreq gmp gmp (gnu multiple precision library 
-sysreq ignore see readme 
-sysreq tk-img img 
-sysreq ignore activetcl 
-sysreq libitpp libitpp 
-sysreq libxerces-c libxerces-c 
-sysreq ignore java runtime 
-sysreq protobuf protocol buffer compiler (to create c++ header 
-sysreq ignore Protocol Buffer compiler (% 
-sysreq ignore source files .proto % 
-sysreq ignore library (version 2.2.0 or later) 
-sysreq ignore library 
-sysreq libpng libpng% 
-sysreq postgresql postgresql 
-sysreq postgresql_java postgresql jdbc driver 
-sysreq ignore gmt 
-sysreq armadillo armadillo 
-sysreq java jri 
-sysreq rpcgen rpcgen 
-sysreq ignore lapack_atlas 
-sysreq ignore libgsl0ldbl 
-sysreq ignore libgslldbl 
-sysreq ignore libgsldev 
-sysreq ignore svmlight 
-sysreq gsl gsl 
+sysreq ignore gcc
+sysreq ignore gnu make
+sysreq ignore % if present
+sysreq ignore none
+sysreq libcurl curl
+sysreq ggobi ggobi
+sysreq libatk atk
+sysreq libcairo cairo
+sysreq libdieharder dieharder%
+sysreq libfontconfig fontconfig
+sysreq libfreetype freetype
+sysreq libfreetype %freetype
+sysreq libgd libgd
+sysreq libgdal %gdal%
+sysreq opengl opengl
+sysreq glade %glade
+sysreq glib glib
+sysreq glu glu library
+sysreq gmp gmp
+sysreq libgraphviz graphviz
+sysreq gsl gnu gsl%
+sysreq gsl gnu scientific library
+sysreq libgtk gtk%
+sysreq libjpeg libjpeg%
+sysreq libmagick imagemagick
+sysreq libpango pango
+sysreq libpng libpng
+sysreq quantlib quantlib%
+sysreq libxml libxml%
+sysreq msttcorefonts msttcorefonts
+sysreq pari-gp pari/gp
+sysreq proj proj%
+sysreq zlib zlib
+sysreq java java
+sysreq odbc %odbc%
+sysreq ignore drivers. see readme.
+sysreq ignore r must be compiled with --enable-r-shlib if the server is to be built
+sysreq yacas yacas%
+sysreq libtiff %libtiff%
+sysreq ignore zlibdll
+sysreq ignore jpegdll%
+sysreq fftw fftw%
+sysreq python python
+sysreq ghostscript ghostscript
+sysreq gsl libgsl
+sysreq ignore rgl packages for rendering
+sysreq grass grass
+sysreq ignore internal files xba.cqv
+sysreq ignore xba.regions
+sysreq ignore lammpi or mpich
+sysreq blas blas
+sysreq blacs blacs
+sysreq scalapack scalapack
+sysreq wordnet wndb-tar.gz%
+sysreq boost boost%
+sysreq jags jags
+sysreq ignore winbugs
+sysreq ignore posix-compliant os
+sysreq curl curl%
+sysreq netcdf netcdf%
+sysreq udunits udunits%
+sysreq rgrs xclip
+sysreq flac flac
+sysreq perl perl
+sysreq ignore encode
+sysreq ignore parse::recdescent
+sysreq ignore getopt::long
+sysreq ignore file::basename
+sysreq ignore spreadsheet::writeexcel
+sysreq ignore file::glob
+sysreq writexls-perl text::csv_xs
+sysreq ignore ant
+sysreq ignore linux/64bit
+sysreq ignore linux/bit
+sysreq tk tcl/tk
+sysreq tktable tktable
+sysreq tktable tktable%
+sysreq ignore optional)
+sysreq bwidget bwidget
+sysreq ignore drivers.
+sysreq graphviz dot graphviz
+sysreq ignore berkeleydb
+sysreq mpfr %mpfr%
+sysreq ignore http://mpfr.org/%
+sysreq gmp gmp (gnu multiple precision library
+sysreq ignore see readme
+sysreq tk-img img
+sysreq ignore activetcl
+sysreq libitpp libitpp
+sysreq libxerces-c libxerces-c
+sysreq ignore java runtime
+sysreq protobuf protocol buffer compiler (to create c++ header
+sysreq ignore Protocol Buffer compiler (%
+sysreq ignore source files .proto %
+sysreq ignore library (version 2.2.0 or later)
+sysreq ignore library
+sysreq libpng libpng%
+sysreq postgresql postgresql
+sysreq postgresql_java postgresql jdbc driver
+sysreq ignore gmt
+sysreq armadillo armadillo
+sysreq java jri
+sysreq rpcgen rpcgen
+sysreq ignore lapack_atlas
+sysreq ignore libgsl0ldbl
+sysreq ignore libgslldbl
+sysreq ignore libgsldev
+sysreq ignore svmlight
+sysreq gsl gsl
 sysreq ignore By default
 sysreq ignore library. however
 sysreq ignore if a system installation is not available
+sysreq ignore with s either proj
