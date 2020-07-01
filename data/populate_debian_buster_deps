@@ -77,3 +77,4 @@ wipe_alias %java% %java% %java%
 alias_build java openjdk-11-jdk
 alias_run java openjdk-11-jre
 sysreq java java
+sysreq ignore phantomjs for taking screenshots
